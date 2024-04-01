@@ -69,8 +69,8 @@ class Haptics{
     }
     func playHeightHaptic(height: Float){
         //HEIGHT needs to be scaled proportional to range of heights, to be between 0 and 1
-        let scaledHeight = height - 12
-        print(scaledHeight)
+     //   let scaledHeight = height - 12
+       // print(scaledHeight)
         let hapticDict = [
             CHHapticPattern.Key.pattern: [
                 [
@@ -81,7 +81,7 @@ class Haptics{
                         CHHapticPattern.Key.eventParameters: [
                             [
                                 CHHapticPattern.Key.parameterID: CHHapticEvent.ParameterID.hapticIntensity,
-                                CHHapticPattern.Key.parameterValue: scaledHeight
+                                CHHapticPattern.Key.parameterValue: height
                             ],
                             [
                                 CHHapticPattern.Key.parameterID: CHHapticEvent.ParameterID.hapticSharpness,

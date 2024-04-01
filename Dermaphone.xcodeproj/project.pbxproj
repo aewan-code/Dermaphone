@@ -27,6 +27,24 @@
 		FFB13B412BAF034600A94673 /* testTexture.ahap in Resources */ = {isa = PBXBuildFile; fileRef = FFB13B402BAF034600A94673 /* testTexture.ahap */; };
 		FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13B422BB1D41500A94673 /* Haptics.swift */; };
 		FFB13B4B2BBB0A8B00A94673 /* skinmodel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */; };
+		FFC1CEAA2BBB22AA00FD49B7 /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE942BBB22A900FD49B7 /* ImageLoader.swift */; };
+		FFC1CEAB2BBB22AA00FD49B7 /* Capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE952BBB22A900FD49B7 /* Capture.swift */; };
+		FFC1CEAC2BBB22AA00FD49B7 /* CaptureFoldersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE962BBB22A900FD49B7 /* CaptureFoldersView.swift */; };
+		FFC1CEAD2BBB22AA00FD49B7 /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE972BBB22A900FD49B7 /* CameraPreviewView.swift */; };
+		FFC1CEAE2BBB22AA00FD49B7 /* HelpPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE982BBB22A900FD49B7 /* HelpPageView.swift */; };
+		FFC1CEAF2BBB22AA00FD49B7 /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE992BBB22A900FD49B7 /* CameraViewModel.swift */; };
+		FFC1CEB02BBB22AA00FD49B7 /* InfoPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE9A2BBB22A900FD49B7 /* InfoPanelView.swift */; };
+		FFC1CEB12BBB22AA00FD49B7 /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE9B2BBB22A900FD49B7 /* TimerView.swift */; };
+		FFC1CEB32BBB22AA00FD49B7 /* CaptureSampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE9D2BBB22A900FD49B7 /* CaptureSampleApp.swift */; };
+		FFC1CEB52BBB22AA00FD49B7 /* CaptureGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA02BBB22A900FD49B7 /* CaptureGalleryView.swift */; };
+		FFC1CEB62BBB22AA00FD49B7 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA12BBB22A900FD49B7 /* CameraView.swift */; };
+		FFC1CEB72BBB22AA00FD49B7 /* CaptureInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA22BBB22A900FD49B7 /* CaptureInfo.swift */; };
+		FFC1CEB82BBB22AA00FD49B7 /* PhotoCaptureDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA32BBB22A900FD49B7 /* PhotoCaptureDelegate.swift */; };
+		FFC1CEB92BBB22AA00FD49B7 /* TriggerEveryTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA42BBB22A900FD49B7 /* TriggerEveryTimer.swift */; };
+		FFC1CEBA2BBB22AA00FD49B7 /* LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = FFC1CEA52BBB22A900FD49B7 /* LICENSE.txt */; };
+		FFC1CEBB2BBB22AA00FD49B7 /* CaptureFolderState.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA62BBB22A900FD49B7 /* CaptureFolderState.swift */; };
+		FFC1CEBC2BBB22AA00FD49B7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA72BBB22A900FD49B7 /* ContentView.swift */; };
+		FFC1CEBE2BBB22AA00FD49B7 /* AsyncImageHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +89,24 @@
 		FFB13B402BAF034600A94673 /* testTexture.ahap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = testTexture.ahap; path = ../../FYPTestingTemp/FYPTestingTemp/testTexture.ahap; sourceTree = "<group>"; };
 		FFB13B422BB1D41500A94673 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = skinmodel.swift; sourceTree = "<group>"; };
+		FFC1CE942BBB22A900FD49B7 /* ImageLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
+		FFC1CE952BBB22A900FD49B7 /* Capture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Capture.swift; sourceTree = "<group>"; };
+		FFC1CE962BBB22A900FD49B7 /* CaptureFoldersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureFoldersView.swift; sourceTree = "<group>"; };
+		FFC1CE972BBB22A900FD49B7 /* CameraPreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+		FFC1CE982BBB22A900FD49B7 /* HelpPageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HelpPageView.swift; sourceTree = "<group>"; };
+		FFC1CE992BBB22A900FD49B7 /* CameraViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
+		FFC1CE9A2BBB22A900FD49B7 /* InfoPanelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfoPanelView.swift; sourceTree = "<group>"; };
+		FFC1CE9B2BBB22A900FD49B7 /* TimerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
+		FFC1CE9D2BBB22A900FD49B7 /* CaptureSampleApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureSampleApp.swift; sourceTree = "<group>"; };
+		FFC1CEA02BBB22A900FD49B7 /* CaptureGalleryView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureGalleryView.swift; sourceTree = "<group>"; };
+		FFC1CEA12BBB22A900FD49B7 /* CameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		FFC1CEA22BBB22A900FD49B7 /* CaptureInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureInfo.swift; sourceTree = "<group>"; };
+		FFC1CEA32BBB22A900FD49B7 /* PhotoCaptureDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoCaptureDelegate.swift; sourceTree = "<group>"; };
+		FFC1CEA42BBB22A900FD49B7 /* TriggerEveryTimer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TriggerEveryTimer.swift; sourceTree = "<group>"; };
+		FFC1CEA52BBB22A900FD49B7 /* LICENSE.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
+		FFC1CEA62BBB22A900FD49B7 /* CaptureFolderState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureFolderState.swift; sourceTree = "<group>"; };
+		FFC1CEA72BBB22A900FD49B7 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncImageHelpers.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +157,7 @@
 		FFB13A7F2BAE183600A94673 /* Dermaphone */ = {
 			isa = PBXGroup;
 			children = (
+				FFC1CE932BBB22A900FD49B7 /* CaptureSample */,
 				FFB13A802BAE183600A94673 /* AppDelegate.swift */,
 				FFB13A822BAE183600A94673 /* SceneDelegate.swift */,
 				FFB13A842BAE183600A94673 /* ViewController.swift */,
@@ -167,6 +204,31 @@
 			);
 			name = 3dmodeltest2;
 			path = ../../3dmodeltest2;
+			sourceTree = "<group>";
+		};
+		FFC1CE932BBB22A900FD49B7 /* CaptureSample */ = {
+			isa = PBXGroup;
+			children = (
+				FFC1CE942BBB22A900FD49B7 /* ImageLoader.swift */,
+				FFC1CE952BBB22A900FD49B7 /* Capture.swift */,
+				FFC1CE962BBB22A900FD49B7 /* CaptureFoldersView.swift */,
+				FFC1CE972BBB22A900FD49B7 /* CameraPreviewView.swift */,
+				FFC1CE982BBB22A900FD49B7 /* HelpPageView.swift */,
+				FFC1CE992BBB22A900FD49B7 /* CameraViewModel.swift */,
+				FFC1CE9A2BBB22A900FD49B7 /* InfoPanelView.swift */,
+				FFC1CE9B2BBB22A900FD49B7 /* TimerView.swift */,
+				FFC1CE9D2BBB22A900FD49B7 /* CaptureSampleApp.swift */,
+				FFC1CEA02BBB22A900FD49B7 /* CaptureGalleryView.swift */,
+				FFC1CEA12BBB22A900FD49B7 /* CameraView.swift */,
+				FFC1CEA22BBB22A900FD49B7 /* CaptureInfo.swift */,
+				FFC1CEA32BBB22A900FD49B7 /* PhotoCaptureDelegate.swift */,
+				FFC1CEA42BBB22A900FD49B7 /* TriggerEveryTimer.swift */,
+				FFC1CEA52BBB22A900FD49B7 /* LICENSE.txt */,
+				FFC1CEA62BBB22A900FD49B7 /* CaptureFolderState.swift */,
+				FFC1CEA72BBB22A900FD49B7 /* ContentView.swift */,
+				FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */,
+			);
+			path = CaptureSample;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -276,6 +338,7 @@
 				FFB13A8D2BAE183800A94673 /* LaunchScreen.storyboard in Resources */,
 				FFB13B2E2BAE1CE500A94673 /* baked_mesh_norm0.png in Resources */,
 				FFB13B322BAE1CE500A94673 /* baked_mesh.obj in Resources */,
+				FFC1CEBA2BBB22AA00FD49B7 /* LICENSE.txt in Resources */,
 				FFB13B3D2BAEFA3500A94673 /* baked_mesh.scn in Resources */,
 				FFB13A8A2BAE183800A94673 /* Assets.xcassets in Resources */,
 				FFB13B412BAF034600A94673 /* testTexture.ahap in Resources */,
@@ -310,10 +373,27 @@
 			buildActionMask = 2147483647;
 			files = (
 				FFB13B4B2BBB0A8B00A94673 /* skinmodel.swift in Sources */,
+				FFC1CEB92BBB22AA00FD49B7 /* TriggerEveryTimer.swift in Sources */,
+				FFC1CEBC2BBB22AA00FD49B7 /* ContentView.swift in Sources */,
+				FFC1CEAC2BBB22AA00FD49B7 /* CaptureFoldersView.swift in Sources */,
+				FFC1CEB52BBB22AA00FD49B7 /* CaptureGalleryView.swift in Sources */,
+				FFC1CEBB2BBB22AA00FD49B7 /* CaptureFolderState.swift in Sources */,
+				FFC1CEAE2BBB22AA00FD49B7 /* HelpPageView.swift in Sources */,
+				FFC1CEAD2BBB22AA00FD49B7 /* CameraPreviewView.swift in Sources */,
 				FFB13A852BAE183600A94673 /* ViewController.swift in Sources */,
+				FFC1CEB82BBB22AA00FD49B7 /* PhotoCaptureDelegate.swift in Sources */,
+				FFC1CEB12BBB22AA00FD49B7 /* TimerView.swift in Sources */,
+				FFC1CEB72BBB22AA00FD49B7 /* CaptureInfo.swift in Sources */,
+				FFC1CEB02BBB22AA00FD49B7 /* InfoPanelView.swift in Sources */,
+				FFC1CEAA2BBB22AA00FD49B7 /* ImageLoader.swift in Sources */,
+				FFC1CEB32BBB22AA00FD49B7 /* CaptureSampleApp.swift in Sources */,
 				FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */,
+				FFC1CEAF2BBB22AA00FD49B7 /* CameraViewModel.swift in Sources */,
+				FFC1CEAB2BBB22AA00FD49B7 /* Capture.swift in Sources */,
+				FFC1CEBE2BBB22AA00FD49B7 /* AsyncImageHelpers.swift in Sources */,
 				FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */,
 				FFB13A832BAE183600A94673 /* SceneDelegate.swift in Sources */,
+				FFC1CEB62BBB22AA00FD49B7 /* CameraView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -24,9 +24,9 @@
 		FFB13B332BAE1CE500A94673 /* baked_mesh.usda in Resources */ = {isa = PBXBuildFile; fileRef = FFB13B2D2BAE1CE500A94673 /* baked_mesh.usda */; };
 		FFB13B3B2BAEF9D400A94673 /* baked_mesh.scn in Resources */ = {isa = PBXBuildFile; fileRef = FFB13B3A2BAEF9D400A94673 /* baked_mesh.scn */; };
 		FFB13B3D2BAEFA3500A94673 /* baked_mesh.scn in Resources */ = {isa = PBXBuildFile; fileRef = FFB13B3C2BAEFA3500A94673 /* baked_mesh.scn */; };
-		FFB13B3F2BAF033400A94673 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13B3E2BAF033400A94673 /* Haptics.swift */; };
 		FFB13B412BAF034600A94673 /* testTexture.ahap in Resources */ = {isa = PBXBuildFile; fileRef = FFB13B402BAF034600A94673 /* testTexture.ahap */; };
 		FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13B422BB1D41500A94673 /* Haptics.swift */; };
+		FFB13B4B2BBB0A8B00A94673 /* skinmodel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,9 +68,9 @@
 		FFB13B2D2BAE1CE500A94673 /* baked_mesh.usda */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = baked_mesh.usda; sourceTree = "<group>"; };
 		FFB13B3A2BAEF9D400A94673 /* baked_mesh.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = baked_mesh.scn; sourceTree = "<group>"; };
 		FFB13B3C2BAEFA3500A94673 /* baked_mesh.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = baked_mesh.scn; sourceTree = "<group>"; };
-		FFB13B3E2BAF033400A94673 /* Haptics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Haptics.swift; path = ../../FYPTestingTemp/FYPTestingTemp/Haptics.swift; sourceTree = "<group>"; };
 		FFB13B402BAF034600A94673 /* testTexture.ahap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = testTexture.ahap; path = ../../FYPTestingTemp/FYPTestingTemp/testTexture.ahap; sourceTree = "<group>"; };
 		FFB13B422BB1D41500A94673 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = skinmodel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,8 +124,8 @@
 				FFB13A802BAE183600A94673 /* AppDelegate.swift */,
 				FFB13A822BAE183600A94673 /* SceneDelegate.swift */,
 				FFB13A842BAE183600A94673 /* ViewController.swift */,
+				FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */,
 				FFB13B402BAF034600A94673 /* testTexture.ahap */,
-				FFB13B3E2BAF033400A94673 /* Haptics.swift */,
 				FFB13B422BB1D41500A94673 /* Haptics.swift */,
 				FFB13B272BAE1CE500A94673 /* 3dmodeltest2 */,
 				FFB13A862BAE183600A94673 /* Main.storyboard */,
@@ -309,7 +309,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FFB13B3F2BAF033400A94673 /* Haptics.swift in Sources */,
+				FFB13B4B2BBB0A8B00A94673 /* skinmodel.swift in Sources */,
 				FFB13A852BAE183600A94673 /* ViewController.swift in Sources */,
 				FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */,
 				FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */,

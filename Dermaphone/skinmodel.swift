@@ -14,9 +14,9 @@ import CoreHaptics
 import SwiftUI
 
 class skinmodel: UIViewController{
-    @StateObject var currentModelName = currentModel()
-    var modelName: String = "baked_mesh.scn"
-
+   // @StateObject var currentModelName = currentModel()
+    var modelName: String = "baked_mesh"
+    var modelFile : String = "baked_mesh.scn"
     /*init(modelName: String) {
             self.modelName = modelName
             self.scene = SCNScene(named: self.modelName)!
@@ -46,13 +46,14 @@ class skinmodel: UIViewController{
         super.viewDidLoad()
         print("hi")
         currentView = view
-        self.modelName = currentModelName.name
+        //self.modelName = currentModelName.name
         print(self.modelName)
-        scene = SCNScene(named: self.modelName)
-        
+        print(self.modelFile)
+        scene = SCNScene(named: self.modelFile)
+
         print(scene?.rootNode.name)
         //print(scene?.rootNode.name)
-        guard let baseNode = scene?.rootNode.childNode(withName: "baked_mesh", recursively: true) else {
+        guard let baseNode = scene?.rootNode.childNode(withName: modelName, recursively: true) else {
                     fatalError("Unable to find baseNode")
                 }
         // Create and configure a haptic engine.
@@ -185,7 +186,7 @@ class skinmodel: UIViewController{
 
         // Check if the desired node is touched
         for result in hitTestResults {
-            if result.node.name == "baked_mesh" {
+            if result.node.name == self.modelName {
                 // Node is touched, perform desired action
          //       print("Node is touched!")
                 // Example: Change color of the node
@@ -227,6 +228,12 @@ class skinmodel: UIViewController{
         }
         
         
+    }
+    
+    func set(name : String){
+        self.modelName = name
+        self.modelFile = name + ".scn"
+        scene = SCNScene(named: self.modelFile)//do i need to deallocate the current scene?
     }
             
             

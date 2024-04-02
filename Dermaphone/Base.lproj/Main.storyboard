@@ -23,7 +23,7 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="View Model"/>
                                 <connections>
-                                    <segue destination="X5O-8l-ZCr" kind="show" id="M40-v1-HQS"/>
+                                    <action selector="touchViewModel:" destination="BYZ-38-t0r" eventType="touchUpInside" id="C0W-fh-40Y"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NLQ-ER-qJQ">
@@ -78,7 +78,7 @@
         <!--Skinmodel-->
         <scene sceneID="MXR-n8-ezY">
             <objects>
-                <viewController id="X5O-8l-ZCr" customClass="skinmodel" customModule="Dermaphone" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="skinmodel" id="X5O-8l-ZCr" customClass="skinmodel" customModule="Dermaphone" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Vqb-kX-A4l">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

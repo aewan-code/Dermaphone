@@ -216,6 +216,7 @@
 		FFB13B272BAE1CE500A94673 /* 3dmodeltest2 */ = {
 			isa = PBXGroup;
 			children = (
+				FFF154D02BBC472800834F38 /* skin2.scn */,
 				FFB13B282BAE1CE500A94673 /* baked_mesh_norm0.png */,
 				FFB13B292BAE1CE500A94673 /* baked_mesh.mtl */,
 				FFB13B2A2BAE1CE500A94673 /* baked_mesh_ao0.png */,
@@ -257,9 +258,11 @@
 		FFF154C12BBC375700834F38 /* 3dmodelSkin2 */ = {
 			isa = PBXGroup;
 			children = (
+				FFF154D12BBC474A00834F38 /* skin2.scn */,
 				FFF154C22BBC375700834F38 /* skin2.obj */,
 				FFF154C32BBC375700834F38 /* skin2_norm0.png */,
 				FFF154C42BBC375700834F38 /* skin2.usda */,
+				FFF154D52BBC549B00834F38 /* skin2.scn */,
 				FFF154CE2BBC377D00834F38 /* skin2.scn */,
 				FFF154C52BBC375700834F38 /* skin2_ao0.png */,
 				FFF154C62BBC375700834F38 /* skin2.mtl */,
@@ -385,6 +388,7 @@
 				FFF154CF2BBC377D00834F38 /* skin2.scn in Resources */,
 				FFB13B412BAF034600A94673 /* testTexture.ahap in Resources */,
 				FFB13B2F2BAE1CE500A94673 /* baked_mesh.mtl in Resources */,
+				FFF154D62BBC549B00834F38 /* skin2.scn in Resources */,
 				FFB13B3B2BAEF9D400A94673 /* baked_mesh.scn in Resources */,
 				FFB13B312BAE1CE500A94673 /* baked_mesh_tex0.png in Resources */,
 				FFB13A882BAE183600A94673 /* Main.storyboard in Resources */,

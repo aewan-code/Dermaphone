@@ -120,6 +120,20 @@ struct ScanToolbarView: View {
                     Image(systemName: "questionmark.circle")
                         .foregroundColor(Color.blue)
                 }
+                Spacer()
+                Button(action: {
+                    print("Pressed Done!")
+                    withAnimation {
+                        let inputFolder = model.captureFolderState?.captureDir?.absoluteString
+                        let outputFile = CaptureFolderState.createModelDirectory()?.absoluteString
+                        let photogrammetry = HelloPhotogrammetry.init(inputFolder: inputFolder!, outputFilename: outputFile!)
+                        photogrammetry.run()
+
+                    }
+                }) {
+                    Text("Done")
+                        .foregroundColor(Color.blue)
+                }
             }
             
             if showInfo {

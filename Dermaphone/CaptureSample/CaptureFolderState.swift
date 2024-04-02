@@ -149,6 +149,41 @@ class CaptureFolderState: ObservableObject {
         return newCaptureDir
     }
     
+    /// This method attempts to create a capture directory for the output photogrammetry model from the images. It names
+    /// the subfolder based on the current time. If it's unable to create the directory, this method returns `nil`.
+    static func createModelDirectory() -> URL? {
+        // The app's Info.plist file enables sharing, which makes the app's
+        // documents directory visible in the Files app and allows sharing
+        // using AirDrop, Mail, or iCloud.
+        guard let capturesFolder = CaptureFolderState.capturesFolder() else {
+            logger.error("Can't get user document dir!")
+            return nil
+        }
+        
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .medium
+        let timestamp = formatter.string(from: Date())
+        let newCaptureDir = capturesFolder
+            .appendingPathComponent(timestamp + "model/", isDirectory: true)
+        
+        logger.log("Creating capture path: \"\(String(describing: newCaptureDir))\"")
+        let capturePath = newCaptureDir.path
+        do {
+            try FileManager.default.createDirectory(atPath: capturePath,
+                                                    withIntermediateDirectories: true)
+        } catch {
+            logger.error("Failed to create capturepath=\"\(capturePath)\" error=\(String(describing: error))")
+        }
+        var isDir: ObjCBool = false
+        let exists = FileManager.default.fileExists(atPath: capturePath, isDirectory: &isDir)
+        guard exists && isDir.boolValue else {
+            return nil
+        }
+        return newCaptureDir
+    }
+    
     /// This method returns a `Future` instance that's populated with a list of capture folders sorted by creation date.
     static func requestCaptureFolderListing() -> Future<[URL], Never> {
         let future = Future<[URL], Never> { promise in

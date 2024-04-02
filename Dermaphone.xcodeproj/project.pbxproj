@@ -45,6 +45,7 @@
 		FFC1CEBB2BBB22AA00FD49B7 /* CaptureFolderState.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA62BBB22A900FD49B7 /* CaptureFolderState.swift */; };
 		FFC1CEBC2BBB22AA00FD49B7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA72BBB22A900FD49B7 /* ContentView.swift */; };
 		FFC1CEBE2BBB22AA00FD49B7 /* AsyncImageHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */; };
+		FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +108,8 @@
 		FFC1CEA62BBB22A900FD49B7 /* CaptureFolderState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureFolderState.swift; sourceTree = "<group>"; };
 		FFC1CEA72BBB22A900FD49B7 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncImageHelpers.swift; sourceTree = "<group>"; };
+		FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = photogrammetryAPI.swift; sourceTree = "<group>"; };
+		FFF1548C2BBC30F300834F38 /* baked_mesh.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = baked_mesh.scn; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +140,7 @@
 		FFB13A742BAE183600A94673 = {
 			isa = PBXGroup;
 			children = (
+				FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */,
 				FFB13A7F2BAE183600A94673 /* Dermaphone */,
 				FFB13A962BAE183800A94673 /* DermaphoneTests */,
 				FFB13AA02BAE183800A94673 /* DermaphoneUITests */,
@@ -164,6 +168,7 @@
 				FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */,
 				FFB13B402BAF034600A94673 /* testTexture.ahap */,
 				FFB13B422BB1D41500A94673 /* Haptics.swift */,
+				FFF1548C2BBC30F300834F38 /* baked_mesh.scn */,
 				FFB13B272BAE1CE500A94673 /* 3dmodeltest2 */,
 				FFB13A862BAE183600A94673 /* Main.storyboard */,
 				FFB13A892BAE183800A94673 /* Assets.xcassets */,
@@ -386,6 +391,7 @@
 				FFC1CEB72BBB22AA00FD49B7 /* CaptureInfo.swift in Sources */,
 				FFC1CEB02BBB22AA00FD49B7 /* InfoPanelView.swift in Sources */,
 				FFC1CEAA2BBB22AA00FD49B7 /* ImageLoader.swift in Sources */,
+				FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */,
 				FFC1CEB32BBB22AA00FD49B7 /* CaptureSampleApp.swift in Sources */,
 				FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */,
 				FFC1CEAF2BBB22AA00FD49B7 /* CameraViewModel.swift in Sources */,
@@ -583,7 +589,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -612,7 +618,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

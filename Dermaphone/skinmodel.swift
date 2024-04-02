@@ -11,16 +11,27 @@ import UIKit
 import SceneKit
 import RealityKit
 import CoreHaptics
+import SwiftUI
 
-class skinmodel: UIViewController {
+class skinmodel: UIViewController{
+   // @StateObject var currentModelName = currentModel()
+    var modelName: String = "baked_mesh"
+
+    /*init(modelName: String) {
+            self.modelName = modelName
+            self.scene = SCNScene(named: self.modelName)!
+            super.init(nibName: nil, bundle: nil)
+        }
     
-    var arView: ARView!
-    var nodeModel: SCNNode!
-    let nodeName = "skin"
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("This class does not support NSCoder")
+    }*/
 
-     let sceneView = SCNView()
+
+    let sceneView = SCNView()
     let cameraNode = SCNNode()
-    let scene = SCNScene(named: "baked_mesh.scn")
+    var scene : SCNScene?
     var currentView: UIView!
     var tempHaptics : Haptics?
     var engine: CHHapticEngine!
@@ -35,7 +46,13 @@ class skinmodel: UIViewController {
         super.viewDidLoad()
         print("hi")
         currentView = view
+      //  self.modelName = currentModelName.name
+        print(self.modelName)
+        scene = SCNScene(named: self.modelName)
         
+        print(scene?.rootNode.name)
+        scene = SCNScene(named: "baked_mesh")
+        print(scene?.rootNode.name)
         guard let baseNode = scene?.rootNode.childNode(withName: "baked_mesh", recursively: true) else {
                     fatalError("Unable to find baseNode")
                 }
@@ -72,12 +89,13 @@ class skinmodel: UIViewController {
         ambientLight.color = UIColor.white // Adjust the light color as needed
         let ambientLightNode = SCNNode()
         ambientLightNode.light = ambientLight
-        scene!.rootNode.addChildNode(ambientLightNode)
+        scene?.rootNode.addChildNode(ambientLightNode)
         
         cameraNode.camera = SCNCamera()
+        //cameraNode.position =
         sceneView.cameraControlConfiguration.allowsTranslation = false
      //   sceneView.scene?.rootNode.eulerAngles = SCNVector3(x: 0, y: 0, z: 0)
-        scene!.rootNode.addChildNode(cameraNode)
+        scene?.rootNode.addChildNode(cameraNode)
         //self.view = sceneView
         view.addSubview(sceneView)
         inspectMaterials(in: scene!.rootNode)

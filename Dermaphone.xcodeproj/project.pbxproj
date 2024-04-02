@@ -46,6 +46,13 @@
 		FFC1CEBC2BBB22AA00FD49B7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA72BBB22A900FD49B7 /* ContentView.swift */; };
 		FFC1CEBE2BBB22AA00FD49B7 /* AsyncImageHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */; };
 		FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */; };
+		FFF154C82BBC375700834F38 /* skin2.obj in Resources */ = {isa = PBXBuildFile; fileRef = FFF154C22BBC375700834F38 /* skin2.obj */; };
+		FFF154C92BBC375700834F38 /* skin2_norm0.png in Resources */ = {isa = PBXBuildFile; fileRef = FFF154C32BBC375700834F38 /* skin2_norm0.png */; };
+		FFF154CA2BBC375700834F38 /* skin2.usda in Resources */ = {isa = PBXBuildFile; fileRef = FFF154C42BBC375700834F38 /* skin2.usda */; };
+		FFF154CB2BBC375700834F38 /* skin2_ao0.png in Resources */ = {isa = PBXBuildFile; fileRef = FFF154C52BBC375700834F38 /* skin2_ao0.png */; };
+		FFF154CC2BBC375700834F38 /* skin2.mtl in Resources */ = {isa = PBXBuildFile; fileRef = FFF154C62BBC375700834F38 /* skin2.mtl */; };
+		FFF154CD2BBC375700834F38 /* skin2_tex0.png in Resources */ = {isa = PBXBuildFile; fileRef = FFF154C72BBC375700834F38 /* skin2_tex0.png */; };
+		FFF154CF2BBC377D00834F38 /* skin2.scn in Resources */ = {isa = PBXBuildFile; fileRef = FFF154CE2BBC377D00834F38 /* skin2.scn */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -110,6 +117,13 @@
 		FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncImageHelpers.swift; sourceTree = "<group>"; };
 		FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = photogrammetryAPI.swift; sourceTree = "<group>"; };
 		FFF1548C2BBC30F300834F38 /* baked_mesh.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = baked_mesh.scn; sourceTree = "<group>"; };
+		FFF154C22BBC375700834F38 /* skin2.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = skin2.obj; sourceTree = "<group>"; };
+		FFF154C32BBC375700834F38 /* skin2_norm0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = skin2_norm0.png; sourceTree = "<group>"; };
+		FFF154C42BBC375700834F38 /* skin2.usda */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = skin2.usda; sourceTree = "<group>"; };
+		FFF154C52BBC375700834F38 /* skin2_ao0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = skin2_ao0.png; sourceTree = "<group>"; };
+		FFF154C62BBC375700834F38 /* skin2.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = skin2.mtl; sourceTree = "<group>"; };
+		FFF154C72BBC375700834F38 /* skin2_tex0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = skin2_tex0.png; sourceTree = "<group>"; };
+		FFF154CE2BBC377D00834F38 /* skin2.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = skin2.scn; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,6 +154,7 @@
 		FFB13A742BAE183600A94673 = {
 			isa = PBXGroup;
 			children = (
+				FFF154C12BBC375700834F38 /* 3dmodelSkin2 */,
 				FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */,
 				FFB13A7F2BAE183600A94673 /* Dermaphone */,
 				FFB13A962BAE183800A94673 /* DermaphoneTests */,
@@ -234,6 +249,20 @@
 				FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */,
 			);
 			path = CaptureSample;
+			sourceTree = "<group>";
+		};
+		FFF154C12BBC375700834F38 /* 3dmodelSkin2 */ = {
+			isa = PBXGroup;
+			children = (
+				FFF154C22BBC375700834F38 /* skin2.obj */,
+				FFF154C32BBC375700834F38 /* skin2_norm0.png */,
+				FFF154C42BBC375700834F38 /* skin2.usda */,
+				FFF154CE2BBC377D00834F38 /* skin2.scn */,
+				FFF154C52BBC375700834F38 /* skin2_ao0.png */,
+				FFF154C62BBC375700834F38 /* skin2.mtl */,
+				FFF154C72BBC375700834F38 /* skin2_tex0.png */,
+			);
+			path = 3dmodelSkin2;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -340,17 +369,24 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FFF154CB2BBC375700834F38 /* skin2_ao0.png in Resources */,
+				FFF154CC2BBC375700834F38 /* skin2.mtl in Resources */,
 				FFB13A8D2BAE183800A94673 /* LaunchScreen.storyboard in Resources */,
+				FFF154CD2BBC375700834F38 /* skin2_tex0.png in Resources */,
 				FFB13B2E2BAE1CE500A94673 /* baked_mesh_norm0.png in Resources */,
 				FFB13B322BAE1CE500A94673 /* baked_mesh.obj in Resources */,
 				FFC1CEBA2BBB22AA00FD49B7 /* LICENSE.txt in Resources */,
 				FFB13B3D2BAEFA3500A94673 /* baked_mesh.scn in Resources */,
+				FFF154C82BBC375700834F38 /* skin2.obj in Resources */,
 				FFB13A8A2BAE183800A94673 /* Assets.xcassets in Resources */,
+				FFF154CF2BBC377D00834F38 /* skin2.scn in Resources */,
 				FFB13B412BAF034600A94673 /* testTexture.ahap in Resources */,
 				FFB13B2F2BAE1CE500A94673 /* baked_mesh.mtl in Resources */,
 				FFB13B3B2BAEF9D400A94673 /* baked_mesh.scn in Resources */,
 				FFB13B312BAE1CE500A94673 /* baked_mesh_tex0.png in Resources */,
 				FFB13A882BAE183600A94673 /* Main.storyboard in Resources */,
+				FFF154CA2BBC375700834F38 /* skin2.usda in Resources */,
+				FFF154C92BBC375700834F38 /* skin2_norm0.png in Resources */,
 				FFB13B302BAE1CE500A94673 /* baked_mesh_ao0.png in Resources */,
 				FFB13B332BAE1CE500A94673 /* baked_mesh.usda in Resources */,
 			);

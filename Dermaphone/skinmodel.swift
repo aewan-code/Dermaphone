@@ -14,8 +14,8 @@ import CoreHaptics
 import SwiftUI
 
 class skinmodel: UIViewController{
-   // @StateObject var currentModelName = currentModel()
-    var modelName: String = "baked_mesh"
+    @StateObject var currentModelName = currentModel()
+    var modelName: String = "baked_mesh.scn"
 
     /*init(modelName: String) {
             self.modelName = modelName
@@ -46,13 +46,12 @@ class skinmodel: UIViewController{
         super.viewDidLoad()
         print("hi")
         currentView = view
-      //  self.modelName = currentModelName.name
+        self.modelName = currentModelName.name
         print(self.modelName)
         scene = SCNScene(named: self.modelName)
         
         print(scene?.rootNode.name)
-        scene = SCNScene(named: "baked_mesh")
-        print(scene?.rootNode.name)
+        //print(scene?.rootNode.name)
         guard let baseNode = scene?.rootNode.childNode(withName: "baked_mesh", recursively: true) else {
                     fatalError("Unable to find baseNode")
                 }

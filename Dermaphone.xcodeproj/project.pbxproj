@@ -54,6 +54,7 @@
 		FFF154CD2BBC375700834F38 /* skin2_tex0.png in Resources */ = {isa = PBXBuildFile; fileRef = FFF154C72BBC375700834F38 /* skin2_tex0.png */; };
 		FFF154CF2BBC377D00834F38 /* skin2.scn in Resources */ = {isa = PBXBuildFile; fileRef = FFF154CE2BBC377D00834F38 /* skin2.scn */; };
 		FFF154E02BBC8C3100834F38 /* SkinCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF154DF2BBC8C3100834F38 /* SkinCondition.swift */; };
+		FFF154E22BBC986900834F38 /* skinConditionInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF154E12BBC986900834F38 /* skinConditionInfoView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -126,6 +127,7 @@
 		FFF154C72BBC375700834F38 /* skin2_tex0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = skin2_tex0.png; sourceTree = "<group>"; };
 		FFF154CE2BBC377D00834F38 /* skin2.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = skin2.scn; sourceTree = "<group>"; };
 		FFF154DF2BBC8C3100834F38 /* SkinCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinCondition.swift; sourceTree = "<group>"; };
+		FFF154E12BBC986900834F38 /* skinConditionInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = skinConditionInfoView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,6 +185,7 @@
 				FFF154DF2BBC8C3100834F38 /* SkinCondition.swift */,
 				FFB13A822BAE183600A94673 /* SceneDelegate.swift */,
 				FFB13A842BAE183600A94673 /* ViewController.swift */,
+				FFF154E12BBC986900834F38 /* skinConditionInfoView.swift */,
 				FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */,
 				FFB13B402BAF034600A94673 /* testTexture.ahap */,
 				FFB13B422BB1D41500A94673 /* Haptics.swift */,
@@ -216,7 +219,6 @@
 		FFB13B272BAE1CE500A94673 /* 3dmodeltest2 */ = {
 			isa = PBXGroup;
 			children = (
-				FFF154D02BBC472800834F38 /* skin2.scn */,
 				FFB13B282BAE1CE500A94673 /* baked_mesh_norm0.png */,
 				FFB13B292BAE1CE500A94673 /* baked_mesh.mtl */,
 				FFB13B2A2BAE1CE500A94673 /* baked_mesh_ao0.png */,
@@ -258,11 +260,9 @@
 		FFF154C12BBC375700834F38 /* 3dmodelSkin2 */ = {
 			isa = PBXGroup;
 			children = (
-				FFF154D12BBC474A00834F38 /* skin2.scn */,
 				FFF154C22BBC375700834F38 /* skin2.obj */,
 				FFF154C32BBC375700834F38 /* skin2_norm0.png */,
 				FFF154C42BBC375700834F38 /* skin2.usda */,
-				FFF154D52BBC549B00834F38 /* skin2.scn */,
 				FFF154CE2BBC377D00834F38 /* skin2.scn */,
 				FFF154C52BBC375700834F38 /* skin2_ao0.png */,
 				FFF154C62BBC375700834F38 /* skin2.mtl */,
@@ -388,7 +388,6 @@
 				FFF154CF2BBC377D00834F38 /* skin2.scn in Resources */,
 				FFB13B412BAF034600A94673 /* testTexture.ahap in Resources */,
 				FFB13B2F2BAE1CE500A94673 /* baked_mesh.mtl in Resources */,
-				FFF154D62BBC549B00834F38 /* skin2.scn in Resources */,
 				FFB13B3B2BAEF9D400A94673 /* baked_mesh.scn in Resources */,
 				FFB13B312BAE1CE500A94673 /* baked_mesh_tex0.png in Resources */,
 				FFB13A882BAE183600A94673 /* Main.storyboard in Resources */,
@@ -433,6 +432,7 @@
 				FFF154E02BBC8C3100834F38 /* SkinCondition.swift in Sources */,
 				FFC1CEB12BBB22AA00FD49B7 /* TimerView.swift in Sources */,
 				FFC1CEB72BBB22AA00FD49B7 /* CaptureInfo.swift in Sources */,
+				FFF154E22BBC986900834F38 /* skinConditionInfoView.swift in Sources */,
 				FFC1CEB02BBB22AA00FD49B7 /* InfoPanelView.swift in Sources */,
 				FFC1CEAA2BBB22AA00FD49B7 /* ImageLoader.swift in Sources */,
 				FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */,

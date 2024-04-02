@@ -53,6 +53,7 @@
 		FFF154CC2BBC375700834F38 /* skin2.mtl in Resources */ = {isa = PBXBuildFile; fileRef = FFF154C62BBC375700834F38 /* skin2.mtl */; };
 		FFF154CD2BBC375700834F38 /* skin2_tex0.png in Resources */ = {isa = PBXBuildFile; fileRef = FFF154C72BBC375700834F38 /* skin2_tex0.png */; };
 		FFF154CF2BBC377D00834F38 /* skin2.scn in Resources */ = {isa = PBXBuildFile; fileRef = FFF154CE2BBC377D00834F38 /* skin2.scn */; };
+		FFF154E02BBC8C3100834F38 /* SkinCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF154DF2BBC8C3100834F38 /* SkinCondition.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -124,6 +125,7 @@
 		FFF154C62BBC375700834F38 /* skin2.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = skin2.mtl; sourceTree = "<group>"; };
 		FFF154C72BBC375700834F38 /* skin2_tex0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = skin2_tex0.png; sourceTree = "<group>"; };
 		FFF154CE2BBC377D00834F38 /* skin2.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = skin2.scn; sourceTree = "<group>"; };
+		FFF154DF2BBC8C3100834F38 /* SkinCondition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkinCondition.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +180,7 @@
 			children = (
 				FFC1CE932BBB22A900FD49B7 /* CaptureSample */,
 				FFB13A802BAE183600A94673 /* AppDelegate.swift */,
+				FFF154DF2BBC8C3100834F38 /* SkinCondition.swift */,
 				FFB13A822BAE183600A94673 /* SceneDelegate.swift */,
 				FFB13A842BAE183600A94673 /* ViewController.swift */,
 				FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */,
@@ -423,6 +426,7 @@
 				FFC1CEAD2BBB22AA00FD49B7 /* CameraPreviewView.swift in Sources */,
 				FFB13A852BAE183600A94673 /* ViewController.swift in Sources */,
 				FFC1CEB82BBB22AA00FD49B7 /* PhotoCaptureDelegate.swift in Sources */,
+				FFF154E02BBC8C3100834F38 /* SkinCondition.swift in Sources */,
 				FFC1CEB12BBB22AA00FD49B7 /* TimerView.swift in Sources */,
 				FFC1CEB72BBB22AA00FD49B7 /* CaptureInfo.swift in Sources */,
 				FFC1CEB02BBB22AA00FD49B7 /* InfoPanelView.swift in Sources */,

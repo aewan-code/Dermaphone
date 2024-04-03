@@ -355,9 +355,13 @@ class ViewController: UIViewController {
         yScale.isHidden = true
         zScale.isHidden = true
         zLabel.isHidden = true
+        xScale.value = 0
+        yScale.value = 0
+        zScale.value = 0
         RotateToggle.isHidden = false
         SelectPivot.isHidden = false
         sceneView.debugOptions = [.showCreases]
+        
     }
     @IBAction func cancelPressed(_ sender: Any) {
         sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation = originalOrientation!
@@ -365,7 +369,6 @@ class ViewController: UIViewController {
     }
     
     @IBAction func completePressed(_ sender: Any) {
-        originalOrientation = sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation
         showOriginalView()
     }
     @IBAction func xChanged(_ sender: Any) {//FIX SO THAT DIRECTION OF USER'S FINGER ON THE SLIDER IS WHAT AFFECTS THE SPINNING DIRECTION

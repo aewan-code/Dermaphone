@@ -12,6 +12,18 @@ import CoreHaptics
 
 class ViewController: UIViewController {
     
+    
+    @IBOutlet weak var zScale: UISlider!
+    
+    @IBOutlet weak var yScale: UISlider!
+    
+    @IBOutlet weak var xScale: UISlider!
+    @IBOutlet weak var zLabel: UILabel!
+    @IBOutlet weak var yLabel: UILabel!
+    @IBOutlet weak var xLabel: UILabel!
+    @IBOutlet weak var completeEdit: UIBarButtonItem!
+
+    @IBOutlet weak var cancelEdit: UIButton!
     var arView: ARView!
     var nodeModel: SCNNode!
     let nodeName = "skin"
@@ -89,8 +101,25 @@ class ViewController: UIViewController {
     //    let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didPan(_:)))
       //  sceneView.addGestureRecognizer(panGestureRecognizer)
         
+        //Add to function
         view.bringSubviewToFront(RotateToggle)
         view.bringSubviewToFront(SelectPivot)
+
+        view.bringSubviewToFront(xLabel)
+        view.bringSubviewToFront(yLabel)
+        view.bringSubviewToFront(zLabel)
+        view.bringSubviewToFront(xScale)
+        view.bringSubviewToFront(yScale)
+        view.bringSubviewToFront(zScale)
+        xLabel.isHidden = true
+        yLabel.isHidden = true
+        zLabel.isHidden = true
+        xScale.isHidden = true
+        yScale.isHidden = true
+        zScale.isHidden = true
+
+        cancelEdit.isHidden = true
+        completeEdit.isHidden = true
         
         changePivot = false
         print("ALEERA")
@@ -230,6 +259,23 @@ class ViewController: UIViewController {
         
     }
     @IBAction func pivotButtonPressed(_ sender: Any) {
+        cancelEdit.isHidden = false
+        completeEdit.isHidden = false
+        xLabel.isHidden = false
+        yLabel.isHidden = false
+        zLabel.isHidden = false
+        xScale.isHidden = false
+        yScale.isHidden = false
+        zScale.isHidden = false
+        RotateToggle.isHidden = true
+        SelectPivot.isHidden = true
+        sceneView.debugOptions = SCNDebugOptions(rawValue: 2048)//shows the grid
+        
+       /* let q = SCNQuaternion(0, 0, (sqrt(2)/2), (sqrt(2)/2))
+        //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
+        sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
+        print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
+        */
   /*      if !changePivot{
             changePivot = true
             rotationOn = false
@@ -297,6 +343,73 @@ class ViewController: UIViewController {
        // let distance = 1.0// Calculate distance between point and plane using plane equation
         return distance
     }
+    func showOriginalView(){
+        cancelEdit.isHidden = true
+        completeEdit.isHidden = true
+        xLabel.isHidden = true
+        yLabel.isHidden = true
+        xScale.isHidden = true
+        yScale.isHidden = true
+        zScale.isHidden = true
+        zLabel.isHidden = true
+        RotateToggle.isHidden = false
+        SelectPivot.isHidden = false
+        sceneView.debugOptions = [.showCreases]
+    }
+    @IBAction func cancelPressed(_ sender: Any) {
+        showOriginalView()
+    }
+    
+    @IBAction func completePressed(_ sender: Any) {
+        showOriginalView()
+    }
+    @IBAction func xChanged(_ sender: Any) {//FIX SO THAT DIRECTION OF USER'S FINGER ON THE SLIDER IS WHAT AFFECTS THE SPINNING DIRECTION
+        var newValue = xScale.value
+        if newValue > 0{
+            newValue = 1
+        }
+        else if newValue < 0 {
+            newValue = -1
+        }
+        let sinAngle = sin((Float.pi * newValue/180))
+        let cosAngle = cos((Float.pi * newValue/180))
+        let q = SCNQuaternion(sinAngle, 0, 0, cosAngle)
+         //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
+         sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
+         print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
+        
+    }
+    @IBAction func yChanged(_ sender: Any) {
+        var newValue = yScale.value
+        if newValue > 0{
+            newValue = 1
+        }
+        else if newValue < 0 {
+            newValue = -1
+        }
+        let sinAngle = sin((Float.pi * newValue/180))
+        let cosAngle = cos((Float.pi * newValue/180))
+        let q = SCNQuaternion(0, sinAngle, 0, cosAngle)
+         //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
+         sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
+         print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
+    }
+    @IBAction func zChanged(_ sender: Any) {
+        var newValue = zScale.value
+        if newValue > 0{
+            newValue = 1
+        }
+        else if newValue < 0 {
+            newValue = -1
+        }
+        let sinAngle = sin((Float.pi * newValue/180))
+        let cosAngle = cos((Float.pi * newValue/180))
+        let q = SCNQuaternion(0, 0, sinAngle, cosAngle)
+         //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
+         sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
+         print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
+    }
+    
     
 
 

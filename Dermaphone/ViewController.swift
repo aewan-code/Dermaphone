@@ -27,6 +27,8 @@ class ViewController: UIViewController {
     var arView: ARView!
     var nodeModel: SCNNode!
     let nodeName = "skin"
+    var originalOrientation :SCNQuaternion?
+    
 
      let sceneView = SCNView()
     let cameraNode = SCNNode()
@@ -96,6 +98,7 @@ class ViewController: UIViewController {
         inspectMaterials(in: scene!.rootNode)
         print(sceneView.frame)
         sceneView.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height) // Adjust the values as needed
+        originalOrientation = (sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)!.orientation)!
 
         
     //    let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didPan(_:)))
@@ -270,7 +273,7 @@ class ViewController: UIViewController {
         RotateToggle.isHidden = true
         SelectPivot.isHidden = true
         sceneView.debugOptions = SCNDebugOptions(rawValue: 2048)//shows the grid
-        
+        originalOrientation = sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation
        /* let q = SCNQuaternion(0, 0, (sqrt(2)/2), (sqrt(2)/2))
         //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
         sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
@@ -357,10 +360,12 @@ class ViewController: UIViewController {
         sceneView.debugOptions = [.showCreases]
     }
     @IBAction func cancelPressed(_ sender: Any) {
+        sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation = originalOrientation!
         showOriginalView()
     }
     
     @IBAction func completePressed(_ sender: Any) {
+        originalOrientation = sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation
         showOriginalView()
     }
     @IBAction func xChanged(_ sender: Any) {//FIX SO THAT DIRECTION OF USER'S FINGER ON THE SLIDER IS WHAT AFFECTS THE SPINNING DIRECTION

@@ -18,15 +18,15 @@ class ViewController: UIViewController {
 
      let sceneView = SCNView()
     let cameraNode = SCNNode()
-    let scene = SCNScene(named: "baked_mesh.scn")
+    let scene = SCNScene(named: "testTransform.scn")
     var currentView: UIView!
     var tempHaptics : Haptics?
     var engine: CHHapticEngine!
     var changePivot = false
     var scale : Float?
     var rotationOn = false
-    let referencePlane = SCNPlane(width: 100, height: 100) // Adjust the size as needed
-    var referencePlaneNode :SCNNode!
+  //  let referencePlane = SCNPlane(width: 100, height: 100) // Adjust the size as needed
+  //  var referencePlaneNode :SCNNode!
     
     @IBOutlet weak var RotateToggle: UIButton!
  
@@ -36,7 +36,7 @@ class ViewController: UIViewController {
         print("hi")
         currentView = view
         
-        guard let baseNode = scene?.rootNode.childNode(withName: "baked_mesh", recursively: true) else {
+        guard let baseNode = scene?.rootNode.childNode(withName: "Mesh", recursively: true) else {
                     fatalError("Unable to find baseNode")
                 }
         // Create and configure a haptic engine.
@@ -78,6 +78,7 @@ class ViewController: UIViewController {
         sceneView.cameraControlConfiguration.allowsTranslation = false
      //   sceneView.scene?.rootNode.eulerAngles = SCNVector3(x: 0, y: 0, z: 0)
         scene!.rootNode.addChildNode(cameraNode)
+        sceneView.debugOptions = [.showCreases]
         //self.view = sceneView
         view.addSubview(sceneView)
         inspectMaterials(in: scene!.rootNode)
@@ -93,9 +94,9 @@ class ViewController: UIViewController {
         
         changePivot = false
         print("ALEERA")
-        print(sceneView.scene?.rootNode.pivot)
-        referencePlaneNode = SCNNode(geometry: referencePlane)
-        scene!.rootNode.addChildNode(referencePlaneNode)
+ //       print(sceneView.scene?.rootNode.pivot)
+ //       referencePlaneNode = SCNNode(geometry: referencePlane)
+  //      scene!.rootNode.addChildNode(referencePlaneNode)
         
     }
     
@@ -145,7 +146,7 @@ class ViewController: UIViewController {
 
                 // Check if the desired node is touched
                 for result in hitTestResults {
-                    if result.node.name == "baked_mesh" {
+                    if result.node.name == "Mesh" {
                         // Node is touched, perform desired action
                         print("Node is touched!")
                         // Example: Change color of the node
@@ -171,28 +172,29 @@ class ViewController: UIViewController {
 
         // Check if the desired node is touched
         for result in hitTestResults {
-            if result.node.name == "baked_mesh" {
+            if result.node.name == "Mesh" {
                 // Node is touched, perform desired action
          //       print("Node is touched!")
                 // Example: Change color of the node
           //      result.node.geometry?.firstMaterial?.diffuse.contents = UIColor.red
                // try tempHaptics?.playTransient()
-                let height = result.localCoordinates.z
+                let height = result.localCoordinates.y
+                print(height)
                 
                 let intersectionPoint = result.worldCoordinates
                         // Calculate the height using the intersection point and the plane
-                let heightTemp = calculateHeight(referencePlaneNode, atPoint: intersectionPoint)
+       //         let heightTemp = calculateHeight(referencePlaneNode, atPoint: intersectionPoint)
             //    print(intersectionPoint)
                 print("Ewan")
-                print(-heightTemp)
+        //        print(-heightTemp)
                 if scale == nil{
-                     scale = heightTemp.rounded()
+        //             scale = heightTemp.rounded()
                 }
-                print(heightTemp)
-                let scaledHeight = heightTemp/scale!//scaled between -0.5 to -1.5
-                print(scaledHeight)
+           //     print(heightTemp)
+            //    let scaledHeight = heightTemp/scale!//scaled between -0.5 to -1.5
+            //   print(scaledHeight)
                 if !rotationOn{
-                    try tempHaptics?.playHeightHaptic(height: scaledHeight)
+                    try tempHaptics?.playHeightHaptic(height: height*10)
                 }
                 
             //    print("Check")
@@ -228,7 +230,7 @@ class ViewController: UIViewController {
         
     }
     @IBAction func pivotButtonPressed(_ sender: Any) {
-        if !changePivot{
+  /*      if !changePivot{
             changePivot = true
             rotationOn = false
             sceneView.allowsCameraControl = false
@@ -240,7 +242,7 @@ class ViewController: UIViewController {
                 print("Camera Euler Angles: \(cameraEulerAngles)")
                 let objectOrientation = cameraEulerAngles
           //      print(objectOrientation)
-                referencePlaneNode.eulerAngles = objectOrientation
+                    //        referencePlaneNode.eulerAngles = objectOrientation
             }
             
             
@@ -257,7 +259,7 @@ class ViewController: UIViewController {
         }
         else{
             changePivot = false
-        }
+        }*/
     }
     
     func calculateHeight(_ plane: SCNNode, atPoint point: SCNVector3) -> Float {

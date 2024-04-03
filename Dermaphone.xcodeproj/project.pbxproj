@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FF1A7DDD2BBD676F0020BA10 /* testTransform.scn in Resources */ = {isa = PBXBuildFile; fileRef = FF1A7DDC2BBD676F0020BA10 /* testTransform.scn */; };
+		FF1A7DDF2BBD67960020BA10 /* skin3_tex0.png in Resources */ = {isa = PBXBuildFile; fileRef = FF1A7DDE2BBD67960020BA10 /* skin3_tex0.png */; };
 		FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A802BAE183600A94673 /* AppDelegate.swift */; };
 		FFB13A832BAE183600A94673 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A822BAE183600A94673 /* SceneDelegate.swift */; };
 		FFB13A852BAE183600A94673 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A842BAE183600A94673 /* ViewController.swift */; };
@@ -46,6 +48,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		FF1A7DDC2BBD676F0020BA10 /* testTransform.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = testTransform.scn; sourceTree = "<group>"; };
+		FF1A7DDE2BBD67960020BA10 /* skin3_tex0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = skin3_tex0.png; sourceTree = "<group>"; };
 		FFB13A7D2BAE183600A94673 /* Dermaphone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dermaphone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFB13A802BAE183600A94673 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FFB13A822BAE183600A94673 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -126,6 +130,8 @@
 				FFB13B422BB1D41500A94673 /* Haptics.swift */,
 				FFB13B272BAE1CE500A94673 /* 3dmodeltest2 */,
 				FFB13A862BAE183600A94673 /* Main.storyboard */,
+				FF1A7DDC2BBD676F0020BA10 /* testTransform.scn */,
+				FF1A7DDE2BBD67960020BA10 /* skin3_tex0.png */,
 				FFB13A892BAE183800A94673 /* Assets.xcassets */,
 				FFB13A8B2BAE183800A94673 /* LaunchScreen.storyboard */,
 				FFB13A8E2BAE183800A94673 /* Info.plist */,
@@ -272,6 +278,7 @@
 			files = (
 				FFB13A8D2BAE183800A94673 /* LaunchScreen.storyboard in Resources */,
 				FFB13B2E2BAE1CE500A94673 /* baked_mesh_norm0.png in Resources */,
+				FF1A7DDD2BBD676F0020BA10 /* testTransform.scn in Resources */,
 				FFB13B322BAE1CE500A94673 /* baked_mesh.obj in Resources */,
 				FFB13B3D2BAEFA3500A94673 /* baked_mesh.scn in Resources */,
 				FFB13A8A2BAE183800A94673 /* Assets.xcassets in Resources */,
@@ -280,6 +287,7 @@
 				FFB13B3B2BAEF9D400A94673 /* baked_mesh.scn in Resources */,
 				FFB13B312BAE1CE500A94673 /* baked_mesh_tex0.png in Resources */,
 				FFB13A882BAE183600A94673 /* Main.storyboard in Resources */,
+				FF1A7DDF2BBD67960020BA10 /* skin3_tex0.png in Resources */,
 				FFB13B302BAE1CE500A94673 /* baked_mesh_ao0.png in Resources */,
 				FFB13B332BAE1CE500A94673 /* baked_mesh.usda in Resources */,
 			);

@@ -72,7 +72,7 @@
                                     <action selector="yChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="yGN-yJ-YEk"/>
                                 </connections>
                             </slider>
-                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="-180" maxValue="180" translatesAutoresizingMaskIntoConstraints="NO" id="6Qn-Ll-QLA">
+                            <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="-90" maxValue="90" translatesAutoresizingMaskIntoConstraints="NO" id="6Qn-Ll-QLA">
                                 <rect key="frame" x="277" y="746" width="118" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="tintColor" red="1" green="0.65514859349999999" blue="0.92088905200000004" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>

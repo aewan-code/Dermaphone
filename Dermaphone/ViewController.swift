@@ -22,7 +22,9 @@ class ViewController: UIViewController {
     @IBOutlet weak var yLabel: UILabel!
     @IBOutlet weak var xLabel: UILabel!
     @IBOutlet weak var completeEdit: UIBarButtonItem!
-
+    var currentXVal :Float?
+    var currentYVal : Float?
+    var currentZVal : Float?
     @IBOutlet weak var cancelEdit: UIButton!
     var arView: ARView!
     var nodeModel: SCNNode!
@@ -47,7 +49,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var SelectPivot: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("hi")
+
         currentView = view
         
         guard let baseNode = scene?.rootNode.childNode(withName: "Mesh", recursively: true) else {
@@ -274,6 +276,9 @@ class ViewController: UIViewController {
         SelectPivot.isHidden = true
         sceneView.debugOptions = SCNDebugOptions(rawValue: 2048)//shows the grid
         originalOrientation = sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation
+        currentXVal = 0
+        currentYVal = 0
+        currentZVal = 0
        /* let q = SCNQuaternion(0, 0, (sqrt(2)/2), (sqrt(2)/2))
         //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
         sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
@@ -373,26 +378,33 @@ class ViewController: UIViewController {
     }
     @IBAction func xChanged(_ sender: Any) {//FIX SO THAT DIRECTION OF USER'S FINGER ON THE SLIDER IS WHAT AFFECTS THE SPINNING DIRECTION
         var newValue = xScale.value
-        if newValue > 0{
-            newValue = 1
+        print(currentXVal)
+        print(newValue)
+        if newValue > currentXVal ?? 0{
+            currentXVal = newValue
+            newValue = 0.5
         }
-        else if newValue < 0 {
-            newValue = -1
+        else if newValue < currentXVal ?? 0 {
+            currentXVal = newValue
+            newValue = -0.5
         }
         let sinAngle = sin((Float.pi * newValue/180))
         let cosAngle = cos((Float.pi * newValue/180))
         let q = SCNQuaternion(sinAngle, 0, 0, cosAngle)
          //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
          sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
-         print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
+      //   print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
+        
         
     }
     @IBAction func yChanged(_ sender: Any) {
         var newValue = yScale.value
-        if newValue > 0{
+        if newValue > currentYVal ?? 0{
+            currentYVal = newValue
             newValue = 1
         }
-        else if newValue < 0 {
+        else if newValue < currentYVal ?? 0  {
+            currentYVal = newValue
             newValue = -1
         }
         let sinAngle = sin((Float.pi * newValue/180))
@@ -400,22 +412,31 @@ class ViewController: UIViewController {
         let q = SCNQuaternion(0, sinAngle, 0, cosAngle)
          //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
          sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
-         print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
+       //  print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
+        
     }
     @IBAction func zChanged(_ sender: Any) {
         var newValue = zScale.value
-        if newValue > 0{
+        print(newValue)
+        print(currentZVal)
+        if newValue > 1 + (currentZVal ?? 0){
+            currentZVal = newValue
             newValue = 1
         }
-        else if newValue < 0 {
+        else if newValue < -1 + (currentZVal ?? 0){
+            currentZVal = newValue
             newValue = -1
         }
         let sinAngle = sin((Float.pi * newValue/180))
         let cosAngle = cos((Float.pi * newValue/180))
         let q = SCNQuaternion(0, 0, sinAngle, cosAngle)
+        print(q)
+        
+        
          //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
          sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
-         print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
+         //print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
+        
     }
     
     

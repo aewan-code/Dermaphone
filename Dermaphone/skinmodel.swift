@@ -79,11 +79,13 @@ class skinmodel: UIViewController{
 
         */
         sceneView.scene = scene
-        
+        print("ALEERA HERE")
+        print(sceneView.debugOptions)
+        sceneView.debugOptions = [.showCreases]
+        print(sceneView.debugOptions)
         sceneView.allowsCameraControl = false//add button to move the model
         sceneView.showsStatistics = false
         //sceneView.backgroundColor = UIColor.black
-        sceneView.debugOptions = .showWireframe
         let ambientLight = SCNLight()
         ambientLight.type = .ambient
         ambientLight.color = UIColor.white // Adjust the light color as needed

@@ -41,6 +41,9 @@ class ViewController: UIViewController {
     var changePivot = false
     var scale : Float?
     var rotationOn = false
+    var xAxisNode : SCNNode?
+    var yAxisNode : SCNNode?
+    var zAxisNode : SCNNode?
   //  let referencePlane = SCNPlane(width: 100, height: 100) // Adjust the size as needed
   //  var referencePlaneNode :SCNNode!
     
@@ -128,6 +131,8 @@ class ViewController: UIViewController {
         
         changePivot = false
         print("ALEERA")
+        createAxes()
+        hideAxes()
  //       print(sceneView.scene?.rootNode.pivot)
  //       referencePlaneNode = SCNNode(geometry: referencePlane)
   //      scene!.rootNode.addChildNode(referencePlaneNode)
@@ -279,41 +284,8 @@ class ViewController: UIViewController {
         currentXVal = 0
         currentYVal = 0
         currentZVal = 0
-       /* let q = SCNQuaternion(0, 0, (sqrt(2)/2), (sqrt(2)/2))
-        //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
-        sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
-        print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
-        */
-  /*      if !changePivot{
-            changePivot = true
-            rotationOn = false
-            sceneView.allowsCameraControl = false
-            if let cameraNode = sceneView.pointOfView {
-                let cameraRotation = cameraNode.rotation
-                let cameraEulerAngles = cameraNode.eulerAngles
-                
-                print("Camera Rotation: \(cameraRotation)")
-                print("Camera Euler Angles: \(cameraEulerAngles)")
-                let objectOrientation = cameraEulerAngles
-          //      print(objectOrientation)
-                    //        referencePlaneNode.eulerAngles = objectOrientation
-            }
-            
-            
-            
-            //let referencePlaneNormal = SCNVector3(0, 1, 0) // Assuming the plane is aligned with the Y-axis
-         //   print(sceneView.scene?.rootNode.rotation)
-       
-            
-            
+        overlayAxes()
 
-            
-            
-            
-        }
-        else{
-            changePivot = false
-        }*/
     }
     
     func calculateHeight(_ plane: SCNNode, atPoint point: SCNVector3) -> Float {
@@ -366,6 +338,7 @@ class ViewController: UIViewController {
         RotateToggle.isHidden = false
         SelectPivot.isHidden = false
         sceneView.debugOptions = [.showCreases]
+        hideAxes()
         
     }
     @IBAction func cancelPressed(_ sender: Any) {
@@ -439,6 +412,51 @@ class ViewController: UIViewController {
         
     }
     
+    func createAxes(){//fix code for axes - change!
+     //   let xaxis = SCNNode(geometry: SCNCylinder(radius: 1, height: 10))//base it on the max of the height/width of the skin lesion
+        
+        let xAxis = SCNCylinder(radius: 0.001, height: 1)
+        xAxis.firstMaterial?.diffuse.contents = UIColor.red
+        xAxisNode = SCNNode(geometry: xAxis)
+        // by default the middle of the cylinder will be at the origin aligned to the y-axis
+        // need to spin around to align with respective axes and shift position so they start at the origin
+        xAxisNode?.simdWorldOrientation = simd_quatf.init(angle: .pi/2, axis: simd_float3(0, 0, 1))
+        xAxisNode?.simdWorldPosition = simd_float1(1)/2 * simd_float3(1, 0, 0)
+       // xaxis.position = SCNVector3(0,0,0)
+        scene?.rootNode.addChildNode(xAxisNode!)
+        let yAxis = SCNCylinder(radius: 0.001, height: 1)
+        yAxis.firstMaterial?.diffuse.contents = UIColor.green
+        yAxisNode = SCNNode(geometry: yAxis)
+        // by default the middle of the cylinder will be at the origin aligned to the y-axis
+        // need to spin around to align with respective axes and shift position so they start at the origin
+
+        yAxisNode?.simdWorldPosition = simd_float1(1)/2 * simd_float3(0, 1, 0)
+       // xaxis.position = SCNVector3(0,0,0)
+        scene?.rootNode.addChildNode(yAxisNode!)
+        let zAxis = SCNCylinder(radius: 0.001, height: 1)
+        zAxis.firstMaterial?.diffuse.contents = UIColor.blue
+        zAxisNode = SCNNode(geometry: zAxis)
+        // by default the middle of the cylinder will be at the origin aligned to the y-axis
+        // need to spin around to align with respective axes and shift position so they start at the origin
+        zAxisNode?.simdWorldOrientation = simd_quatf.init(angle: .pi/2, axis: simd_float3(1, 0, 0))
+        zAxisNode?.simdWorldPosition = simd_float1(1)/2 * simd_float3(0, 0, 1)
+       // xaxis.position = SCNVector3(0,0,0)
+        scene?.rootNode.addChildNode(zAxisNode!)
+        
+    }
+    
+    func hideAxes(){
+        xAxisNode?.isHidden = true
+        yAxisNode?.isHidden = true
+        zAxisNode?.isHidden = true
+        
+    }
+    
+    func overlayAxes(){
+        xAxisNode?.isHidden = false
+        yAxisNode?.isHidden = false
+        zAxisNode?.isHidden = false
+    }
     
 
 

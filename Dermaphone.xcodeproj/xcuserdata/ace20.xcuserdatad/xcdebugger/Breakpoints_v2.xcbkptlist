@@ -14,8 +14,8 @@
             filePath = "Dermaphone/ViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "67"
-            endingLineNumber = "67"
+            startingLineNumber = "71"
+            endingLineNumber = "71"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
             <Locations>
@@ -62,6 +62,21 @@
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "67"
                   endingLineNumber = "67"
+                  offsetFromSymbolStart = "8692">
+               </Location>
+               <Location
+                  uuid = "21E0F4A1-C206-436A-AA93-819315F0AA4F - f13c5c8bca16d899"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Dermaphone.ViewController.viewDidLoad() -&gt; ()"
+                  moduleName = "Dermaphone"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ace20/Documents/Dermaphone/Dermaphone/ViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "71"
+                  endingLineNumber = "71"
                   offsetFromSymbolStart = "8692">
                </Location>
             </Locations>

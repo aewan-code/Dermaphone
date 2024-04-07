@@ -50,6 +50,10 @@ class ViewController: UIViewController {
     @IBOutlet weak var RotateToggle: UIButton!
  
     @IBOutlet weak var SelectPivot: UIButton!
+    
+    let hapticAlgorithm = HapticRendering(maxHeight: 0.5, minHeight: -0.5)
+    
+    var prevTimestamp : TimeInterval?
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -208,7 +212,7 @@ class ViewController: UIViewController {
         let touch = touches.first!
         let location = touch.location(in: view)
         let hitTestResults = sceneView.hitTest(location, options: nil)
-
+        
         // Check if the desired node is touched
         for result in hitTestResults {
             if result.node.name == "Mesh" {
@@ -224,17 +228,38 @@ class ViewController: UIViewController {
                         // Calculate the height using the intersection point and the plane
        //         let heightTemp = calculateHeight(referencePlaneNode, atPoint: intersectionPoint)
             //    print(intersectionPoint)
+                let previousLocation = touch.previousLocation(in: self.view)
+                        let currentLocation = touch.location(in: self.view)
+                        
+                let deltaX = (currentLocation.x - previousLocation.x)*0.01 //cm
+                
+                let deltaY = (currentLocation.y - previousLocation.y)*0.01
+                    //    let deltaZ = currentLocation.z - previousLocation.z // Assuming your touch event provides z-coordinates
+                let prevTime = prevTimestamp ?? 0.0
+                let timeDelta = touch.timestamp - prevTime
+                prevTimestamp = touch.timestamp
+                let velocityX = deltaX / CGFloat(timeDelta)
+                let velocityY = deltaY / CGFloat(timeDelta)
+                let speed = Float(sqrt((velocityX * velocityX) + (velocityY * velocityY)))
+                     //   let timeDelta = touch.timestamp - touch.previousLocation(in: self.view).timestamp
                 print("Ewan")
         //        print(-heightTemp)
+                print(deltaX)
+                print(deltaY)
                 if scale == nil{
         //             scale = heightTemp.rounded()
                 }
            //     print(heightTemp)
             //    let scaledHeight = heightTemp/scale!//scaled between -0.5 to -1.5
             //   print(scaledHeight)
+                let intensity = hapticAlgorithm.forceFeedback(height: height, velocity: speed)
                 if !rotationOn{
-                    try tempHaptics?.playHeightHaptic(height: height*10)
+                    //try tempHaptics?.playHeightHaptic(height: height*10)
+                    try tempHaptics?.playHeightHaptic(height:intensity/2)
                 }
+                print(speed)
+                print("ALGORITHM")
+                print(hapticAlgorithm.forceFeedback(height: height, velocity: speed))
                 
             //    print("Check")
               //  print(result.localCoordinates)//localCoordinates shows the x,y,z coordinates of the point cloud
@@ -457,6 +482,8 @@ class ViewController: UIViewController {
         yAxisNode?.isHidden = false
         zAxisNode?.isHidden = false
     }
+    
+    
     
 
 

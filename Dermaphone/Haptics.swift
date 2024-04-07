@@ -77,7 +77,7 @@ class Haptics{
                     CHHapticPattern.Key.event: [
                         CHHapticPattern.Key.eventType: CHHapticEvent.EventType.hapticTransient,
                         CHHapticPattern.Key.time: CHHapticTimeImmediate,
-                        CHHapticPattern.Key.eventDuration: 0.001,
+                        CHHapticPattern.Key.eventDuration: 0.00001,
                         CHHapticPattern.Key.eventParameters: [
                             [
                                 CHHapticPattern.Key.parameterID: CHHapticEvent.ParameterID.hapticIntensity,
@@ -85,7 +85,7 @@ class Haptics{
                             ],
                             [
                                 CHHapticPattern.Key.parameterID: CHHapticEvent.ParameterID.hapticSharpness,
-                                CHHapticPattern.Key.parameterValue: 0.6
+                                CHHapticPattern.Key.parameterValue: 1
                             ]
                         ]
                     ]
@@ -95,10 +95,10 @@ class Haptics{
         do {
             let pattern = try CHHapticPattern(dictionary: hapticDict)
             do {
-                let player = try engine.makePlayer(with: pattern)
-                engine.notifyWhenPlayersFinished { error in
+                let player = try engine.makeAdvancedPlayer(with: pattern)
+         /*       engine.notifyWhenPlayersFinished { error in
                     return .stopEngine
-                }
+                }*/
 
 
                 try engine.start()

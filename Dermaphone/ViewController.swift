@@ -12,7 +12,9 @@ import CoreHaptics
 
 class ViewController: UIViewController {
     
+    //MARK -UI
     
+    @IBOutlet weak var navBar: UINavigationItem!
     @IBOutlet weak var zScale: UISlider!
     
     @IBOutlet weak var yScale: UISlider!
@@ -22,10 +24,21 @@ class ViewController: UIViewController {
     @IBOutlet weak var yLabel: UILabel!
     @IBOutlet weak var xLabel: UILabel!
     @IBOutlet weak var completeEdit: UIBarButtonItem!
+    @IBOutlet weak var cancelEdit: UIBarButtonItem!
+    
+    @IBOutlet weak var symptonsButton: UIButton!
+    
+    @IBOutlet weak var treatmentButton: UIButton!
+    @IBOutlet weak var notesButton: UIButton!
+    @IBOutlet weak var urgencylabel: UILabel!
+    @IBOutlet weak var similarButton: UIButton!
+
+    @IBOutlet var magnifier: [UIImageView]!
+    
+    @IBOutlet var magnifierText: [UILabel]!
     var currentXVal :Float?
     var currentYVal : Float?
     var currentZVal : Float?
-    @IBOutlet weak var cancelEdit: UIButton!
     var arView: ARView!
     var nodeModel: SCNNode!
     let nodeName = "skin"
@@ -58,7 +71,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 
         currentView = view
-        
+        print(notesButton.frame.minY)
         guard let baseNode = scene?.rootNode.childNode(withName: "Mesh", recursively: true) else {
                     fatalError("Unable to find baseNode")
                 }
@@ -99,15 +112,24 @@ class ViewController: UIViewController {
         
         cameraNode.camera = SCNCamera()
         sceneView.cameraControlConfiguration.allowsTranslation = false
+        
      //   sceneView.scene?.rootNode.eulerAngles = SCNVector3(x: 0, y: 0, z: 0)
-        scene!.rootNode.addChildNode(cameraNode)
+     //   scene!.rootNode.addChildNode(cameraNode)
+        cameraNode.constraints = [SCNTransformConstraint.positionConstraint(
+            inWorldSpace: true,
+            with: { (node, position) -> SCNVector3 in
+                // Return the original position to prevent any translation
+                return node.position
+            }
+        )]
         sceneView.debugOptions = [.showCreases]
         //self.view = sceneView
         view.addSubview(sceneView)
-        inspectMaterials(in: scene!.rootNode)
         print(sceneView.frame)
-        sceneView.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height) // Adjust the values as needed
+        sceneView.frame = CGRect(x: 0, y: notesButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (notesButton.frame.maxY + 10)) // Adjust the values as needed
         originalOrientation = (sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)!.orientation)!
+        urgencylabel.text = "Precancerous"
+        
 
         
     //    let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didPan(_:)))
@@ -137,31 +159,21 @@ class ViewController: UIViewController {
         print("ALEERA")
         createAxes()
         hideAxes()
+        navBar.title = "Skin Lesion: Actinic Keratosis"
+        navBar.titleView?.isHidden = false
+        for image in magnifier{
+            view.bringSubviewToFront(image)
+        }
+        for descript in magnifierText{
+            view.bringSubviewToFront(descript)
+        }
+
  //       print(sceneView.scene?.rootNode.pivot)
  //       referencePlaneNode = SCNNode(geometry: referencePlane)
   //      scene!.rootNode.addChildNode(referencePlaneNode)
-        
+        customizeGestureRecognizers()
     }
     
-    func inspectMaterials(in node: SCNNode) {
-        for childNode in node.childNodes {
-            // Check if the node has geometry
-            if let geometry = childNode.geometry {
-                // Iterate through the materials applied to the geometry
-                print("temp: \(geometry.boundingSphere)")
-                for material in geometry.materials {
-                    // Print material properties
-                    print("Material properties for node: \(childNode.name ?? "Unnamed")")
-                    print("Diffuse color: \(material.diffuse.contents ?? "No diffuse color")")
-                    print("Specular color: \(material.specular.contents ?? "No specular color")")
-                    print("Shininess: \(material.shininess)")
-                    // You can inspect other material properties as needed
-                }
-            }
-            // Recursively inspect child nodes
-            inspectMaterials(in: childNode)
-        }
-    }
     
  /*   @objc private func didPan(_ sender: UIPanGestureRecognizer) {
         switch sender.state {
@@ -210,7 +222,7 @@ class ViewController: UIViewController {
         super.touchesMoved(touches, with: event)
      //   print("touch moved")
         let touch = touches.first!
-        let location = touch.location(in: view)
+        let location = touch.location(in: sceneView)
         let hitTestResults = sceneView.hitTest(location, options: nil)
         
         // Check if the desired node is touched
@@ -228,8 +240,8 @@ class ViewController: UIViewController {
                         // Calculate the height using the intersection point and the plane
        //         let heightTemp = calculateHeight(referencePlaneNode, atPoint: intersectionPoint)
             //    print(intersectionPoint)
-                let previousLocation = touch.previousLocation(in: self.view)
-                        let currentLocation = touch.location(in: self.view)
+                let previousLocation = touch.previousLocation(in: sceneView)
+                        let currentLocation = touch.location(in: sceneView)
                         
                 let deltaX = (currentLocation.x - previousLocation.x)*0.01 //cm
                 
@@ -257,6 +269,8 @@ class ViewController: UIViewController {
                     //try tempHaptics?.playHeightHaptic(height: height*10)
                     try tempHaptics?.playHeightHaptic(height:intensity/2)
                 }
+                print(sceneView.cameraControlConfiguration.panSensitivity)
+               // print(cameraNode.constraints)
                 print(speed)
                 print("ALGORITHM")
                 print(hapticAlgorithm.forceFeedback(height: height, velocity: speed))
@@ -272,6 +286,19 @@ class ViewController: UIViewController {
         
     }
     
+    private func customizeGestureRecognizers() {
+        // Remove default gesture recognizers for two-finger pan
+        if let defaultGestureRecognizers = sceneView.gestureRecognizers
+        {
+            for recognizer in defaultGestureRecognizers {
+                if let panGestureRecognizer = recognizer as? UIPanGestureRecognizer {
+                    if panGestureRecognizer.minimumNumberOfTouches == 2 {
+                        sceneView.removeGestureRecognizer(panGestureRecognizer)
+                    }
+                }
+            }
+        }
+    }
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
         print("touch ended")
@@ -285,10 +312,22 @@ class ViewController: UIViewController {
         if !rotationOn{
             rotationOn = true
             sceneView.allowsCameraControl = true
+            sceneView.cameraControlConfiguration.allowsTranslation = false
+            print("CHECK CAMERA")
+            print(sceneView.gestureRecognizers)
+            RotateToggle.tintColor = UIColor.systemGreen
+          //  sceneView.defaultCameraController.
+          //  sceneView.cameraControlConfiguration.panSensitivity = 0
+          //  sceneView.defaultCameraController.interactionMode = .orbitTurntable
+          //  scnview.defaultCameraController.inertiaEnabled = true
+           // scnview.defaultCameraController.maximumVerticalAngle = 69
+            //scnview.defaultCameraController.minimumVerticalAngle = -69
+            //s/cnview.autoenablesDefaultLighting = true
         }
         else{
             rotationOn = false
             sceneView.allowsCameraControl = false
+            RotateToggle.tintColor = UIColor.systemBlue
         }
         
         
@@ -304,6 +343,11 @@ class ViewController: UIViewController {
         zScale.isHidden = false
         RotateToggle.isHidden = true
         SelectPivot.isHidden = true
+        notesButton.isHidden = true
+        treatmentButton.isHidden = true
+        symptonsButton.isHidden = true
+        urgencylabel.isHidden = true
+        similarButton.isHidden = true
         sceneView.debugOptions = SCNDebugOptions(rawValue: 2048)//shows the grid
         originalOrientation = sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation
         currentXVal = 0
@@ -363,6 +407,11 @@ class ViewController: UIViewController {
         RotateToggle.isHidden = false
         SelectPivot.isHidden = false
         sceneView.debugOptions = [.showCreases]
+        notesButton.isHidden = false
+        symptonsButton.isHidden = false
+        treatmentButton.isHidden = false
+        urgencylabel.isHidden = false
+        similarButton.isHidden = false
         hideAxes()
         
     }
@@ -374,59 +423,108 @@ class ViewController: UIViewController {
     @IBAction func completePressed(_ sender: Any) {
         showOriginalView()
     }
-    @IBAction func xChanged(_ sender: Any) {//FIX SO THAT DIRECTION OF USER'S FINGER ON THE SLIDER IS WHAT AFFECTS THE SPINNING DIRECTION
+    @IBAction func xChanged(_ sender: Any) {
         var newValue = xScale.value
-        print(currentXVal)
         print(newValue)
-        if newValue > currentXVal ?? 0{
+        print(currentXVal)
+        if newValue > (currentXVal ?? 0){
             currentXVal = newValue
-            newValue = 0.5
+            if newValue == xScale.maximumValue || newValue == xScale.minimumValue{
+                newValue = 0.0
+            }else{
+                newValue = 1
+            }
         }
-        else if newValue < currentXVal ?? 0 {
+        else if newValue < (currentXVal ?? 0){
             currentXVal = newValue
-            newValue = -0.5
+            if newValue == xScale.maximumValue || newValue == xScale.minimumValue{
+                newValue = 0.0
+            }else{
+                newValue = -1
+            }
+        }
+        else if newValue == currentXVal{
+            newValue = 0
         }
         let sinAngle = sin((Float.pi * newValue/180))
         let cosAngle = cos((Float.pi * newValue/180))
+        print(cosAngle)
+        print(cos((0.0)))
+        print(newValue)
         let q = SCNQuaternion(sinAngle, 0, 0, cosAngle)
+        print(q)
+        
+        
          //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
          sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
-      //   print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
-        
+         //print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
         
     }
     @IBAction func yChanged(_ sender: Any) {
         var newValue = yScale.value
-        if newValue > currentYVal ?? 0{
+        print(newValue)
+        print(currentYVal)
+        if newValue > (currentYVal ?? 0){
             currentYVal = newValue
-            newValue = 1
+            if newValue == yScale.maximumValue || newValue == yScale.minimumValue{
+                newValue = 0.0
+            }else{
+                newValue = 1
+            }
         }
-        else if newValue < currentYVal ?? 0  {
+        else if newValue < (currentYVal ?? 0){
             currentYVal = newValue
-            newValue = -1
+            if newValue == yScale.maximumValue || newValue == yScale.minimumValue{
+                newValue = 0.0
+            }else{
+                newValue = -1
+            }
+        }
+        else if newValue == currentYVal{
+            newValue = 0
         }
         let sinAngle = sin((Float.pi * newValue/180))
         let cosAngle = cos((Float.pi * newValue/180))
+        print(cosAngle)
+        print(cos((0.0)))
+        print(newValue)
         let q = SCNQuaternion(0, sinAngle, 0, cosAngle)
+        print(q)
+        
+        
          //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
          sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
-       //  print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
+         //print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
         
     }
     @IBAction func zChanged(_ sender: Any) {
         var newValue = zScale.value
         print(newValue)
         print(currentZVal)
-        if newValue > 1 + (currentZVal ?? 0){
+        if newValue > (currentZVal ?? 0){
             currentZVal = newValue
-            newValue = 1
+            if newValue == zScale.maximumValue || newValue == zScale.minimumValue{
+                newValue = 0.0
+            }else{
+                newValue = 1
+            }
         }
-        else if newValue < -1 + (currentZVal ?? 0){
+        else if newValue < (currentZVal ?? 0){
             currentZVal = newValue
-            newValue = -1
+            if newValue == zScale.maximumValue || newValue == zScale.minimumValue{
+                newValue = 0.0
+            }else{
+                newValue = -1
+            }
+        }
+        else if newValue == currentZVal{
+            newValue = 0
         }
         let sinAngle = sin((Float.pi * newValue/180))
         let cosAngle = cos((Float.pi * newValue/180))
+        print(cosAngle)
+        print(cos((0.0)))
+        print(newValue)
         let q = SCNQuaternion(0, 0, sinAngle, cosAngle)
         print(q)
         

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="kgt-0B-Fby">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="kgt-0B-Fby">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -18,8 +19,9 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p7b-Vb-9ki">
-                                <rect key="frame" x="187" y="783" width="114" height="35"/>
+                                <rect key="frame" x="216" y="783" width="114" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" name="AccentColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Select Base"/>
                                 <connections>
@@ -27,8 +29,9 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7mh-fo-DmQ">
-                                <rect key="frame" x="52" y="783" width="128" height="35"/>
+                                <rect key="frame" x="59" y="783" width="128" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" name="AccentColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Rotate Lesion"/>
                                 <connections>
@@ -80,6 +83,69 @@
                                     <action selector="zChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="MB4-b7-BQ1"/>
                                 </connections>
                             </slider>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Precancerous" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fRb-oA-JQL">
+                                <rect key="frame" x="144" y="103" width="105" height="26"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" systemColor="systemRedColor"/>
+                                <color key="tintColor" systemColor="systemRedColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2fK-fz-cjE">
+                                <rect key="frame" x="82" y="184" width="105" height="45"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" name="AccentColor"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Clinical Notes"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fKp-gb-OBH">
+                                <rect key="frame" x="205" y="184" width="115" height="45"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" name="AccentColor"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Similar Conditions"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aYr-s0-8AR">
+                                <rect key="frame" x="17" y="141" width="106" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" name="AccentColor"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Symptoms"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RJd-H1-Pyw">
+                                <rect key="frame" x="279" y="141" width="102" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" name="AccentColor"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Treatment"/>
+                            </button>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="arrow.right.to.line.alt" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="IP8-6O-ej6">
+                                <rect key="frame" x="323" y="677" width="19" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="arrow.left.to.line.alt" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="onQ-he-2kf">
+                                <rect key="frame" x="309" y="677" width="19" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="1 mm" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="StS-Cb-XZW">
+                                <rect key="frame" x="312" y="696" width="30" height="15"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="x4" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5kg-n4-HQM">
+                                <rect key="frame" x="53" y="680" width="19" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="plus.magnifyingglass" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="FmT-vf-aOF">
+                                <rect key="frame" x="50" y="655" width="21" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -114,14 +180,25 @@
                     <connections>
                         <outlet property="RotateToggle" destination="7mh-fo-DmQ" id="e81-zf-34M"/>
                         <outlet property="SelectPivot" destination="p7b-Vb-9ki" id="Tko-d2-cNt"/>
-                        <outlet property="cancelEdit" destination="oXJ-c9-EmN" id="f4q-7r-5z1"/>
+                        <outlet property="cancelEdit" destination="X0K-3X-vcE" id="WOg-xe-ecp"/>
                         <outlet property="completeEdit" destination="sAS-e1-thz" id="ThN-ng-vAS"/>
+                        <outlet property="navBar" destination="buM-Uc-tQG" id="lAi-aZ-LA1"/>
+                        <outlet property="notesButton" destination="2fK-fz-cjE" id="H10-K8-FZE"/>
+                        <outlet property="similarButton" destination="fKp-gb-OBH" id="YhM-Lh-4Mw"/>
+                        <outlet property="symptonsButton" destination="aYr-s0-8AR" id="pS2-Zw-XJV"/>
+                        <outlet property="treatmentButton" destination="RJd-H1-Pyw" id="wTo-qu-sUL"/>
+                        <outlet property="urgencylabel" destination="fRb-oA-JQL" id="mwy-F3-3iH"/>
                         <outlet property="xLabel" destination="4NA-8D-LZO" id="GZk-xl-8Kc"/>
                         <outlet property="xScale" destination="IoQ-EP-Zzy" id="he6-nP-qc9"/>
                         <outlet property="yLabel" destination="9Qj-dt-lA0" id="CHU-rK-PQk"/>
                         <outlet property="yScale" destination="cKl-Ld-QuK" id="m97-qU-Z96"/>
                         <outlet property="zLabel" destination="bZZ-8q-DHa" id="nl7-GZ-ZHY"/>
                         <outlet property="zScale" destination="6Qn-Ll-QLA" id="CQK-aJ-IMa"/>
+                        <outletCollection property="magnifier" destination="FmT-vf-aOF" collectionClass="NSMutableArray" id="b60-Q8-cDW"/>
+                        <outletCollection property="magnifier" destination="IP8-6O-ej6" collectionClass="NSMutableArray" id="wKM-tJ-23n"/>
+                        <outletCollection property="magnifier" destination="onQ-he-2kf" collectionClass="NSMutableArray" id="src-zi-L6M"/>
+                        <outletCollection property="magnifierText" destination="5kg-n4-HQM" collectionClass="NSMutableArray" id="lpP-cI-2Rz"/>
+                        <outletCollection property="magnifierText" destination="StS-Cb-XZW" collectionClass="NSMutableArray" id="5Yc-VW-TUG"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -148,6 +225,12 @@
         </scene>
     </scenes>
     <resources>
+        <image name="arrow.left.to.line.alt" catalog="system" width="128" height="100"/>
+        <image name="arrow.right.to.line.alt" catalog="system" width="128" height="100"/>
+        <image name="plus.magnifyingglass" catalog="system" width="128" height="117"/>
+        <namedColor name="AccentColor">
+            <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

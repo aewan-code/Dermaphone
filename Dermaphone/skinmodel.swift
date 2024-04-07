@@ -17,16 +17,7 @@ class skinmodel: UIViewController{
    // @StateObject var currentModelName = currentModel()
     var modelName: String = "baked_mesh"
     var modelFile : String = "baked_mesh.scn"
-    /*init(modelName: String) {
-            self.modelName = modelName
-            self.scene = SCNScene(named: self.modelName)!
-            super.init(nibName: nil, bundle: nil)
-        }
-    
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("This class does not support NSCoder")
-    }*/
+
 
 
     let sceneView = SCNView()
@@ -65,19 +56,7 @@ class skinmodel: UIViewController{
             fatalError("Engine Creation Error: \(error)")
         }
         tempHaptics = Haptics(engine: engine)
-       // _level = TutorialLevel1()
-       
-            /*  let cameraNode = SCNNode()
-        cameraNode.camera = SCNCamera()
-        scene!.rootNode.addChildNode(cameraNode)
-
-        // Adjust camera position
-        cameraNode.position = SCNVector3(x: 0, y: 0, z: 10) // Move camera 10 units along the z-axis
-
-        // Set camera orientation (optional)
-        cameraNode.eulerAngles = SCNVector3(x: 0, y: 0, z: 0) // Adjust the rotation if needed
-
-        */
+ 
         sceneView.scene = scene
         print("ALEERA HERE")
         print(sceneView.debugOptions)

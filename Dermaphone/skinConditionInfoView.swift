@@ -17,6 +17,7 @@ class skinConditionInfoView : UIViewController{
     var diagnosisMethod : String? = nil
     var features : [String]? = nil
     var editMode : Bool = false
+    var skinCondition : SkinCondition? = nil
     @IBOutlet weak var modelImage: UIImageView!
     @IBOutlet weak var editButton: UIButton!
     
@@ -40,5 +41,17 @@ class skinConditionInfoView : UIViewController{
     
     func setImage(image : UIImage){
         modelImage.image = image
+    }
+    
+    func set(skinCondition : SkinCondition){
+        self.skinCondition = skinCondition
+        self.name = self.skinCondition?.name
+        self.conditionDescription = self.skinCondition?.description
+        self.conditionCauses = self.skinCondition?.cause
+        //self.conditionPeople = self.skinCondition.
+        var conditionImage = self.skinCondition?.image
+        var treatment = self.skinCondition?.treatment
+        var diagnosisMethod = self.skinCondition?.diagnosis
+        var features = self.skinCondition?.texture
     }
 }

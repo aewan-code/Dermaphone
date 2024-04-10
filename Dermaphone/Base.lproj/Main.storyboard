@@ -18,26 +18,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p7b-Vb-9ki">
-                                <rect key="frame" x="216" y="783" width="114" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" name="AccentColor"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Select Base"/>
-                                <connections>
-                                    <action selector="pivotButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="YBz-zH-LRe"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7mh-fo-DmQ">
-                                <rect key="frame" x="59" y="783" width="128" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" name="AccentColor"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Rotate Lesion"/>
-                                <connections>
-                                    <action selector="buttonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Le9-yq-pqA"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="X" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4NA-8D-LZO">
                                 <rect key="frame" x="59" y="719" width="15" height="27"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -146,10 +126,40 @@
                                 <rect key="frame" x="50" y="655" width="21" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7mh-fo-DmQ">
+                                <rect key="frame" x="127" y="777" width="128" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" name="AccentColor"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Rotate Lesion"/>
+                                <connections>
+                                    <action selector="buttonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Le9-yq-pqA"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Av3-gp-U9q">
+                                <rect key="frame" x="31" y="777" width="79" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Record"/>
+                                <connections>
+                                    <action selector="recordPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Gjp-Ew-fPE"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p7b-Vb-9ki">
+                                <rect key="frame" x="267" y="777" width="114" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" name="AccentColor"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Select Base"/>
+                                <connections>
+                                    <action selector="pivotButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="YBz-zH-LRe"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
+                    <toolbarItems/>
                     <navigationItem key="navigationItem" id="buM-Uc-tQG">
                         <nil key="title"/>
                         <barButtonItem key="leftBarButtonItem" style="plain" id="X0K-3X-vcE">
@@ -177,6 +187,7 @@
                             </button>
                         </barButtonItem>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="RotateToggle" destination="7mh-fo-DmQ" id="e81-zf-34M"/>
                         <outlet property="SelectPivot" destination="p7b-Vb-9ki" id="Tko-d2-cNt"/>
@@ -184,6 +195,7 @@
                         <outlet property="completeEdit" destination="sAS-e1-thz" id="ThN-ng-vAS"/>
                         <outlet property="navBar" destination="buM-Uc-tQG" id="lAi-aZ-LA1"/>
                         <outlet property="notesButton" destination="2fK-fz-cjE" id="H10-K8-FZE"/>
+                        <outlet property="recordHaptic" destination="Av3-gp-U9q" id="eDS-2g-5IX"/>
                         <outlet property="similarButton" destination="fKp-gb-OBH" id="YhM-Lh-4Mw"/>
                         <outlet property="symptonsButton" destination="aYr-s0-8AR" id="pS2-Zw-XJV"/>
                         <outlet property="treatmentButton" destination="RJd-H1-Pyw" id="wTo-qu-sUL"/>

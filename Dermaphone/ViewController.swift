@@ -9,6 +9,7 @@ import UIKit
 import SceneKit
 import RealityKit
 import CoreHaptics
+import SwiftUI
 
 class ViewController: UIViewController {
     
@@ -44,7 +45,8 @@ class ViewController: UIViewController {
     let nodeName = "skin"
     var originalOrientation :SCNQuaternion?
     
-
+    var recordHaptics = false
+    
      let sceneView = SCNView()
     let cameraNode = SCNNode()
     let scene = SCNScene(named: "testTransform.scn")
@@ -64,6 +66,7 @@ class ViewController: UIViewController {
  
     @IBOutlet weak var SelectPivot: UIButton!
     
+    @IBOutlet weak var recordHaptic: UIButton!
     let hapticAlgorithm = HapticRendering(maxHeight: 0.5, minHeight: -0.5)
     
     var prevTimestamp : TimeInterval?
@@ -84,19 +87,6 @@ class ViewController: UIViewController {
             fatalError("Engine Creation Error: \(error)")
         }
         tempHaptics = Haptics(engine: engine)
-       // _level = TutorialLevel1()
-       
-            /*  let cameraNode = SCNNode()
-        cameraNode.camera = SCNCamera()
-        scene!.rootNode.addChildNode(cameraNode)
-
-        // Adjust camera position
-        cameraNode.position = SCNVector3(x: 0, y: 0, z: 10) // Move camera 10 units along the z-axis
-
-        // Set camera orientation (optional)
-        cameraNode.eulerAngles = SCNVector3(x: 0, y: 0, z: 0) // Adjust the rotation if needed
-
-        */
         sceneView.scene = scene
         
         sceneView.allowsCameraControl = false//add button to move the model
@@ -138,7 +128,7 @@ class ViewController: UIViewController {
         //Add to function
         view.bringSubviewToFront(RotateToggle)
         view.bringSubviewToFront(SelectPivot)
-
+        view.bringSubviewToFront(recordHaptic)
         view.bringSubviewToFront(xLabel)
         view.bringSubviewToFront(yLabel)
         view.bringSubviewToFront(zLabel)
@@ -172,21 +162,32 @@ class ViewController: UIViewController {
  //       referencePlaneNode = SCNNode(geometry: referencePlane)
   //      scene!.rootNode.addChildNode(referencePlaneNode)
         customizeGestureRecognizers()
+        
+        // 1
+        let vc = UIHostingController(rootView: HapticChart())
+
+        let swiftuiView = vc.view!
+        swiftuiView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // 2
+        // Add the view controller to the destination view controller.
+        addChild(vc)
+        view.addSubview(swiftuiView)
+        
+        // 3
+        // Create and activate the constraints for the swiftui's view.
+        NSLayoutConstraint.activate([
+            swiftuiView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            swiftuiView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+        ])
+        
+        // 4
+        // Notify the child view controller that the move is complete.
+        vc.didMove(toParent: self)
+        
     }
     
     
- /*   @objc private func didPan(_ sender: UIPanGestureRecognizer) {
-        switch sender.state {
-        case .began:
-            print(sender.location(in: sceneView))
-            print(sender.location(in: view))
-        case .changed:
-          //  print(sender.location(in: view))
-            break
-        default:
-            break
-        }
-    }*/
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
@@ -286,7 +287,7 @@ class ViewController: UIViewController {
         
     }
     
-    private func customizeGestureRecognizers() {
+    private func customizeGestureRecognizers() {//doesn't work
         // Remove default gesture recognizers for two-finger pan
         if let defaultGestureRecognizers = sceneView.gestureRecognizers
         {
@@ -348,6 +349,7 @@ class ViewController: UIViewController {
         symptonsButton.isHidden = true
         urgencylabel.isHidden = true
         similarButton.isHidden = true
+        recordHaptic.isHidden = true
         sceneView.debugOptions = SCNDebugOptions(rawValue: 2048)//shows the grid
         originalOrientation = sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation
         currentXVal = 0
@@ -412,6 +414,7 @@ class ViewController: UIViewController {
         treatmentButton.isHidden = false
         urgencylabel.isHidden = false
         similarButton.isHidden = false
+        recordHaptic.isHidden = false
         hideAxes()
         
     }
@@ -579,6 +582,26 @@ class ViewController: UIViewController {
         xAxisNode?.isHidden = false
         yAxisNode?.isHidden = false
         zAxisNode?.isHidden = false
+    }
+    
+    
+    @IBAction func recordPressed(_ sender: Any) {//when rotation turned on, turn off record
+        if !recordHaptics {
+            recordHaptics = true
+            recordHaptic.titleLabel?.text = "Recording"
+            recordHaptic.tintColor = UIColor.systemGreen
+            
+            RotateToggle.tintColor = UIColor.systemBlue
+            rotationOn = false
+            sceneView.allowsCameraControl = false
+            //BEGIN RECORDING 
+        }
+        else{
+            recordHaptics = false
+            recordHaptic.titleLabel?.text = "Record"
+            recordHaptic.tintColor = UIColor.systemBlue
+            //IF IT EXISTS, SHOW GRAPH - LET IT BE POSSIBLE TO BE CLOSED (WITH AN X ON THE TOP)
+        }
     }
     
     

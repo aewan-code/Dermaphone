@@ -70,6 +70,8 @@ class ViewController: UIViewController {
     let hapticAlgorithm = HapticRendering(maxHeight: 0.5, minHeight: -0.5)
     
     var prevTimestamp : TimeInterval?
+    
+    var chartData : [HapticDataPoint]?
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -163,27 +165,7 @@ class ViewController: UIViewController {
   //      scene!.rootNode.addChildNode(referencePlaneNode)
         customizeGestureRecognizers()
         
-        // 1
-        let vc = UIHostingController(rootView: HapticChart())
 
-        let swiftuiView = vc.view!
-        swiftuiView.translatesAutoresizingMaskIntoConstraints = false
-        
-        // 2
-        // Add the view controller to the destination view controller.
-        addChild(vc)
-        view.addSubview(swiftuiView)
-        
-        // 3
-        // Create and activate the constraints for the swiftui's view.
-        NSLayoutConstraint.activate([
-            swiftuiView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            swiftuiView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-        ])
-        
-        // 4
-        // Notify the child view controller that the move is complete.
-        vc.didMove(toParent: self)
         
     }
     
@@ -208,6 +190,11 @@ class ViewController: UIViewController {
                         // Example: Change color of the node
                       //  result.node.geometry?.firstMaterial?.diffuse.contents = UIColor.red
                         let position = result.localCoordinates
+                        //later remove so that first point is only added if continued onto touches moved
+                        if recordHaptics{
+                            let firstPoint = HapticDataPoint(intensity: position.y, time: 0)
+                            chartData?.append(firstPoint)
+                        }
                     /*    if changePivot{
                             sceneView.scene?.rootNode.pivot = SCNMatrix4MakeTranslation(position.x, position.y, position.z)
                             
@@ -266,6 +253,10 @@ class ViewController: UIViewController {
             //    let scaledHeight = heightTemp/scale!//scaled between -0.5 to -1.5
             //   print(scaledHeight)
                 let intensity = hapticAlgorithm.forceFeedback(height: height, velocity: speed)
+                if recordHaptics{
+                    let dataPoint = HapticDataPoint(intensity: intensity, time: Float(touch.timestamp))
+                    chartData?.append(dataPoint)
+                }
                 if !rotationOn{
                     //try tempHaptics?.playHeightHaptic(height: height*10)
                     try tempHaptics?.playHeightHaptic(height:intensity/2)
@@ -594,12 +585,38 @@ class ViewController: UIViewController {
             RotateToggle.tintColor = UIColor.systemBlue
             rotationOn = false
             sceneView.allowsCameraControl = false
-            //BEGIN RECORDING 
+            chartData = []
+            //BEGIN RECORDING
         }
         else{
             recordHaptics = false
             recordHaptic.titleLabel?.text = "Record"
             recordHaptic.tintColor = UIColor.systemBlue
+            
+            if chartData != nil || ((chartData?.isEmpty) != nil) == false{
+                // 1
+                let vc = UIHostingController(rootView: HapticChart(data: chartData ?? []))
+
+                let swiftuiView = vc.view!
+                swiftuiView.translatesAutoresizingMaskIntoConstraints = false
+                
+                // 2
+                // Add the view controller to the destination view controller.
+                addChild(vc)
+                view.addSubview(swiftuiView)
+                
+                // 3
+                // Create and activate the constraints for the swiftui's view.
+                NSLayoutConstraint.activate([
+                    swiftuiView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                    swiftuiView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                ])
+                
+                // 4
+                // Notify the child view controller that the move is complete.
+                vc.didMove(toParent: self)
+            }
+            chartData = []//DATA DELETED
             //IF IT EXISTS, SHOW GRAPH - LET IT BE POSSIBLE TO BE CLOSED (WITH AN X ON THE TOP)
         }
     }

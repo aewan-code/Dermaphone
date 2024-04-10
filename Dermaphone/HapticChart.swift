@@ -9,7 +9,7 @@ import SwiftUI
 import Charts
 
 struct HapticChart: View {
-    var data = [
+    /*var data = [
         HapticDataPoint(intensity: 1.0, time: 0),
         HapticDataPoint(intensity: 0.9, time: 0.1),
         HapticDataPoint(intensity: 0.8, time: 0.2),
@@ -23,7 +23,8 @@ struct HapticChart: View {
         HapticDataPoint(intensity: 1.0, time: 1.0),
         HapticDataPoint(intensity: 0.9, time: 1.1),
         HapticDataPoint(intensity: 0.9, time: 1.2)
-    ]
+    ]*/
+    let data : [HapticDataPoint]
     var body: some View {
         Chart{
             ForEach(data) { d in
@@ -35,5 +36,5 @@ struct HapticChart: View {
 }
 
 #Preview {
-    HapticChart()
+    HapticChart(data: [])
 }

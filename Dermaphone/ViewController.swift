@@ -14,7 +14,9 @@ import SwiftUI
 class ViewController: UIViewController {
     
     //MARK -UI
-    
+    var swiftuiView : UIView?
+    var closeView : UIButton?
+    var firstTimestamp : TimeInterval?
     @IBOutlet weak var navBar: UINavigationItem!
     @IBOutlet weak var zScale: UISlider!
     
@@ -192,8 +194,9 @@ class ViewController: UIViewController {
                         let position = result.localCoordinates
                         //later remove so that first point is only added if continued onto touches moved
                         if recordHaptics{
-                            let firstPoint = HapticDataPoint(intensity: position.y, time: 0)
+                            let firstPoint = HapticDataPoint(intensity: position.y, time: 0.0)
                             chartData?.append(firstPoint)
+                            firstTimestamp = touch.timestamp
                         }
                     /*    if changePivot{
                             sceneView.scene?.rootNode.pivot = SCNMatrix4MakeTranslation(position.x, position.y, position.z)
@@ -254,7 +257,7 @@ class ViewController: UIViewController {
             //   print(scaledHeight)
                 let intensity = hapticAlgorithm.forceFeedback(height: height, velocity: speed)
                 if recordHaptics{
-                    let dataPoint = HapticDataPoint(intensity: intensity, time: Float(touch.timestamp))
+                    let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
                     chartData?.append(dataPoint)
                 }
                 if !rotationOn{
@@ -592,33 +595,57 @@ class ViewController: UIViewController {
             recordHaptics = false
             recordHaptic.titleLabel?.text = "Record"
             recordHaptic.tintColor = UIColor.systemBlue
-            
+            print(chartData)
             if chartData != nil || ((chartData?.isEmpty) != nil) == false{
                 // 1
                 let vc = UIHostingController(rootView: HapticChart(data: chartData ?? []))
 
-                let swiftuiView = vc.view!
-                swiftuiView.translatesAutoresizingMaskIntoConstraints = false
+                swiftuiView = vc.view!
+                swiftuiView?.translatesAutoresizingMaskIntoConstraints = false
                 
                 // 2
                 // Add the view controller to the destination view controller.
                 addChild(vc)
-                view.addSubview(swiftuiView)
+                view.addSubview(swiftuiView!)
                 
                 // 3
                 // Create and activate the constraints for the swiftui's view.
                 NSLayoutConstraint.activate([
-                    swiftuiView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                    swiftuiView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-                ])
-                
+                    //swiftuiView!.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                    swiftuiView!.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                    swiftuiView!.widthAnchor.constraint(equalTo: view.widthAnchor),
+                    swiftuiView!.leftAnchor.constraint(equalTo: view.leftAnchor)
+                    ])
+              //  swiftuiView?.frame.width = view.wid
                 // 4
                 // Notify the child view controller that the move is complete.
                 vc.didMove(toParent: self)
+                
+                closeView = UIButton(frame: CGRect(x: 100, y: 100, width: 100, height: 50))
+                closeView?.backgroundColor = UIColor.systemRed
+                
+                closeView?.setTitle("Close", for: [])
+             //   closeView?.titleLabel?.text = "Close"
+                closeView?.addTarget(self, action: #selector(closeViewAction), for: .touchUpInside)
+
+                self.view.addSubview(closeView!)
+                NSLayoutConstraint.activate([
+                   // closeView!.leftAnchor.constraint(equalTo: swiftuiView!.leftAnchor),
+                    closeView!.bottomAnchor.constraint(equalTo: swiftuiView!.topAnchor)
+                 //   closeView.centerYAnchor.constraint(equalTo: swiftuiView!.centerYAnchor),
+                ])
+                view.bringSubviewToFront(closeView!)
+                
             }
             chartData = []//DATA DELETED
             //IF IT EXISTS, SHOW GRAPH - LET IT BE POSSIBLE TO BE CLOSED (WITH AN X ON THE TOP)
         }
+    }
+    
+    @objc func closeViewAction(){
+        swiftuiView?.removeFromSuperview()
+        closeView?.removeFromSuperview()
+        
     }
     
     

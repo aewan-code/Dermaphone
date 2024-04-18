@@ -28,10 +28,13 @@ struct HapticChart: View {
     var body: some View {
         Chart{
             ForEach(data) { d in
-                BarMark(x: PlottableValue.value("Time", d.time), y: PlottableValue.value("Intensity", d.intensity))
+                PointMark(x: PlottableValue.value("Time", d.time), y: PlottableValue.value("Intensity", d.intensity))
             }
         }
         .padding()
+        .chartXAxisLabel("Time (seconds)")//DOUBLE CHECK
+        .chartYAxisLabel("Taptic Intensity")
+        
     }
 }
 

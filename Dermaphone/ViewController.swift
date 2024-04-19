@@ -11,7 +11,7 @@ import RealityKit
 import CoreHaptics
 import SwiftUI
 
-class ViewController: UIViewController {
+class skinmodel: UIViewController {
     
     //MARK -UI
     var prevPoint : Float?

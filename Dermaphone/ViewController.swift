@@ -21,8 +21,7 @@ class ViewController: UIViewController {
             return
         }
         vc.set(name: modelName)
-        vc.modalPresentationStyle = .fullScreen
-        present(vc, animated: true, completion: nil)
+        navigationController?.pushViewController(vc, animated: true)
     }
     override func viewDidLoad() {
         super.viewDidLoad()

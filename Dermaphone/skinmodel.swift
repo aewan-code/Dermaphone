@@ -13,7 +13,7 @@ import RealityKit
 import CoreHaptics
 import SwiftUI
 
-class skinmodel: UIViewController{
+class skinmodel1: UIViewController{
    // @StateObject var currentModelName = currentModel()
     var modelName: String = "baked_mesh"
     var modelFile : String = "baked_mesh.scn"
@@ -147,7 +147,8 @@ class skinmodel: UIViewController{
                         // Example: Change color of the node
                       //  result.node.geometry?.firstMaterial?.diffuse.contents = UIColor.red
                         let position = result.localCoordinates
-                    /*    if changePivot{
+                      
+                        /*    if changePivot{
                             sceneView.scene?.rootNode.pivot = SCNMatrix4MakeTranslation(position.x, position.y, position.z)
                             
                         }*/

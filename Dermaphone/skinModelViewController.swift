@@ -11,8 +11,9 @@ import RealityKit
 import CoreHaptics
 import SwiftUI
 
-class skinmodel1: UIViewController {
-    
+class skinmodel: UIViewController {
+    var modelName: String?// = "Mesh"
+    var modelFile : String?// = "testTransform.scn"
     //MARK -UI
     var prevPoint : Float?
     
@@ -28,9 +29,8 @@ class skinmodel1: UIViewController {
     @IBOutlet weak var zLabel: UILabel!
     @IBOutlet weak var yLabel: UILabel!
     @IBOutlet weak var xLabel: UILabel!
-    @IBOutlet weak var completeEdit: UIBarButtonItem!
-    @IBOutlet weak var cancelEdit: UIBarButtonItem!
-    
+    @IBOutlet weak var completeEdit: UIButton!
+    @IBOutlet weak var cancelEdit: UIButton!
     @IBOutlet weak var symptonsButton: UIButton!
     
     @IBOutlet weak var treatmentButton: UIButton!
@@ -53,7 +53,7 @@ class skinmodel1: UIViewController {
     
      let sceneView = SCNView()
     let cameraNode = SCNNode()
-    let scene = SCNScene(named: "testTransform.scn")
+    var scene : SCNScene?
     var currentView: UIView!
     var tempHaptics : Haptics?
     var engine: CHHapticEngine!
@@ -74,11 +74,17 @@ class skinmodel1: UIViewController {
     var prevTimestamp : TimeInterval?
     
     var chartData : [HapticDataPoint]?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        print(modelName)
+        print(modelFile)
         currentView = view
-        guard let baseNode = scene?.rootNode.childNode(withName: "Mesh", recursively: true) else {
+
+        scene = SCNScene(named: modelFile ?? "baked_mesh.scn")
+        
+        guard let baseNode = scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true) else {
                     fatalError("Unable to find baseNode")
                 }
         // Create and configure a haptic engine.
@@ -117,7 +123,7 @@ class skinmodel1: UIViewController {
         //self.view = sceneView
         view.addSubview(sceneView)
         sceneView.frame = CGRect(x: 0, y: notesButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (notesButton.frame.maxY + 10)) // Adjust the values as needed
-        originalOrientation = (sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)!.orientation)!
+        originalOrientation = (sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)!.orientation)!
         urgencylabel.text = "Precancerous"
         
         //Add to function
@@ -170,7 +176,7 @@ class skinmodel1: UIViewController {
 
                 // Check if the desired node is touched
                 for result in hitTestResults {
-                    if result.node.name == "Mesh" {
+                    if result.node.name == modelName{
                         // Node is touched, perform desired action
                         let position = result.localCoordinates
                         //later remove so that first point is only added if continued onto touches moved
@@ -194,7 +200,7 @@ class skinmodel1: UIViewController {
         
         // Check if the desired node is touched
         for result in hitTestResults {
-            if result.node.name == "Mesh" {
+            if result.node.name == modelName {
                 let height = result.localCoordinates.y
                 
                 let intersectionPoint = result.worldCoordinates
@@ -273,7 +279,7 @@ class skinmodel1: UIViewController {
         similarButton.isHidden = true
         recordHaptic.isHidden = true
         sceneView.debugOptions = SCNDebugOptions(rawValue: 2048)//shows the grid
-        originalOrientation = sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation
+        originalOrientation = sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.orientation
         currentXVal = 0
         currentYVal = 0
         currentZVal = 0
@@ -306,7 +312,7 @@ class skinmodel1: UIViewController {
         
     }
     @IBAction func cancelPressed(_ sender: Any) {
-        sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation = originalOrientation!
+        sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.orientation = originalOrientation!
         showOriginalView()
     }
     
@@ -337,7 +343,7 @@ class skinmodel1: UIViewController {
         let sinAngle = sin((Float.pi * newValue/180))
         let cosAngle = cos((Float.pi * newValue/180))
         let q = SCNQuaternion(sinAngle, 0, 0, cosAngle)
-         sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
+        sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.localRotate(by: q)
         
     }
     @IBAction func yChanged(_ sender: Any) {
@@ -365,7 +371,7 @@ class skinmodel1: UIViewController {
         let cosAngle = cos((Float.pi * newValue/180))
         let q = SCNQuaternion(0, sinAngle, 0, cosAngle)
 
-         sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
+        sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.localRotate(by: q)
         
     }
     @IBAction func zChanged(_ sender: Any) {
@@ -392,7 +398,7 @@ class skinmodel1: UIViewController {
         let sinAngle = sin((Float.pi * newValue/180))
         let cosAngle = cos((Float.pi * newValue/180))
         let q = SCNQuaternion(0, 0, sinAngle, cosAngle)
-         sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
+        sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.localRotate(by: q)
         
     }
     
@@ -493,6 +499,14 @@ class skinmodel1: UIViewController {
         swiftuiView?.removeFromSuperview()
         closeView?.removeFromSuperview()
         
+    }
+    
+    func set(name : String, fileName : String){
+        
+        self.modelName = name
+        self.modelFile = fileName
+        scene = SCNScene(named: fileName)//do i need to deallocate the current scene?
+        print(self.modelName)
     }
     
     

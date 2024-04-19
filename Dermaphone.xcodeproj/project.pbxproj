@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		FF5C1C7A2BD2F99400C097E9 /* skinModelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1C792BD2F99400C097E9 /* skinModelViewController.swift */; };
+		FF5C1C7C2BD2FA1000C097E9 /* HapticChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1C7B2BD2FA1000C097E9 /* HapticChart.swift */; };
 		FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A802BAE183600A94673 /* AppDelegate.swift */; };
 		FFB13A832BAE183600A94673 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A822BAE183600A94673 /* SceneDelegate.swift */; };
 		FFB13A852BAE183600A94673 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A842BAE183600A94673 /* ViewController.swift */; };
@@ -77,6 +78,7 @@
 
 /* Begin PBXFileReference section */
 		FF5C1C792BD2F99400C097E9 /* skinModelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = skinModelViewController.swift; sourceTree = "<group>"; };
+		FF5C1C7B2BD2FA1000C097E9 /* HapticChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticChart.swift; sourceTree = "<group>"; };
 		FFB13A7D2BAE183600A94673 /* Dermaphone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dermaphone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFB13A802BAE183600A94673 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FFB13A822BAE183600A94673 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 		FFB13A742BAE183600A94673 = {
 			isa = PBXGroup;
 			children = (
+				FF5C1C7B2BD2FA1000C097E9 /* HapticChart.swift */,
 				FFF154C12BBC375700834F38 /* 3dmodelSkin2 */,
 				FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */,
 				FFB13A7F2BAE183600A94673 /* Dermaphone */,
@@ -427,6 +430,7 @@
 				FFC1CEBC2BBB22AA00FD49B7 /* ContentView.swift in Sources */,
 				FFC1CEAC2BBB22AA00FD49B7 /* CaptureFoldersView.swift in Sources */,
 				FFC1CEB52BBB22AA00FD49B7 /* CaptureGalleryView.swift in Sources */,
+				FF5C1C7C2BD2FA1000C097E9 /* HapticChart.swift in Sources */,
 				FFC1CEBB2BBB22AA00FD49B7 /* CaptureFolderState.swift in Sources */,
 				FFC1CEAE2BBB22AA00FD49B7 /* HelpPageView.swift in Sources */,
 				FFC1CEAD2BBB22AA00FD49B7 /* CameraPreviewView.swift in Sources */,

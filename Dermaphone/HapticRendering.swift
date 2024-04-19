@@ -27,6 +27,8 @@ class HapticRendering {
         return F
     }
     
+    
+    
     func changePlane(newMax : Float, newMin : Float){
         self.maxHeight = newMax
         self.minHeight = newMin

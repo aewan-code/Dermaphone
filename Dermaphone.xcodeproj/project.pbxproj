@@ -140,8 +140,8 @@
 				FFB13B272BAE1CE500A94673 /* 3dmodeltest2 */,
 				FFB13A862BAE183600A94673 /* Main.storyboard */,
 				FF1A7DDC2BBD676F0020BA10 /* testTransform.scn */,
-				FF1A7DDE2BBD67960020BA10 /* skin3_tex0.png */,
 				FFB13A892BAE183800A94673 /* Assets.xcassets */,
+				FF1A7DDE2BBD67960020BA10 /* skin3_tex0.png */,
 				FFB13A8B2BAE183800A94673 /* LaunchScreen.storyboard */,
 				FFB13A8E2BAE183800A94673 /* Info.plist */,
 			);

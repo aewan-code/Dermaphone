@@ -14,6 +14,8 @@ import SwiftUI
 class ViewController: UIViewController {
     
     //MARK -UI
+    var prevPoint : Float?
+    
     var swiftuiView : UIView?
     var closeView : UIButton?
     var firstTimestamp : TimeInterval?
@@ -61,8 +63,6 @@ class ViewController: UIViewController {
     var xAxisNode : SCNNode?
     var yAxisNode : SCNNode?
     var zAxisNode : SCNNode?
-  //  let referencePlane = SCNPlane(width: 100, height: 100) // Adjust the size as needed
-  //  var referencePlaneNode :SCNNode!
     
     @IBOutlet weak var RotateToggle: UIButton!
  
@@ -78,7 +78,6 @@ class ViewController: UIViewController {
         super.viewDidLoad()
 
         currentView = view
-        print(notesButton.frame.minY)
         guard let baseNode = scene?.rootNode.childNode(withName: "Mesh", recursively: true) else {
                     fatalError("Unable to find baseNode")
                 }
@@ -107,8 +106,6 @@ class ViewController: UIViewController {
         cameraNode.camera = SCNCamera()
         sceneView.cameraControlConfiguration.allowsTranslation = false
         
-     //   sceneView.scene?.rootNode.eulerAngles = SCNVector3(x: 0, y: 0, z: 0)
-     //   scene!.rootNode.addChildNode(cameraNode)
         cameraNode.constraints = [SCNTransformConstraint.positionConstraint(
             inWorldSpace: true,
             with: { (node, position) -> SCNVector3 in
@@ -119,15 +116,9 @@ class ViewController: UIViewController {
         sceneView.debugOptions = [.showCreases]
         //self.view = sceneView
         view.addSubview(sceneView)
-        print(sceneView.frame)
         sceneView.frame = CGRect(x: 0, y: notesButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (notesButton.frame.maxY + 10)) // Adjust the values as needed
         originalOrientation = (sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)!.orientation)!
         urgencylabel.text = "Precancerous"
-        
-
-        
-    //    let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(didPan(_:)))
-      //  sceneView.addGestureRecognizer(panGestureRecognizer)
         
         //Add to function
         view.bringSubviewToFront(RotateToggle)
@@ -150,7 +141,6 @@ class ViewController: UIViewController {
         completeEdit.isHidden = true
         
         changePivot = false
-        print("ALEERA")
         createAxes()
         hideAxes()
         navBar.title = "Skin Lesion: Actinic Keratosis"
@@ -161,11 +151,6 @@ class ViewController: UIViewController {
         for descript in magnifierText{
             view.bringSubviewToFront(descript)
         }
-
- //       print(sceneView.scene?.rootNode.pivot)
- //       referencePlaneNode = SCNNode(geometry: referencePlane)
-  //      scene!.rootNode.addChildNode(referencePlaneNode)
-        customizeGestureRecognizers()
         
 
         
@@ -178,7 +163,6 @@ class ViewController: UIViewController {
         let touch = touches.first!
         let location = touch.location(in: sceneView)
         if touch.view == sceneView{
-            print("sceneView")
             self.currentView = sceneView
         }
         // Perform hit test
@@ -188,9 +172,6 @@ class ViewController: UIViewController {
                 for result in hitTestResults {
                     if result.node.name == "Mesh" {
                         // Node is touched, perform desired action
-                        print("Node is touched!")
-                        // Example: Change color of the node
-                      //  result.node.geometry?.firstMaterial?.diffuse.contents = UIColor.red
                         let position = result.localCoordinates
                         //later remove so that first point is only added if continued onto touches moved
                         if recordHaptics{
@@ -198,20 +179,15 @@ class ViewController: UIViewController {
                             chartData?.append(firstPoint)
                             firstTimestamp = touch.timestamp
                         }
-                    /*    if changePivot{
-                            sceneView.scene?.rootNode.pivot = SCNMatrix4MakeTranslation(position.x, position.y, position.z)
-                            
-                        }*/
+                        prevPoint = position.y
                         return
                     }
                 }
-        print("touch began")
         
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
-     //   print("touch moved")
         let touch = touches.first!
         let location = touch.location(in: sceneView)
         let hitTestResults = sceneView.hitTest(location, options: nil)
@@ -219,105 +195,57 @@ class ViewController: UIViewController {
         // Check if the desired node is touched
         for result in hitTestResults {
             if result.node.name == "Mesh" {
-                // Node is touched, perform desired action
-         //       print("Node is touched!")
-                // Example: Change color of the node
-          //      result.node.geometry?.firstMaterial?.diffuse.contents = UIColor.red
-               // try tempHaptics?.playTransient()
                 let height = result.localCoordinates.y
-                print(height)
                 
                 let intersectionPoint = result.worldCoordinates
-                        // Calculate the height using the intersection point and the plane
-       //         let heightTemp = calculateHeight(referencePlaneNode, atPoint: intersectionPoint)
-            //    print(intersectionPoint)
                 let previousLocation = touch.previousLocation(in: sceneView)
                         let currentLocation = touch.location(in: sceneView)
                         
                 let deltaX = (currentLocation.x - previousLocation.x)*0.01 //cm
                 
                 let deltaY = (currentLocation.y - previousLocation.y)*0.01
-                    //    let deltaZ = currentLocation.z - previousLocation.z // Assuming your touch event provides z-coordinates
                 let prevTime = prevTimestamp ?? 0.0
                 let timeDelta = touch.timestamp - prevTime
                 prevTimestamp = touch.timestamp
                 let velocityX = deltaX / CGFloat(timeDelta)
                 let velocityY = deltaY / CGFloat(timeDelta)
                 let speed = Float(sqrt((velocityX * velocityX) + (velocityY * velocityY)))
-                     //   let timeDelta = touch.timestamp - touch.previousLocation(in: self.view).timestamp
-                print("Ewan")
-        //        print(-heightTemp)
-                print(deltaX)
-                print(deltaY)
                 if scale == nil{
         //             scale = heightTemp.rounded()
                 }
-           //     print(heightTemp)
-            //    let scaledHeight = heightTemp/scale!//scaled between -0.5 to -1.5
-            //   print(scaledHeight)
-                let intensity = hapticAlgorithm.forceFeedback(height: height, velocity: speed)
+                //let intensity = hapticAlgorithm.forceFeedback(height: height, velocity: speed)
+                let intensity = (((height - (prevPoint ?? 0))*1000)+5)/10
+                print(intensity)
                 if recordHaptics{
-                    let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
+                 //   let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
+                    let dataPoint = HapticDataPoint(intensity: intensity, time:Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
                     chartData?.append(dataPoint)
                 }
+                
+                prevPoint = height
                 if !rotationOn{
-                    //try tempHaptics?.playHeightHaptic(height: height*10)
-                    try tempHaptics?.playHeightHaptic(height:intensity/2)
+                    try tempHaptics?.playHeightHaptic(height:intensity)
                 }
-                print(sceneView.cameraControlConfiguration.panSensitivity)
-               // print(cameraNode.constraints)
-                print(speed)
-                print("ALGORITHM")
-                print(hapticAlgorithm.forceFeedback(height: height, velocity: speed))
-                
-            //    print("Check")
-              //  print(result.localCoordinates)//localCoordinates shows the x,y,z coordinates of the point cloud
-              //  print(height)
-                
                 return
             }
         }
 
         
     }
-    
-    private func customizeGestureRecognizers() {//doesn't work
-        // Remove default gesture recognizers for two-finger pan
-        if let defaultGestureRecognizers = sceneView.gestureRecognizers
-        {
-            for recognizer in defaultGestureRecognizers {
-                if let panGestureRecognizer = recognizer as? UIPanGestureRecognizer {
-                    if panGestureRecognizer.minimumNumberOfTouches == 2 {
-                        sceneView.removeGestureRecognizer(panGestureRecognizer)
-                    }
-                }
-            }
-        }
-    }
+
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        print("touch ended")
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
-        print("touch cancelled")
     }
     @IBAction func buttonPressed(_ sender: Any) {
         if !rotationOn{
             rotationOn = true
             sceneView.allowsCameraControl = true
             sceneView.cameraControlConfiguration.allowsTranslation = false
-            print("CHECK CAMERA")
-            print(sceneView.gestureRecognizers)
             RotateToggle.tintColor = UIColor.systemGreen
-          //  sceneView.defaultCameraController.
-          //  sceneView.cameraControlConfiguration.panSensitivity = 0
-          //  sceneView.defaultCameraController.interactionMode = .orbitTurntable
-          //  scnview.defaultCameraController.inertiaEnabled = true
-           // scnview.defaultCameraController.maximumVerticalAngle = 69
-            //scnview.defaultCameraController.minimumVerticalAngle = -69
-            //s/cnview.autoenablesDefaultLighting = true
         }
         else{
             rotationOn = false
@@ -353,41 +281,6 @@ class ViewController: UIViewController {
 
     }
     
-    func calculateHeight(_ plane: SCNNode, atPoint point: SCNVector3) -> Float {
-        let worldTransform = plane.worldTransform
-        
-        //let planePosition = SCNVector3(worldTransform.m41, worldTransform.m42, worldTransform.m43)
-        let planePosition = plane.position
-       // print("position")
-        //print(planePosition)
-       // print(worldTransform)
-        let planeNormal = SCNVector3(worldTransform.m31, worldTransform.m32, worldTransform.m33)
-        let D = -(planeNormal.x * planePosition.x + planeNormal.y * planePosition.y + planeNormal.z * planePosition.z)
-        //print(D)
-        let A = planeNormal.x
-        let B = planeNormal.y
-        let C = planeNormal.z
-        let x = point.x
-        let y = point.y
-        let z = point.z
-        var numerator = A * x
-        numerator = numerator + (B * y)
-        numerator = numerator + (C * z)
-        numerator = numerator + D
-        numerator = numerator * numerator
-        numerator = sqrt(numerator)
-        
-        var denominator = A * A
-        denominator = denominator + (B * B)
-        denominator = denominator + (C * C)
-        denominator = sqrt(denominator)
-        //+ B^2 + C^2)
-     //   print(numerator)
-       // print(denominator)
-        let distance = numerator/denominator //|Axo + Byo+ Czo + D|/√(A2 + B2 + C2)
-       // let distance = 1.0// Calculate distance between point and plane using plane equation
-        return distance
-    }
     func showOriginalView(){
         cancelEdit.isHidden = true
         completeEdit.isHidden = true
@@ -422,8 +315,6 @@ class ViewController: UIViewController {
     }
     @IBAction func xChanged(_ sender: Any) {
         var newValue = xScale.value
-        print(newValue)
-        print(currentXVal)
         if newValue > (currentXVal ?? 0){
             currentXVal = newValue
             if newValue == xScale.maximumValue || newValue == xScale.minimumValue{
@@ -445,22 +336,12 @@ class ViewController: UIViewController {
         }
         let sinAngle = sin((Float.pi * newValue/180))
         let cosAngle = cos((Float.pi * newValue/180))
-        print(cosAngle)
-        print(cos((0.0)))
-        print(newValue)
         let q = SCNQuaternion(sinAngle, 0, 0, cosAngle)
-        print(q)
-        
-        
-         //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
          sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
-         //print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
         
     }
     @IBAction func yChanged(_ sender: Any) {
         var newValue = yScale.value
-        print(newValue)
-        print(currentYVal)
         if newValue > (currentYVal ?? 0){
             currentYVal = newValue
             if newValue == yScale.maximumValue || newValue == yScale.minimumValue{
@@ -482,22 +363,13 @@ class ViewController: UIViewController {
         }
         let sinAngle = sin((Float.pi * newValue/180))
         let cosAngle = cos((Float.pi * newValue/180))
-        print(cosAngle)
-        print(cos((0.0)))
-        print(newValue)
         let q = SCNQuaternion(0, sinAngle, 0, cosAngle)
-        print(q)
-        
-        
-         //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
+
          sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
-         //print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
         
     }
     @IBAction func zChanged(_ sender: Any) {
         var newValue = zScale.value
-        print(newValue)
-        print(currentZVal)
         if newValue > (currentZVal ?? 0){
             currentZVal = newValue
             if newValue == zScale.maximumValue || newValue == zScale.minimumValue{
@@ -519,48 +391,30 @@ class ViewController: UIViewController {
         }
         let sinAngle = sin((Float.pi * newValue/180))
         let cosAngle = cos((Float.pi * newValue/180))
-        print(cosAngle)
-        print(cos((0.0)))
-        print(newValue)
         let q = SCNQuaternion(0, 0, sinAngle, cosAngle)
-        print(q)
-        
-        
-         //sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localTranslate(by: vector)
          sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
-         //print(sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation)
         
     }
     
     func createAxes(){//fix code for axes - change!
-     //   let xaxis = SCNNode(geometry: SCNCylinder(radius: 1, height: 10))//base it on the max of the height/width of the skin lesion
         
         let xAxis = SCNCylinder(radius: 0.001, height: 1)
         xAxis.firstMaterial?.diffuse.contents = UIColor.red
         xAxisNode = SCNNode(geometry: xAxis)
-        // by default the middle of the cylinder will be at the origin aligned to the y-axis
-        // need to spin around to align with respective axes and shift position so they start at the origin
         xAxisNode?.simdWorldOrientation = simd_quatf.init(angle: .pi/2, axis: simd_float3(0, 0, 1))
         xAxisNode?.simdWorldPosition = simd_float1(1)/2 * simd_float3(1, 0, 0)
-       // xaxis.position = SCNVector3(0,0,0)
         scene?.rootNode.addChildNode(xAxisNode!)
         let yAxis = SCNCylinder(radius: 0.001, height: 1)
         yAxis.firstMaterial?.diffuse.contents = UIColor.green
         yAxisNode = SCNNode(geometry: yAxis)
-        // by default the middle of the cylinder will be at the origin aligned to the y-axis
-        // need to spin around to align with respective axes and shift position so they start at the origin
 
         yAxisNode?.simdWorldPosition = simd_float1(1)/2 * simd_float3(0, 1, 0)
-       // xaxis.position = SCNVector3(0,0,0)
         scene?.rootNode.addChildNode(yAxisNode!)
         let zAxis = SCNCylinder(radius: 0.001, height: 1)
         zAxis.firstMaterial?.diffuse.contents = UIColor.blue
         zAxisNode = SCNNode(geometry: zAxis)
-        // by default the middle of the cylinder will be at the origin aligned to the y-axis
-        // need to spin around to align with respective axes and shift position so they start at the origin
         zAxisNode?.simdWorldOrientation = simd_quatf.init(angle: .pi/2, axis: simd_float3(1, 0, 0))
         zAxisNode?.simdWorldPosition = simd_float1(1)/2 * simd_float3(0, 0, 1)
-       // xaxis.position = SCNVector3(0,0,0)
         scene?.rootNode.addChildNode(zAxisNode!)
         
     }
@@ -595,7 +449,6 @@ class ViewController: UIViewController {
             recordHaptics = false
             recordHaptic.titleLabel?.text = "Record"
             recordHaptic.tintColor = UIColor.systemBlue
-            print(chartData)
             if chartData != nil || ((chartData?.isEmpty) != nil) == false{
                 // 1
                 let vc = UIHostingController(rootView: HapticChart(data: chartData ?? []))
@@ -616,8 +469,6 @@ class ViewController: UIViewController {
                     swiftuiView!.widthAnchor.constraint(equalTo: view.widthAnchor),
                     swiftuiView!.leftAnchor.constraint(equalTo: view.leftAnchor)
                     ])
-              //  swiftuiView?.frame.width = view.wid
-                // 4
                 // Notify the child view controller that the move is complete.
                 vc.didMove(toParent: self)
                 
@@ -625,20 +476,16 @@ class ViewController: UIViewController {
                 closeView?.backgroundColor = UIColor.systemRed
                 
                 closeView?.setTitle("Close", for: [])
-             //   closeView?.titleLabel?.text = "Close"
                 closeView?.addTarget(self, action: #selector(closeViewAction), for: .touchUpInside)
 
                 self.view.addSubview(closeView!)
                 NSLayoutConstraint.activate([
-                   // closeView!.leftAnchor.constraint(equalTo: swiftuiView!.leftAnchor),
                     closeView!.bottomAnchor.constraint(equalTo: swiftuiView!.topAnchor)
-                 //   closeView.centerYAnchor.constraint(equalTo: swiftuiView!.centerYAnchor),
                 ])
                 view.bringSubviewToFront(closeView!)
                 
             }
             chartData = []//DATA DELETED
-            //IF IT EXISTS, SHOW GRAPH - LET IT BE POSSIBLE TO BE CLOSED (WITH AN X ON THE TOP)
         }
     }
     

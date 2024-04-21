@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="LTM-Ud-GKA">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -251,18 +250,11 @@
                                 <buttonConfiguration key="configuration" style="filled" title="Similar Conditions"/>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wCq-0w-L5o">
-                                <rect key="frame" x="17" y="141" width="106" height="35"/>
+                                <rect key="frame" x="9" y="139" width="101" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="tintColor" name="AccentColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Symptoms"/>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K54-LO-Tnl">
-                                <rect key="frame" x="279" y="141" width="102" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" name="AccentColor"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Treatment"/>
                             </button>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="arrow.right.to.line.alt" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="5Dd-VU-Sc5">
                                 <rect key="frame" x="329" y="659" width="45" height="38"/>
@@ -328,13 +320,29 @@
                                     <action selector="completePressed:" destination="6oJ-M7-Edc" eventType="touchUpInside" id="HpF-RK-2Fb"/>
                                 </connections>
                             </button>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="Icb-0O-N1B">
+                                <rect key="frame" x="112" y="141" width="159" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="Transient"/>
+                                    <segment title="Continuous"/>
+                                </segments>
+                                <connections>
+                                    <action selector="hapticMethodChanged:" destination="6oJ-M7-Edc" eventType="valueChanged" id="LQ0-62-UI3"/>
+                                </connections>
+                            </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K54-LO-Tnl">
+                                <rect key="frame" x="278" y="139" width="103" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="tintColor" name="AccentColor"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Treatment"/>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="EU6-GI-TbU"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
-                    <toolbarItems>
-                        <barButtonItem title="Item" id="i9V-oZ-54g"/>
-                    </toolbarItems>
+                    <toolbarItems/>
                     <navigationItem key="navigationItem" id="ggu-Tv-x1G">
                         <nil key="title"/>
                     </navigationItem>
@@ -344,6 +352,7 @@
                         <outlet property="SelectPivot" destination="vtc-u6-Iug" id="apY-6c-utF"/>
                         <outlet property="cancelEdit" destination="Te1-Ta-19T" id="cCe-xU-4NV"/>
                         <outlet property="completeEdit" destination="nj7-my-Yzq" id="8Mz-h3-j7c"/>
+                        <outlet property="hapticMethod" destination="Icb-0O-N1B" id="H3x-0M-DYz"/>
                         <outlet property="navBar" destination="ggu-Tv-x1G" id="3f4-0d-7SJ"/>
                         <outlet property="notesButton" destination="Djs-bE-UuZ" id="xhK-zc-FMn"/>
                         <outlet property="recordHaptic" destination="7Ll-FG-3r2" id="52v-Hp-eEq"/>
@@ -364,7 +373,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="MlQ-DC-lMc" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2482" y="-113"/>
+            <point key="canvasLocation" x="2481.679389312977" y="-113.38028169014085"/>
         </scene>
     </scenes>
     <resources>

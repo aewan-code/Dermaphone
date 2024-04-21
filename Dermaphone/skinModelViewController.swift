@@ -14,9 +14,10 @@ import SwiftUI
 class skinmodel: UIViewController {
     var modelName: String?// = "Mesh"
     var modelFile : String?// = "testTransform.scn"
+    var currentIntensity : Float?
     //MARK -UI
     var prevPoint : Float?
-    
+    var hapticTransient : Bool?
     var swiftuiView : UIView?
     var closeView : UIButton?
     var firstTimestamp : TimeInterval?
@@ -41,6 +42,7 @@ class skinmodel: UIViewController {
     @IBOutlet var magnifier: [UIImageView]!
     
     @IBOutlet var magnifierText: [UILabel]!
+    @IBOutlet weak var hapticMethod: UISegmentedControl!
     var currentXVal :Float?
     var currentYVal : Float?
     var currentZVal : Float?
@@ -77,11 +79,11 @@ class skinmodel: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        hapticMethod.selectedSegmentIndex = 0
         print(modelName)
         print(modelFile)
         currentView = view
-
+        hapticTransient = true
         scene = SCNScene(named: modelFile ?? "baked_mesh.scn")
         
         guard let baseNode = scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true) else {
@@ -186,6 +188,21 @@ class skinmodel: UIViewController {
                             firstTimestamp = touch.timestamp
                         }
                         prevPoint = position.y
+                        
+                        if !(hapticTransient ?? true){
+                            //continuous mode
+                            tempHaptics?.createContinuousHapticPlayer(initialIntensity: position.y*10, initialSharpness: position.y*10)
+                            currentIntensity = position.y*10
+                          //  tempHaptics?.continuousPlayer.start(atTime: <#T##TimeInterval#>)
+                            // Warm engine.
+                            do {
+                                // Begin playing continuous pattern.
+                                try tempHaptics?.continuousPlayer.start(atTime: CHHapticTimeImmediate)
+                                print("STARTED CONTINUOUS PLAYER")
+                            } catch let error {
+                                print("Error starting the continuous haptic player: \(error)")
+                            }
+                        }
                         return
                     }
                 }
@@ -221,7 +238,7 @@ class skinmodel: UIViewController {
                 }
                 //let intensity = hapticAlgorithm.forceFeedback(height: height, velocity: speed)
                 let intensity = (((height - (prevPoint ?? 0))*1000)+5)/10
-                print(intensity)
+                
                 if recordHaptics{
                  //   let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
                     let dataPoint = HapticDataPoint(intensity: intensity, time:Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
@@ -230,7 +247,27 @@ class skinmodel: UIViewController {
                 
                 prevPoint = height
                 if !rotationOn{
-                    try tempHaptics?.playHeightHaptic(height:intensity)
+                    if !(hapticTransient ?? true){
+                        let intensityParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
+                                                                          value: (height*10/(currentIntensity ?? 1)),
+                                                                          relativeTime: 0)
+                        let sharpnessParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
+                                                                          value: (height*10/(currentIntensity ?? 1)),
+                                                                          relativeTime: 0)
+                        print("continuous")
+                        print(height*10)
+                        // Send dynamic parameters to the haptic player.
+                        do {
+                            try tempHaptics?.continuousPlayer.sendParameters([intensityParameter, sharpnessParameter],
+                                                                atTime: 0)
+                        } catch let error {
+                            print("Dynamic Parameter Error: \(error)")
+                        }
+                    }
+                    else{
+                        try tempHaptics?.playHeightHaptic(height:intensity)
+                        print(intensity)
+                    }
                 }
                 return
             }
@@ -241,10 +278,24 @@ class skinmodel: UIViewController {
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
+        if(!(hapticTransient ?? true)){
+            
+            do {
+                try tempHaptics?.continuousPlayer?.stop(atTime: CHHapticTimeImmediate)
+            } catch /*let error {
+                     print("Error stopping the continuous haptic player: \(error)")
+                     }*/
+            {return}
+        }
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
+        do {
+            try tempHaptics?.continuousPlayer.stop(atTime: CHHapticTimeImmediate)
+        } catch let error {
+            print("Error stopping the continuous haptic player: \(error)")
+        }
     }
     @IBAction func buttonPressed(_ sender: Any) {
         if !rotationOn{
@@ -443,6 +494,7 @@ class skinmodel: UIViewController {
         if !recordHaptics {
             recordHaptics = true
             recordHaptic.titleLabel?.text = "Recording"
+            
             recordHaptic.tintColor = UIColor.systemGreen
             
             RotateToggle.tintColor = UIColor.systemBlue
@@ -490,6 +542,8 @@ class skinmodel: UIViewController {
                 ])
                 view.bringSubviewToFront(closeView!)
                 
+                print(chartData)
+                
             }
             chartData = []//DATA DELETED
         }
@@ -509,6 +563,14 @@ class skinmodel: UIViewController {
         print(self.modelName)
     }
     
+    @IBAction func hapticMethodChanged(_ sender: Any) {
+        if hapticMethod.selectedSegmentIndex == 0{//transient
+            hapticTransient = true
+        }
+        else{
+            hapticTransient = false
+        }
+    }
     
     
 

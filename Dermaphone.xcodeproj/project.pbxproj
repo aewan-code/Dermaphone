@@ -20,6 +20,7 @@
 		FF5C1C942BD320E200C097E9 /* baked_mesh.obj in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1C8D2BD320E200C097E9 /* baked_mesh.obj */; };
 		FF5C1C952BD320E200C097E9 /* baked_mesh.usda in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1C8E2BD320E200C097E9 /* baked_mesh.usda */; };
 		FF5C1C972BD3212300C097E9 /* baked_mesh.scn in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1C962BD3212300C097E9 /* baked_mesh.scn */; };
+		FF5C1C992BD43D0900C097E9 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1C982BD43D0900C097E9 /* HapticManager.swift */; };
 		FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A802BAE183600A94673 /* AppDelegate.swift */; };
 		FFB13A832BAE183600A94673 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A822BAE183600A94673 /* SceneDelegate.swift */; };
 		FFB13A852BAE183600A94673 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A842BAE183600A94673 /* ViewController.swift */; };
@@ -93,6 +94,7 @@
 		FF5C1C8D2BD320E200C097E9 /* baked_mesh.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = baked_mesh.obj; sourceTree = "<group>"; };
 		FF5C1C8E2BD320E200C097E9 /* baked_mesh.usda */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = baked_mesh.usda; sourceTree = "<group>"; };
 		FF5C1C962BD3212300C097E9 /* baked_mesh.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = baked_mesh.scn; sourceTree = "<group>"; };
+		FF5C1C982BD43D0900C097E9 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
 		FFB13A7D2BAE183600A94673 /* Dermaphone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dermaphone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFB13A802BAE183600A94673 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FFB13A822BAE183600A94673 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 				FF5C1C832BD3109300C097E9 /* testTransform.scn */,
 				FFF154E12BBC986900834F38 /* skinConditionInfoView.swift */,
 				FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */,
+				FF5C1C982BD43D0900C097E9 /* HapticManager.swift */,
 				FFB13B402BAF034600A94673 /* testTexture.ahap */,
 				FFB13B422BB1D41500A94673 /* Haptics.swift */,
 				FFF1548C2BBC30F300834F38 /* baked_mesh1.scn */,
@@ -451,6 +454,7 @@
 				FFC1CEB12BBB22AA00FD49B7 /* TimerView.swift in Sources */,
 				FFC1CEB72BBB22AA00FD49B7 /* CaptureInfo.swift in Sources */,
 				FFF154E22BBC986900834F38 /* skinConditionInfoView.swift in Sources */,
+				FF5C1C992BD43D0900C097E9 /* HapticManager.swift in Sources */,
 				FFC1CEB02BBB22AA00FD49B7 /* InfoPanelView.swift in Sources */,
 				FFC1CEAA2BBB22AA00FD49B7 /* ImageLoader.swift in Sources */,
 				FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */,

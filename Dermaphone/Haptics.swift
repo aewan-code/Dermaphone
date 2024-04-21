@@ -13,6 +13,7 @@ class Haptics{
     //haptics end
     //haptics parameters
     let engine :  CHHapticEngine
+    var continuousPlayer: CHHapticAdvancedPatternPlayer!
     
     init(engine: CHHapticEngine) {
         self.engine = engine
@@ -108,6 +109,42 @@ class Haptics{
             }
         } catch let error {
             fatalError("Pattern Creation Error: \(error)")
+        }
+    }
+    
+    //from hapticpalette code
+    /// - Tag: CreateContinuousPattern
+    func createContinuousHapticPlayer(initialIntensity : Float, initialSharpness : Float) {
+        // Create an intensity parameter:
+        let intensity = CHHapticEventParameter(parameterID: .hapticIntensity,
+                                               value: initialIntensity)
+        
+        // Create a sharpness parameter:
+        let sharpness = CHHapticEventParameter(parameterID: .hapticSharpness,
+                                               value: initialSharpness)
+        
+        // Create a continuous event with a long duration from the parameters.
+        let continuousEvent = CHHapticEvent(eventType: .hapticContinuous,
+                                            parameters: [intensity, sharpness],
+                                            relativeTime: 0,
+                                            duration: 100)
+        
+        do {
+            // Create a pattern from the continuous haptic event.
+            let pattern = try CHHapticPattern(events: [continuousEvent], parameters: [])
+            
+            // Create a player from the continuous haptic pattern.
+            continuousPlayer = try engine.makeAdvancedPlayer(with: pattern)
+            
+        } catch let error {
+            print("Pattern Player Creation Error: \(error)")
+        }
+        
+        continuousPlayer.completionHandler = { _ in
+            DispatchQueue.main.async {
+                // Restore original color.
+                //  self.continuousPalette.backgroundColor = self.padColor
+            }
         }
     }
 }

@@ -36,8 +36,8 @@ class ViewController: UIViewController {
         let optionClosure = {(action : UIAction) in
             print(action.title)
             
-            if action.title == "baked_mesh"{
-                self.modelFile = "baked_mesh.scn"
+            if action.title == "skin2model"{
+                self.modelFile = "test2scene.scn"
                 self.modelName = "Mesh"
             }
             else{
@@ -50,8 +50,8 @@ class ViewController: UIViewController {
         }
         
         ViewModel.menu = UIMenu(children : [
-            UIAction(title : "baked_mesh", state: .on, handler : optionClosure),
-            UIAction(title : "Mesh", handler : optionClosure),
+            UIAction(title : "skin2model", state: .on, handler : optionClosure),
+            UIAction(title : "skin3model", handler : optionClosure),
           //  UIAction(title : "skin3", handler : optionClosure),
          //   UIAction(title : "skin4", handler : optionClosure),
         //UIAction(title : "skin5", handler : optionClosure)

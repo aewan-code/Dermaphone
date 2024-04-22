@@ -21,6 +21,9 @@
 		FF5C1C952BD320E200C097E9 /* baked_mesh.usda in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1C8E2BD320E200C097E9 /* baked_mesh.usda */; };
 		FF5C1C972BD3212300C097E9 /* baked_mesh.scn in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1C962BD3212300C097E9 /* baked_mesh.scn */; };
 		FF5C1C992BD43D0900C097E9 /* HapticManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1C982BD43D0900C097E9 /* HapticManager.swift */; };
+		FF5C1C9F2BD5481C00C097E9 /* skin2Model in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1C9E2BD5481B00C097E9 /* skin2Model */; };
+		FF5C1CA32BD54B8500C097E9 /* test2scene.usda in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1CA22BD54B8500C097E9 /* test2scene.usda */; };
+		FF5C1CA52BD54B8D00C097E9 /* test2scene.scn in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1CA42BD54B8D00C097E9 /* test2scene.scn */; };
 		FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A802BAE183600A94673 /* AppDelegate.swift */; };
 		FFB13A832BAE183600A94673 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A822BAE183600A94673 /* SceneDelegate.swift */; };
 		FFB13A852BAE183600A94673 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A842BAE183600A94673 /* ViewController.swift */; };
@@ -95,6 +98,9 @@
 		FF5C1C8E2BD320E200C097E9 /* baked_mesh.usda */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = baked_mesh.usda; sourceTree = "<group>"; };
 		FF5C1C962BD3212300C097E9 /* baked_mesh.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = baked_mesh.scn; sourceTree = "<group>"; };
 		FF5C1C982BD43D0900C097E9 /* HapticManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManager.swift; sourceTree = "<group>"; };
+		FF5C1C9E2BD5481B00C097E9 /* skin2Model */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = skin2Model; path = ../../skin2Model; sourceTree = "<group>"; };
+		FF5C1CA22BD54B8500C097E9 /* test2scene.usda */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = test2scene.usda; path = ../../test2scene.usda; sourceTree = "<group>"; };
+		FF5C1CA42BD54B8D00C097E9 /* test2scene.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = test2scene.scn; path = ../../test2scene.scn; sourceTree = "<group>"; };
 		FFB13A7D2BAE183600A94673 /* Dermaphone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dermaphone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFB13A802BAE183600A94673 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FFB13A822BAE183600A94673 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -221,9 +227,12 @@
 				FFF154E12BBC986900834F38 /* skinConditionInfoView.swift */,
 				FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */,
 				FF5C1C982BD43D0900C097E9 /* HapticManager.swift */,
+				FF5C1CA22BD54B8500C097E9 /* test2scene.usda */,
+				FF5C1CA42BD54B8D00C097E9 /* test2scene.scn */,
 				FFB13B402BAF034600A94673 /* testTexture.ahap */,
 				FFB13B422BB1D41500A94673 /* Haptics.swift */,
 				FFF1548C2BBC30F300834F38 /* baked_mesh1.scn */,
+				FF5C1C9E2BD5481B00C097E9 /* skin2Model */,
 				FF5C1C8F2BD320E200C097E9 /* 3dmodelSkin5 */,
 				FFB13A862BAE183600A94673 /* Main.storyboard */,
 				FFB13A892BAE183800A94673 /* Assets.xcassets */,
@@ -401,11 +410,14 @@
 				FF5C1C942BD320E200C097E9 /* baked_mesh.obj in Resources */,
 				FF5C1C842BD3109300C097E9 /* testTransform.scn in Resources */,
 				FFB13A8D2BAE183800A94673 /* LaunchScreen.storyboard in Resources */,
+				FF5C1CA52BD54B8D00C097E9 /* test2scene.scn in Resources */,
 				FF5C1C912BD320E200C097E9 /* baked_mesh_norm0.png in Resources */,
 				FFF154CD2BBC375700834F38 /* skin2_tex0.png in Resources */,
 				FF5C1C952BD320E200C097E9 /* baked_mesh.usda in Resources */,
 				FFC1CEBA2BBB22AA00FD49B7 /* LICENSE.txt in Resources */,
+				FF5C1C9F2BD5481C00C097E9 /* skin2Model in Resources */,
 				FFF154C82BBC375700834F38 /* skin2.obj in Resources */,
+				FF5C1CA32BD54B8500C097E9 /* test2scene.usda in Resources */,
 				FFB13A8A2BAE183800A94673 /* Assets.xcassets in Resources */,
 				FFF154CF2BBC377D00834F38 /* skin2.scn in Resources */,
 				FFB13B412BAF034600A94673 /* testTexture.ahap in Resources */,

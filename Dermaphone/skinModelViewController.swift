@@ -15,6 +15,7 @@ class skinmodel: UIViewController {
     var modelName: String?// = "Mesh"
     var modelFile : String?// = "testTransform.scn"
     var currentIntensity : Float?
+    var currentSharpness : Float?
     //MARK -UI
     var prevPoint : Float?
     var hapticTransient : Bool?
@@ -84,7 +85,7 @@ class skinmodel: UIViewController {
         print(modelFile)
         currentView = view
         hapticTransient = true
-        scene = SCNScene(named: modelFile ?? "baked_mesh.scn")
+        scene = SCNScene(named: modelFile ?? "test2scene.scn")
         
         guard let baseNode = scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true) else {
                     fatalError("Unable to find baseNode")
@@ -193,6 +194,7 @@ class skinmodel: UIViewController {
                             //continuous mode
                             tempHaptics?.createContinuousHapticPlayer(initialIntensity: position.y*10, initialSharpness: position.y*10)
                             currentIntensity = position.y*10
+                            currentSharpness = currentIntensity
                           //  tempHaptics?.continuousPlayer.start(atTime: <#T##TimeInterval#>)
                             // Warm engine.
                             do {
@@ -252,7 +254,7 @@ class skinmodel: UIViewController {
                                                                           value: (height*10/(currentIntensity ?? 1)),
                                                                           relativeTime: 0)
                         let sharpnessParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
-                                                                          value: (height*10/(currentIntensity ?? 1)),
+                                                                          value: (height*10 - currentSharpness ?? 0)),
                                                                           relativeTime: 0)
                         print("continuous")
                         print(height*10)

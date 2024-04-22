@@ -1,0 +1,27 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "Reality Composer Pro Version 1.0 (409.100.15)"
+    }
+    defaultPrim = "Root"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "Root"
+{
+    def "baked_mesh" (
+        active = true
+        customData = {
+            float3 rotationEulerHint = (2.829705, -0.07620326, 0.46218938)
+        }
+        prepend references = @baked_mesh.usda@
+    )
+    {
+        quatf xformOp:orient = (0.14245507, 0.9622614, 0.22034073, 0.07217729)
+        float3 xformOp:scale = (0.9999999, 0.99999976, 0.9999997)
+        float3 xformOp:translate = (-0.026424162, 0.08082405, -0.0011323541)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+    }
+}
+

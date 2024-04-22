@@ -254,7 +254,7 @@ class skinmodel: UIViewController {
                                                                           value: (height*10/(currentIntensity ?? 1)),
                                                                           relativeTime: 0)
                         let sharpnessParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
-                                                                          value: (height*10 - currentSharpness ?? 0)),
+                                                                          value: (height*10 - (currentSharpness ?? 0)),
                                                                           relativeTime: 0)
                         print("continuous")
                         print(height*10)

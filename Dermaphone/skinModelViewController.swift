@@ -18,10 +18,13 @@ class skinmodel: UIViewController {
     var currentSharpness : Float?
     //MARK -UI
     var prevPoint : Float?
+    var previousPosition : modelLocation?
     var hapticTransient : Bool?
     var swiftuiView : UIView?
     var closeView : UIButton?
     var firstTimestamp : TimeInterval?
+    var allVertices : [SCNVector3]?
+
     @IBOutlet weak var navBar: UINavigationItem!
     @IBOutlet weak var zScale: UISlider!
     
@@ -72,12 +75,15 @@ class skinmodel: UIViewController {
     @IBOutlet weak var SelectPivot: UIButton!
     
     @IBOutlet weak var recordHaptic: UIButton!
+    @IBOutlet weak var smoothButton: UIButton!
     let hapticAlgorithm = HapticRendering(maxHeight: 0.5, minHeight: -0.5)
     
     var prevTimestamp : TimeInterval?
     
     var chartData : [HapticDataPoint]?
-    
+    let smoothedModel = smoothModel()
+    var kernel : [[[Double]]]?
+    var vertices : [SCNVector3]?
     override func viewDidLoad() {
         super.viewDidLoad()
         hapticMethod.selectedSegmentIndex = 0
@@ -139,6 +145,7 @@ class skinmodel: UIViewController {
         view.bringSubviewToFront(xScale)
         view.bringSubviewToFront(yScale)
         view.bringSubviewToFront(zScale)
+        view.bringSubviewToFront(smoothButton)
         xLabel.isHidden = true
         yLabel.isHidden = true
         zLabel.isHidden = true
@@ -160,15 +167,198 @@ class skinmodel: UIViewController {
         for descript in magnifierText{
             view.bringSubviewToFront(descript)
         }
+      //  allVertices = try extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
+     //   print("before")
+      //  print(allVertices)
+      //  try print(extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
+        vertices = extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
+        print("gaussian")
         
 
+
+        //let normalisedKernel = smoothedModel.normaliseKernel(kernel)
+      //  let gaussianModel = smoothedModel.applyGaussianSmoothing(pointcloud: newCoordinates!, kernel: kernel)
         
+      //  print(gaussianModel)
+       /* print("PRINTING NUMBER OF VERTICES")
+        print(scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry?.sources.first(where: { $0.semantic == .vertex }))
+        try print(extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
+        try showVertices1(of: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, childNode: scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)! )
+        
+        print(scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.transform)
+        print(scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.worldTransform)*/
+        try showVertices1(of: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, childNode: scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)! )
+        print("check", vertices)
+        kernel = smoothedModel.generateKernel(kernelSize: 3, sigma: 0.5)
     }
+    @IBAction func applyGaussian(_ sender: Any) {
+       // var newCoordinates : [[[Float]]]
+       /* Task { @MainActor in
+            newCoordinates = await smoothedModel.convertToPointCloud(coordinates: extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)!) ?? [[[0]]]
+
+        }
+        let gaussianModel =  smoothedModel.applyGaussianSmoothing(pointcloud: newCoordinates, kernel: kernel ?? [[[0]]])
+        print(gaussianModel)*/
+        Task {
+            // Asynchronously fetch new coordinates
+            /*guard let vertices = extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!) else {
+                print("Failed to extract vertices")
+                return
+            }*/
+
+            let newCoordinates = smoothedModel.convertToPointCloud(coordinates: vertices ?? [SCNVector3(x: 0, y: 0, z: 0)]) ?? [[[0]]]
+            print("new coordinates", vertices)
+            // Once new coordinates are obtained, apply Gaussian smoothing
+            let gaussianModel = smoothedModel.applyGaussianSmoothing(pointcloud: newCoordinates, kernel: kernel ?? [[[0]]])
+            print(gaussianModel)
+        }
+    }
+  /*  func applyGaussian(){
+
+    }*/
+    
+
+    func extractVertices(from geometry: SCNGeometry) -> [SCNVector3]? {//returns all the vertices from
+        // Get vertex sources
+        guard let vertexSource = geometry.sources.first(where: { $0.semantic == .vertex }) else {return nil}
+
+
+        let stride = vertexSource.dataStride // in bytes
+        let offset = vertexSource.dataOffset // in bytes
+        let componentsPerVector = vertexSource.componentsPerVector
+        let bytesPerComponent = vertexSource.bytesPerComponent
+        let bytesPerVector = componentsPerVector * bytesPerComponent
+        let vectorCount = vertexSource.vectorCount
+
+        var vertices = [SCNVector3]() // A new array for vertices
+
+        // For each vector, read the bytes
+        for i in 0..<vectorCount {
+            // Assuming that bytes per component is 4 (a float)
+            // If it was 8 then it would be a double (aka CGFloat)
+            var vectorData = [Float](repeating: 0, count: componentsPerVector)
+
+            // The range of bytes for this vector
+            let byteRange = i * stride + offset ..< i * stride + offset + bytesPerVector
+            
+            vertexSource.data.withUnsafeBytes { (rawBufferPointer: UnsafeRawBufferPointer) in//explain code
+                // Bind the raw buffer pointer to the desired type (Float)
+                let typedBufferPointer = rawBufferPointer.bindMemory(to: Float.self)
+
+                // Access the base address of the typed buffer pointer
+                if let baseAddress = typedBufferPointer.baseAddress {
+                    // Calculate the destination pointer for the copy operation
+                    let destinationPointer = UnsafeMutablePointer<Float>.allocate(capacity: bytesPerVector / MemoryLayout<Float>.stride)
+                    
+                    // Convert destinationPointer to UnsafeMutableRawPointer
+                    let destinationRawPointer = UnsafeMutableRawPointer(destinationPointer)
+                    
+                    // Convert destinationRawPointer to UnsafeMutableRawBufferPointer
+                    let destinationBufferPointer = UnsafeMutableRawBufferPointer(start: destinationRawPointer, count: bytesPerVector)
+                    
+                    // Copy bytes from the byte range to the destination buffer pointer
+                    rawBufferPointer.copyBytes(to: destinationBufferPointer, from: byteRange)
+                    
+                    // Convert the copied bytes to an array of Float (vectorData)
+                    vectorData = Array(UnsafeBufferPointer(start: destinationPointer, count: bytesPerVector / MemoryLayout<Float>.stride))
+                    
+                    // Deallocate the memory allocated for the destination pointer
+                    destinationPointer.deallocate()
+                }
+            }
+
+
+            // At this point you can read the data from the float array
+            let x = vectorData[0]
+            let y = vectorData[1]
+            let z = vectorData[2]
+
+            // Append the vertex to the array
+            vertices.append(SCNVector3(x, y, z))
+
+            // ... or just log it
+            print("x: \(x), y: \(y), z: \(z)")
+        }
+
+        return vertices
+    }
+    
+    func showVertices(of geometry: SCNGeometry, parentNode: SCNNode) {
+        guard let Vertices = extractVertices(from: geometry) else {
+            print("Failed to extract vertices.")
+            return
+        }
+        vertices = Vertices
+        
+        
+
+        // Create a sphere to represent each vertex
+        let sphereGeometry = SCNSphere(radius: 0.001)
+        let material = SCNMaterial()
+        material.diffuse.contents = UIColor.red // Color of the vertices
+        sphereGeometry.materials = [material]
+
+        // Create nodes for each vertex and position them
+        for vertex in Vertices {
+            let vertexNode = SCNNode(geometry: sphereGeometry)
+           // vertexNode.position = vertex
+            // Adjust the position to be relative to the parent node
+          //  vertexNode.position = vertex + parentNode.position // Adjusted position
+            // Optionally, you can add some customization to the nodes
+            vertexNode.position = SCNVector3Make(
+                vertex.x + (parentNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.position.x ?? 0),
+                vertex.y + (parentNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.position.y ?? 0),
+                vertex.z + (parentNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.position.z ?? 0)
+            )
+
+            // Add the vertex node to the scene
+            parentNode.addChildNode(vertexNode)
+        }
+    }
+    
+    func showVertices1(of geometry: SCNGeometry, childNode: SCNNode) {
+        guard let vertices = extractVertices(from: geometry) else {
+            print("Failed to extract vertices.")
+            return
+        }
+
+        // Create a sphere to represent each vertex
+        let sphereGeometry = SCNSphere(radius: 0.001)
+        let material = SCNMaterial()
+        material.diffuse.contents = UIColor.red // Color of the vertices
+        sphereGeometry.materials = [material]
+
+        // Get the transformation matrix of the child node
+        //let childTransform = childNode.worldTransform
+        let transf = childNode.transform
+
+        // Create nodes for each vertex and position them relative to the child's transformed position
+        for vertex in vertices {
+            let vertexPosition = SCNVector3ToGLKVector3(vertex)
+            let childTransf = SCNMatrix4ToGLKMatrix4(transf)
+            
+            let transformedVertexPosition = GLKMatrix4MultiplyVector3(childTransf, vertexPosition)
+           // transformedVertexPosition = GLKMatrix4MultiplyVector3(transf, transformedVertexPosition)
+            let transformedVertex = SCNVector3FromGLKVector3(transformedVertexPosition)
+
+            let vertexNode = SCNNode(geometry: sphereGeometry)
+            vertexNode.position = transformedVertex
+            // Optionally, you can add some customization to the nodes
+
+            // Add the vertex node to the scene
+            childNode.addChildNode(vertexNode)
+        }
+    }
+
+
+
+
     
     
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
+        print("")
         let touch = touches.first!
         let location = touch.location(in: sceneView)
         if touch.view == sceneView{
@@ -184,12 +374,13 @@ class skinmodel: UIViewController {
                         let position = result.localCoordinates
                         //later remove so that first point is only added if continued onto touches moved
                         if recordHaptics{
-                            let firstPoint = HapticDataPoint(intensity: position.y, time: 0.0)
+                            let firstPoint = HapticDataPoint(intensity: 0, time: 0.0)
                             chartData?.append(firstPoint)
                             firstTimestamp = touch.timestamp
+                            prevTimestamp = firstTimestamp
                         }
                         prevPoint = position.y
-                        
+                        previousPosition = modelLocation(xPos: position.x, yPos: position.y, zPos: position.z)
                         if !(hapticTransient ?? true){
                             //continuous mode
                             tempHaptics?.createContinuousHapticPlayer(initialIntensity: position.y*10, initialSharpness: position.y*10)
@@ -220,6 +411,7 @@ class skinmodel: UIViewController {
         // Check if the desired node is touched
         for result in hitTestResults {
             if result.node.name == modelName {
+                let position = result.localCoordinates
                 let height = result.localCoordinates.y
                 
                 let intersectionPoint = result.worldCoordinates
@@ -227,11 +419,11 @@ class skinmodel: UIViewController {
                         let currentLocation = touch.location(in: sceneView)
                         
                 let deltaX = (currentLocation.x - previousLocation.x)*0.01 //cm
-                
+                //This isn't based on the change in height
                 let deltaY = (currentLocation.y - previousLocation.y)*0.01
                 let prevTime = prevTimestamp ?? 0.0
                 let timeDelta = touch.timestamp - prevTime
-                prevTimestamp = touch.timestamp
+              //  prevTimestamp = touch.timestamp
                 let velocityX = deltaX / CGFloat(timeDelta)
                 let velocityY = deltaY / CGFloat(timeDelta)
                 let speed = Float(sqrt((velocityX * velocityX) + (velocityY * velocityY)))
@@ -241,11 +433,15 @@ class skinmodel: UIViewController {
                 //let intensity = hapticAlgorithm.forceFeedback(height: height, velocity: speed)
                 let intensity = (((height - (prevPoint ?? 0))*1000)+5)/10
                 
-                if recordHaptics{
+
+                
+                    
+
+                /*if recordHaptics{
                  //   let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
                     let dataPoint = HapticDataPoint(intensity: intensity, time:Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
                     chartData?.append(dataPoint)
-                }
+                }*/
                 
                 prevPoint = height
                 if !rotationOn{
@@ -253,33 +449,244 @@ class skinmodel: UIViewController {
                         let intensityParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
                                                                           value: (height*10/(currentIntensity ?? 1)),
                                                                           relativeTime: 0)
-                        let sharpnessParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
+                        let sharpnessParameter = CHHapticDynamicParameter(parameterID: .hapticSharpnessControl,
                                                                           value: (height*10 - (currentSharpness ?? 0)),
                                                                           relativeTime: 0)
                         print("continuous")
-                        print(height*10)
+                        currentIntensity = height*10
+                        currentSharpness = height*10
+                        print(currentIntensity)
+                        //print(currentSharpness)
+                        //print(height*10)
                         // Send dynamic parameters to the haptic player.
                         do {
                             try tempHaptics?.continuousPlayer.sendParameters([intensityParameter, sharpnessParameter],
                                                                 atTime: 0)
+                            
                         } catch let error {
                             print("Dynamic Parameter Error: \(error)")
                         }
                     }
                     else{
-                        try tempHaptics?.playHeightHaptic(height:intensity)
-                        print(intensity)
+                     //   try tempHaptics?.playHeightHaptic(height:intensity)
+                        print("new point")
+                       // print(intensity)
+                      //  print(intensity1)
+                      //  print(result.localCoordinates.x)
+                      //  print(result.localCoordinates.z)
+
+                    }
+                    
+                    /MARK - TRYING GRADIENT POINT CLOUD METHOD/
+                 //   let allVertices = try extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
+                        
+                    
+                    // Filter vertices within the specified radius of the touch location
+                 /*   let verticesWithinRadius = (allVertices?.filter { vertex in
+                        let xSquared = sqrt((vertex.x - position.x)*(vertex.x - position.x))
+                        let ySquared = sqrt((vertex.y - position.y)*(vertex.y - position.y))
+                        let zSquared = sqrt((vertex.z - position.z)*(vertex.z - position.z))
+                        let distanceSquared = xSquared + ySquared + zSquared
+                        return distanceSquared <= 0.01//radius
+                    })! */
+                    
+                    
+                    
+                    //gives me all the points in the point cloud within the radius
+                    //let gradients = extractPointCloudRegionAndGradients(from scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, at position, radius: 0.01)
+                  //  let gradients = extractPointCloudRegionAndGradients(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, at: position, radius: 0.01)
+                    
+                   /* if let previousPosition = previousPosition {
+                        if sqrt((previousPosition.xPos - position.x)*(previousPosition.xPos - position.x)) > 0.001 || sqrt((previousPosition.zPos - position.z)*(previousPosition.zPos - position.z)) > 0.001 {
+                            print("check here")
+                          //  let gradient = computeGradient(at: position, in: verticesWithinRadius)
+                            // Compute gradients for each vertex within the region
+                            let gradients = verticesWithinRadius.compactMap { vertex -> (vertex: SCNVector3, gradient: Float)? in
+                           //     guard let allVertices = allVertices else { return nil }
+                                let gradient = computeGradient(at: vertex, in: allVertices ?? [])
+                                return (vertex: vertex, gradient: gradient) as! (vertex: SCNVector3, gradient: Float)
+                            }
+                            if computeGradient(at: position, in: verticesWithinRadius) <= 0.001{
+                                print("STATIONARY POINT")
+                                //let hessian = computeHessian(at: position, in: verticesWithinRadius)
+                                let gradVals = gradients.map { $0.gradient }
+                                var pos = SCNVector3(x: position.x + 0.001, y: position.y, z: position.z)
+                              //  print(functionValue(at: pos, vertices: verticesWithinRadius))
+                                let grad2 = computeGradient(at: pos, in: verticesWithinRadius)
+                                pos = SCNVector3(x: position.x - 0.001, y: position.y, z: position.z)
+                              //  print(functionValue(at: pos, vertices: verticesWithinRadius))
+                                let grad1 = computeGradient(at: pos, in: verticesWithinRadius)
+                                pos = SCNVector3(x: position.x, y: position.y, z: position.z + 0.001)
+                               // print(functionValue(at: pos, vertices: verticesWithinRadius))
+                                let grad4 = computeGradient(at: pos, in: verticesWithinRadius)
+                                pos = SCNVector3(x: position.x, y: position.y, z: position.z - 0.001)
+                              //  print(functionValue(at: pos, vertices: verticesWithinRadius))
+                                let grad3 = computeGradient(at: pos, in: verticesWithinRadius)
+                                var hessianAttempt = sqrt((grad2-grad1)*(grad2-grad1))//
+                                hessianAttempt = hessianAttempt*sqrt((grad4-grad3)*(grad4-grad3))//[grad2, grad1, grad4, grad3]//dependent on the direction the user is moving
+                                print(grad2)
+                                print(grad1)
+                                print(grad3)
+                                print(grad4)
+                                
+                                print(hessianAttempt)
+                            //
+                                
+                                try tempHaptics?.playHeightHaptic(height:hessianAttempt*10)
+                            }
+                            else{
+                                print("gradient")
+                                print(computeGradient(at: position, in: verticesWithinRadius))
+                            }*/
+                       // for point in gradients {
+                          //  if point.gradient == 0 {
+                           //     print(point.vertex)
+                           //     print("STATIONARY POINT")
+                             //   let hessian = computeHessian(at: position, in: verticesWithinRadius)
+                        //    print(hessian)
+                    //        print("end")
+                               // try tempHaptics?.playHeightHaptic(height:height)
+                        //    }
+                     //   }
+                    /END MARK/
+
+                        
+
+                                print(position.y)
+                             /*   let intensity1 = sqrt((height - previousPosition.yPos)*(height - previousPosition.yPos))
+                                previousPosition.xPos = position.x
+                                previousPosition.yPos = position.y
+                                previousPosition.zPos = position.z*/
+                                let timeChange = touch.timestamp - ((prevTimestamp ?? firstTimestamp) ?? 0)
+                        //      let intensityChange = intensity1/Float(timeChange)
+                                try tempHaptics?.playHeightHaptic(height:intensity*10)
+                                prevTimestamp = touch.timestamp
+                                //print(intensity1*100)
+                                if recordHaptics{
+                                 //   let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
+                                    let dataPoint = HapticDataPoint(intensity: intensity*10, time:Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
+                                    chartData?.append(dataPoint)
+                                }
+                        } else {
+                            // Handle the case when previousPosition is nil
+                        }
+                        
                     }
                 }
                 return
+        
+    }
+    
+    // Function to compute value of the function at a vertex based on the y value of the nearest neighboring vertex
+    func functionValue(at vertex: SCNVector3, vertices: [SCNVector3]) -> Float {
+        // Find the vertex with the closest x and z values to the current vertex
+        var nearestVertex: SCNVector3?
+    //    print(vertices)
+     //   print(vertex)
+    //    print("CIANA")
+        var minDistanceSquared: Float = .greatestFiniteMagnitude
+       // print("mindistance ", minDistanceSquared)
+        for neighborVertex in vertices {
+            let dx = vertex.x - neighborVertex.x
+            let dz = vertex.z - neighborVertex.z
+            let distanceSquared = dx * dx + dz * dz
+            
+            // Check if the current neighborVertex is closer than the previously found nearestVertex
+            if distanceSquared < minDistanceSquared {
+                if !((neighborVertex.x == vertex.x) && (neighborVertex.z == vertex.z)){
+         //          print("disSqure", distanceSquared)
+                    minDistanceSquared = distanceSquared
+                    nearestVertex = neighborVertex
+           //         print("IS THIS WORKING")
+                }
             }
+        }
+        
+        
+        // Return the y value of the nearest vertex if found
+        return nearestVertex?.y ?? 0
+    }
+
+    
+    // Function to compute gradient at a vertex using central finite differences
+    func computeGradient(at vertex: SCNVector3, in vertices: [SCNVector3]) -> Float{
+        // Define a small step size for differentiation
+        let h: Float = 0.002
+        
+        //Compute the change in height value
+        let stepPoint = SCNVector3(x: vertex.x + h, y: vertex.y + h, z: vertex.z + h)
+        let secondStepPoint = SCNVector3(x: vertex.x - h, y: vertex.y - h, z: vertex.z - h)
+       // print("CIAA2")
+       // print(functionValue(at: stepPoint, vertices: vertices))
+       // print(functionValue(at: secondStepPoint, vertices: vertices))
+        let gradient = (functionValue(at: stepPoint, vertices: vertices) - functionValue(at: secondStepPoint, vertices: vertices))/(2*h)
+            // print(gradient)
+        return gradient
+    }
+    // Define your point cloud region extraction function
+    func extractPointCloudRegionAndGradients(from geometry: SCNGeometry, at position: SCNVector3, radius: Float) -> [(vertex: SCNVector3, gradient: Float)]{
+        // Extract vertices from the geometry
+        let allVertices = try? extractVertices(from: geometry)
+        
+        // Filter vertices within the specified radius of the position
+        let verticesWithinRadius = allVertices?.filter { vertex in
+            let xSquared = (vertex.x - position.x) * (vertex.x - position.x)
+            let ySquared = (vertex.y - position.y) * (vertex.y - position.y)
+            let zSquared = (vertex.z - position.z) * (vertex.z - position.z)
+            let distanceSquared = xSquared + ySquared + zSquared
+            return distanceSquared <= radius * radius
+        }
+        
+        // Compute gradients for each vertex within the region
+        let gradients = verticesWithinRadius?.compactMap { vertex -> (vertex: SCNVector3, gradient: Float)? in
+            guard let allVertices = allVertices else { return nil }
+            let gradient = computeGradient(at: vertex, in: allVertices ?? [])
+            return (vertex: vertex, gradient: gradient) as! (vertex: SCNVector3, gradient: Float)
         }
 
         
+        return gradients!
     }
+    
+    func getStationaryPoints(gradients: [(vertex: SCNVector3, gradient: Float)]){
+        for point in gradients {
+            if point.gradient == 0 {
+                print(point.vertex)
+                print("STATIONARY POINT")
+            }
+        }
+    }
+    
+    // Function to compute Hessian at a vertex using central finite differences
+    func computeHessian(at vertex: SCNVector3, in vertices: [SCNVector3]) -> Float {
+        // Define a small step size for differentiation
+        let h: Float = 0.001
+        
+        // Compute the change in gradient
+        let stepPoint = SCNVector3(x: vertex.x + h, y: vertex.y, z: vertex.z)
+        let secondStepPoint = SCNVector3(x: vertex.x - h, y: vertex.y, z: vertex.z)
+        let gradientX = (computeGradient(at: stepPoint, in: vertices) - computeGradient(at: secondStepPoint, in: vertices)) / (2 * h)
+        
+        let stepPointY = SCNVector3(x: vertex.x, y: vertex.y + h, z: vertex.z)
+        let secondStepPointY = SCNVector3(x: vertex.x, y: vertex.y - h, z: vertex.z)
+        let gradientY = (computeGradient(at: stepPointY, in: vertices) - computeGradient(at: secondStepPointY, in: vertices)) / (2 * h)
+        
+        let stepPointZ = SCNVector3(x: vertex.x, y: vertex.y, z: vertex.z + h)
+        let secondStepPointZ = SCNVector3(x: vertex.x, y: vertex.y, z: vertex.z - h)
+        let gradientZ = (computeGradient(at: stepPointZ, in: vertices) - computeGradient(at: secondStepPointZ, in: vertices)) / (2 * h)
+        
+        // Compute the change in gradients to get the Hessian (second derivative)
+        let hessian = (gradientX + gradientY + gradientZ) / 3.0 // You may adjust this based on your specific function
+        
+        return hessian
+    }
+
+
+
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
+        previousPosition = nil
         if(!(hapticTransient ?? true)){
             
             do {
@@ -293,6 +700,7 @@ class skinmodel: UIViewController {
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
+        previousPosition = nil
         do {
             try tempHaptics?.continuousPlayer.stop(atTime: CHHapticTimeImmediate)
         } catch let error {
@@ -543,6 +951,7 @@ class skinmodel: UIViewController {
                     closeView!.bottomAnchor.constraint(equalTo: swiftuiView!.topAnchor)
                 ])
                 view.bringSubviewToFront(closeView!)
+                
                 
                 print(chartData)
                 

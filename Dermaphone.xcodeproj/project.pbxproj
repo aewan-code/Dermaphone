@@ -24,6 +24,10 @@
 		FF5C1C9F2BD5481C00C097E9 /* skin2Model in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1C9E2BD5481B00C097E9 /* skin2Model */; };
 		FF5C1CA32BD54B8500C097E9 /* test2scene.usda in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1CA22BD54B8500C097E9 /* test2scene.usda */; };
 		FF5C1CA52BD54B8D00C097E9 /* test2scene.scn in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1CA42BD54B8D00C097E9 /* test2scene.scn */; };
+		FF5C1CA72BDF8F1700C097E9 /* modelLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1CA62BDF8F1700C097E9 /* modelLocation.swift */; };
+		FF5C1CA92BDFD0D200C097E9 /* testTriangle in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1CA82BDFD0D100C097E9 /* testTriangle */; };
+		FF5C1CAB2BE026D400C097E9 /* smoothModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1CAA2BE026D400C097E9 /* smoothModel.swift */; };
+		FF5C1CAD2BE117CA00C097E9 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1CAC2BE117CA00C097E9 /* NotesView.swift */; };
 		FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A802BAE183600A94673 /* AppDelegate.swift */; };
 		FFB13A832BAE183600A94673 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A822BAE183600A94673 /* SceneDelegate.swift */; };
 		FFB13A852BAE183600A94673 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A842BAE183600A94673 /* ViewController.swift */; };
@@ -101,6 +105,10 @@
 		FF5C1C9E2BD5481B00C097E9 /* skin2Model */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = skin2Model; path = ../../skin2Model; sourceTree = "<group>"; };
 		FF5C1CA22BD54B8500C097E9 /* test2scene.usda */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = test2scene.usda; path = ../../test2scene.usda; sourceTree = "<group>"; };
 		FF5C1CA42BD54B8D00C097E9 /* test2scene.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = test2scene.scn; path = ../../test2scene.scn; sourceTree = "<group>"; };
+		FF5C1CA62BDF8F1700C097E9 /* modelLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = modelLocation.swift; sourceTree = "<group>"; };
+		FF5C1CA82BDFD0D100C097E9 /* testTriangle */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = testTriangle; path = ../../testTriangle; sourceTree = "<group>"; };
+		FF5C1CAA2BE026D400C097E9 /* smoothModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smoothModel.swift; sourceTree = "<group>"; };
+		FF5C1CAC2BE117CA00C097E9 /* NotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesView.swift; sourceTree = "<group>"; };
 		FFB13A7D2BAE183600A94673 /* Dermaphone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dermaphone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFB13A802BAE183600A94673 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FFB13A822BAE183600A94673 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -223,6 +231,9 @@
 				FFB13A822BAE183600A94673 /* SceneDelegate.swift */,
 				FFB13A842BAE183600A94673 /* ViewController.swift */,
 				FF5C1C792BD2F99400C097E9 /* skinModelViewController.swift */,
+				FF5C1CAA2BE026D400C097E9 /* smoothModel.swift */,
+				FF5C1CA82BDFD0D100C097E9 /* testTriangle */,
+				FF5C1CA62BDF8F1700C097E9 /* modelLocation.swift */,
 				FF5C1C832BD3109300C097E9 /* testTransform.scn */,
 				FFF154E12BBC986900834F38 /* skinConditionInfoView.swift */,
 				FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */,
@@ -235,6 +246,7 @@
 				FF5C1C9E2BD5481B00C097E9 /* skin2Model */,
 				FF5C1C8F2BD320E200C097E9 /* 3dmodelSkin5 */,
 				FFB13A862BAE183600A94673 /* Main.storyboard */,
+				FF5C1CAC2BE117CA00C097E9 /* NotesView.swift */,
 				FFB13A892BAE183800A94673 /* Assets.xcassets */,
 				FFB13A8B2BAE183800A94673 /* LaunchScreen.storyboard */,
 				FFB13A8E2BAE183800A94673 /* Info.plist */,
@@ -402,6 +414,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF5C1CA92BDFD0D200C097E9 /* testTriangle in Resources */,
 				FFF154CB2BBC375700834F38 /* skin2_ao0.png in Resources */,
 				FFF154CC2BBC375700834F38 /* skin2.mtl in Resources */,
 				FF5C1C922BD320E200C097E9 /* baked_mesh_tex0.png in Resources */,
@@ -465,13 +478,16 @@
 				FFF154E02BBC8C3100834F38 /* SkinCondition.swift in Sources */,
 				FFC1CEB12BBB22AA00FD49B7 /* TimerView.swift in Sources */,
 				FFC1CEB72BBB22AA00FD49B7 /* CaptureInfo.swift in Sources */,
+				FF5C1CA72BDF8F1700C097E9 /* modelLocation.swift in Sources */,
 				FFF154E22BBC986900834F38 /* skinConditionInfoView.swift in Sources */,
+				FF5C1CAD2BE117CA00C097E9 /* NotesView.swift in Sources */,
 				FF5C1C992BD43D0900C097E9 /* HapticManager.swift in Sources */,
 				FFC1CEB02BBB22AA00FD49B7 /* InfoPanelView.swift in Sources */,
 				FFC1CEAA2BBB22AA00FD49B7 /* ImageLoader.swift in Sources */,
 				FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */,
 				FFC1CEB32BBB22AA00FD49B7 /* CaptureSampleApp.swift in Sources */,
 				FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */,
+				FF5C1CAB2BE026D400C097E9 /* smoothModel.swift in Sources */,
 				FFC1CEAF2BBB22AA00FD49B7 /* CameraViewModel.swift in Sources */,
 				FFC1CEAB2BBB22AA00FD49B7 /* Capture.swift in Sources */,
 				FFC1CEBE2BBB22AA00FD49B7 /* AsyncImageHelpers.swift in Sources */,

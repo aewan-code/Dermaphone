@@ -78,7 +78,7 @@ class Haptics{
                     CHHapticPattern.Key.event: [
                         CHHapticPattern.Key.eventType: CHHapticEvent.EventType.hapticTransient,
                         CHHapticPattern.Key.time: CHHapticTimeImmediate,
-                        CHHapticPattern.Key.eventDuration: 0.00001,
+                     //   CHHapticPattern.Key.eventDuration: 0.00001,
                         CHHapticPattern.Key.eventParameters: [
                             [
                                 CHHapticPattern.Key.parameterID: CHHapticEvent.ParameterID.hapticIntensity,

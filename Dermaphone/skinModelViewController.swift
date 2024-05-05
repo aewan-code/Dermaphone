@@ -38,6 +38,7 @@ class skinmodel: UIViewController {
     @IBOutlet weak var cancelEdit: UIButton!
     @IBOutlet weak var symptonsButton: UIButton!
     
+    @IBOutlet weak var hapticsButton: UIButton!
     @IBOutlet weak var treatmentButton: UIButton!
     @IBOutlet weak var notesButton: UIButton!
     @IBOutlet weak var urgencylabel: UILabel!
@@ -54,6 +55,9 @@ class skinmodel: UIViewController {
     var nodeModel: SCNNode!
     let nodeName = "skin"
     var originalOrientation :SCNQuaternion?
+    var hapticsToggle = false
+    var originalCameraPosition: SCNVector3?
+    var originalCameraOrientation: SCNQuaternion?
     
     var recordHaptics = false
     
@@ -105,6 +109,7 @@ class skinmodel: UIViewController {
             fatalError("Engine Creation Error: \(error)")
         }
         tempHaptics = Haptics(engine: engine)
+        
         sceneView.scene = scene
         
         sceneView.allowsCameraControl = false//add button to move the model
@@ -118,9 +123,11 @@ class skinmodel: UIViewController {
         ambientLightNode.light = ambientLight
         scene!.rootNode.addChildNode(ambientLightNode)
         
-        cameraNode.camera = SCNCamera()
+      //  cameraNode.camera = SCNCamera()
         sceneView.cameraControlConfiguration.allowsTranslation = false
-        
+        sceneView.defaultCameraController.pointOfView?.position = SCNVector3(x: Float.pi/36, y: Float.pi/3, z: Float.pi/24)
+        sceneView.defaultCameraController.pointOfView?.orientation = SCNQuaternion(-Float.pi/4, 0.0, 0.0, Float.pi/4)
+        sceneView.defaultCameraController.pointOfView?.eulerAngles = SCNVector3(-Float.pi/2, 0.0,0.0)
         cameraNode.constraints = [SCNTransformConstraint.positionConstraint(
             inWorldSpace: true,
             with: { (node, position) -> SCNVector3 in
@@ -128,6 +135,9 @@ class skinmodel: UIViewController {
                 return node.position
             }
         )]
+      //  originalCameraPosition = cameraNode.position
+        originalCameraPosition = sceneView.defaultCameraController.pointOfView?.position
+        originalCameraOrientation = sceneView.defaultCameraController.pointOfView?.orientation
         sceneView.debugOptions = [.showCreases]
         //self.view = sceneView
         view.addSubview(sceneView)
@@ -146,6 +156,7 @@ class skinmodel: UIViewController {
         view.bringSubviewToFront(yScale)
         view.bringSubviewToFront(zScale)
         view.bringSubviewToFront(smoothButton)
+        view.bringSubviewToFront(hapticsButton)
         xLabel.isHidden = true
         yLabel.isHidden = true
         zLabel.isHidden = true
@@ -157,6 +168,7 @@ class skinmodel: UIViewController {
         completeEdit.isHidden = true
         
         changePivot = false
+        hapticsToggle = false
         createAxes()
         hideAxes()
         navBar.title = "Skin Lesion: Actinic Keratosis"
@@ -381,7 +393,7 @@ class skinmodel: UIViewController {
                         }
                         prevPoint = position.y
                         previousPosition = modelLocation(xPos: position.x, yPos: position.y, zPos: position.z)
-                        if !(hapticTransient ?? true){
+                        if !(hapticTransient ?? true) && hapticsToggle{
                             //continuous mode
                             tempHaptics?.createContinuousHapticPlayer(initialIntensity: position.y*10, initialSharpness: position.y*10)
                             currentIntensity = position.y*10
@@ -444,7 +456,7 @@ class skinmodel: UIViewController {
                 }*/
                 
                 prevPoint = height
-                if !rotationOn{
+                if !rotationOn && hapticsToggle{
                     if !(hapticTransient ?? true){
                         let intensityParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
                                                                           value: (height*10/(currentIntensity ?? 1)),
@@ -734,6 +746,7 @@ class skinmodel: UIViewController {
         RotateToggle.isHidden = true
         SelectPivot.isHidden = true
         notesButton.isHidden = true
+        hapticsButton.isHidden = true
         treatmentButton.isHidden = true
         symptonsButton.isHidden = true
         urgencylabel.isHidden = true
@@ -762,6 +775,7 @@ class skinmodel: UIViewController {
         zScale.value = 0
         RotateToggle.isHidden = false
         SelectPivot.isHidden = false
+        hapticsButton.isHidden = false
         sceneView.debugOptions = [.showCreases]
         notesButton.isHidden = false
         symptonsButton.isHidden = false
@@ -983,6 +997,43 @@ class skinmodel: UIViewController {
         }
     }
     
+    @IBAction func hapticsPressed(_ sender: Any) {
+        if !hapticsToggle{
+            hapticsToggle = true
+            hapticsButton.tintColor = .green
+            print(sceneView.defaultCameraController.pointOfView?.position)
+            print(sceneView.defaultCameraController.pointOfView?.orientation)
+            print(sceneView.defaultCameraController.pointOfView?.eulerAngles)
+            if let originalPosition = originalCameraPosition {
+           //     cameraNode.position = originalPosition
+                sceneView.defaultCameraController.pointOfView?.position = originalPosition
+            } else {
+                // Handle the case where originalCameraPosition is nil
+                // Maybe log an error, provide a default position, or take other appropriate action
+                print("Error: originalCameraPosition is nil")
+            }
+            if let originalCamOrientation = originalCameraOrientation {
+                sceneView.defaultCameraController.pointOfView?.orientation = originalCamOrientation
+            } else {
+                // Handle the case where originalCameraPosition is nil
+                // Maybe log an error, provide a default position, or take other appropriate action
+                print("Error: originalCameraOrientation is nil")
+            }
+            sceneView.allowsCameraControl = false
+            rotationOn = false
+            RotateToggle.isEnabled = false
+            
+            
+          //  sceneView.defaultCameraController.pointOfView?.eulerAngles = SCNVector3(0.5, 0, 0)
+
+        }
+        else{
+            hapticsToggle = false
+            hapticsButton.tintColor = .blue
+            sceneView.allowsCameraControl = true
+            RotateToggle.isEnabled = true
+        }
+    }
     
 
 

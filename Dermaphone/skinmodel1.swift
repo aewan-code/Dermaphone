@@ -217,7 +217,7 @@ class skinmodel1: UIViewController{
         self.modelFile = name + ".scn"
         scene = SCNScene(named: self.modelFile)//do i need to deallocate the current scene?
     }
-            
+    
             
 
 

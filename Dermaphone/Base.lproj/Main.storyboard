@@ -352,6 +352,15 @@
                                     <action selector="applyGaussian:" destination="6oJ-M7-Edc" eventType="touchUpInside" id="b99-Xh-7fz"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EFi-oA-ugE">
+                                <rect key="frame" x="267" y="555" width="130" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Haptics Mode"/>
+                                <connections>
+                                    <action selector="hapticsPressed:" destination="6oJ-M7-Edc" eventType="touchUpInside" id="v5q-ny-Xcl"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="EU6-GI-TbU"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -367,6 +376,7 @@
                         <outlet property="cancelEdit" destination="Te1-Ta-19T" id="cCe-xU-4NV"/>
                         <outlet property="completeEdit" destination="nj7-my-Yzq" id="8Mz-h3-j7c"/>
                         <outlet property="hapticMethod" destination="Icb-0O-N1B" id="H3x-0M-DYz"/>
+                        <outlet property="hapticsButton" destination="EFi-oA-ugE" id="plN-8e-q24"/>
                         <outlet property="navBar" destination="ggu-Tv-x1G" id="3f4-0d-7SJ"/>
                         <outlet property="notesButton" destination="Djs-bE-UuZ" id="xhK-zc-FMn"/>
                         <outlet property="recordHaptic" destination="7Ll-FG-3r2" id="52v-Hp-eEq"/>

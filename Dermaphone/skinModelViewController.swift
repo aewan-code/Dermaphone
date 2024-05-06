@@ -26,6 +26,9 @@ class skinmodel: UIViewController {
     var closeView : UIButton?
     var firstTimestamp : TimeInterval?
     var allVertices : [SCNVector3]?
+    
+    var smoothedCloud : [SCNVector3]?
+    var transientCloud : [SCNVector3]?
 
     @IBOutlet weak var navBar: UINavigationItem!
     @IBOutlet weak var zScale: UISlider!
@@ -197,13 +200,55 @@ class skinmodel: UIViewController {
         let testElement = SCNGeometryElement(indices: indices, primitiveType: .triangles)
         let testShape = SCNGeometry(sources: [testSource], elements: [testElement])
             // -0.1293827, y: 0.019729614, z: 0.14373043
+       // let url = URL.documentsDirectory.appendingPathComponent("coordinates.txt")
+      //  let url2 = URL.documentsDirectory.appendingPathComponent("tra.txt")
+        let url = URL.documentsDirectory.appendingPathComponent("smoothCloud.txt")
+       let url2 = URL.documentsDirectory.appendingPathComponent("transientCloud.txt")
+        
+        do {
+            let fileHandle = try FileHandle(forReadingFrom: url)
+            let data = fileHandle.readDataToEndOfFile()
+            fileHandle.closeFile()
+            
+            // Assuming the file contains text data, you can convert it to a String
+            if let text = String(data: data, encoding: .utf8) {
+                print("Smoothed cloud")
+                smoothedCloud = convertTextToSCNVector3(text: text)
+                print(smoothedCloud?[0])
+            } else {
+                print("Unable to convert data to text.")
+            }
+        } catch {
+            print("Error: \(error)")
+        }
+        do {
+            let fileHandle = try FileHandle(forReadingFrom: url2)
+            let data = fileHandle.readDataToEndOfFile()
+            fileHandle.closeFile()
+            
+            // Assuming the file contains text data, you can convert it to a String
+            if let text = String(data: data, encoding: .utf8) {
+                print("transientCloud.txt:")
+                transientCloud = convertTextToSCNVector3(text: text)
+                print(transientCloud)
+            } else {
+                print("Unable to convert data to text.")
+            }
+        } catch {
+            print("Error: \(error)")
+        }
+     /*   do {
+            try FileManager.default.removeItem(at: url)
+        }catch{
+            print("error deleting file")
+        }*/
         DispatchQueue.global(qos: .background).async{
-            let clouds = gaussMethod.smoothPointCloud(from: (self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry)!)
+           // let clouds = gaussMethod.smoothPointCloud(from: (self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry)!)
             DispatchQueue.main.async{
                 print("smoothed:")
-                print(clouds.smoothed)
+            //    print(clouds.smoothed)
                 print("transient")
-                print(clouds.transient)
+          //      print(clouds.transient)
             }
         }
        //print(gaussMethod.smoothPointCloud(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
@@ -239,6 +284,46 @@ class skinmodel: UIViewController {
     
        // kernel = smoothedModel.generateKernel(kernelSize: 3, sigma: 0.5)
     }
+    
+    // Assuming text contains lines of space-separated coordinates, e.g., "x y z\n"
+    // Function to convert a line of text to SCNVector3
+    func convertTextToSCNVector3(text: String) -> [SCNVector3] {
+        var vectorList: [SCNVector3] = []
+        
+        // Split text into lines
+        let lines = text.components(separatedBy: .newlines)
+        
+        // Iterate over each line and convert it to SCNVector3
+        for line in lines {
+            // Example line format: SCNVector3(x: 0.102449834, y: 8.901209e-05, z: 0.15636508)
+            
+            // Remove "SCNVector3" and parentheses
+            var cleanLine = line.replacingOccurrences(of: "SCNVector3", with: "")
+            cleanLine = cleanLine.replacingOccurrences(of: "(", with: "")
+            cleanLine = cleanLine.replacingOccurrences(of: ")", with: "")
+            
+            // Split line by commas to get individual components
+            let components = cleanLine.components(separatedBy: ",")
+            
+            // Extract x, y, and z values
+            guard components.count == 3,
+                  let xString = components[0].split(separator: ":").last?.trimmingCharacters(in: .whitespaces),
+                  let yString = components[1].split(separator: ":").last?.trimmingCharacters(in: .whitespaces),
+                  let zString = components[2].split(separator: ":").last?.trimmingCharacters(in: .whitespaces),
+                  let x = Float(xString),
+                  let y = Float(yString),
+                  let z = Float(zString) else {
+                // Skip this line if it doesn't match the expected format
+                continue
+            }
+            
+            // Create SCNVector3 object and add it to the list
+            vectorList.append(SCNVector3(x, y, z))
+        }
+        
+        return vectorList
+    }
+    
     @IBAction func applyGaussian(_ sender: Any) {
        // var newCoordinates : [[[Float]]]
        /* Task { @MainActor in

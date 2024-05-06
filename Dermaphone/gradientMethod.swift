@@ -117,8 +117,33 @@ class gradientMethod{
     }
     
     func smoothPointCloud(from geometry: SCNGeometry) -> (smoothed: [SCNVector3], transient: [SCNVector3]){
+        let url = URL.documentsDirectory.appendingPathComponent("smoothCloud.txt")
+        let url2 = URL.documentsDirectory.appendingPathComponent("transientCloud.txt")
+        print(URL.documentsDirectory)
+            /*guard let fileHandle = FileHandle(forWritingAtPath: url.path) else {
+               fatalError("Could not open file for writing.")
+           }*/
+            if !FileManager.default.fileExists(atPath: url.path) {
+                // File doesn't exist, create it
+                FileManager.default.createFile(atPath: url.path, contents: nil, attributes: nil)
+            }
+            
+            guard let fileHandle = try FileHandle(forWritingAtPath: url.path) else {
+                fatalError("Could not open file for writing.")
+            }
+        
+        if !FileManager.default.fileExists(atPath: url2.path) {
+            // File doesn't exist, create it
+            FileManager.default.createFile(atPath: url2.path, contents: nil, attributes: nil)
+        }
+        
+        guard let fileHandle2 = try FileHandle(forWritingAtPath: url2.path) else {
+            fatalError("Could not open file 2 for writing.")
+        }
+            
+            // File handle is successfully obtained, you can write to the file here
+            
         let pointCloud : [SCNVector3] = extractVertices(from: geometry) ?? []
-        print("check1")
         var smoothedHeightMap : [SCNVector3] = []//should this be a dictionary? what if the x,z coordinate that is touched isn't exactly equal to a key in the dictionary?
         //go to each value in point cloud
         var yDifferences : [SCNVector3] = []
@@ -127,14 +152,35 @@ class gradientMethod{
             print(i)
             let changedPoint = addNewAverage(inputPoint: point, originalPointCloud: pointCloud, k: 3)
             smoothedHeightMap.append(changedPoint)
-            yDifferences.append(SCNVector3(point.x, point.y - changedPoint.y, point.z))
+            let yDifference = SCNVector3(point.x, point.y - changedPoint.y, point.z)
+            yDifferences.append(yDifference)
+            let coordinateString = "\(changedPoint)\n"
+            // Convert the string to Data
+         //   if let data = coordinateString.data(using: .utf8) {
+                // Write the Data to the file
+            if let data = coordinateString.data(using: .utf8) {
+                // Write the Data to the file
+                fileHandle.write(data)
+            }
+            let transientString = "\(yDifference)\n"
+            // Convert the string to Data
+         //   if let data = coordinateString.data(using: .utf8) {
+                // Write the Data to the file
+            if let data2 = transientString.data(using: .utf8) {
+                // Write the Data to the file
+                fileHandle2.write(data2)
+            }
+          //  }
             i += 1
         }
         
        /* let yDifferences = zip(pointCloud, smoothedHeightMap).map { (coord1, coord2) in
             return SCNVector3(x: coord1.x, y: coord1.y - coord2.y, z: coord1.z)
         }*/
+        fileHandle.closeFile()
+        fileHandle2.closeFile()
         
+        print("Coordinates saved to file: \(url)")
     
         return (smoothedHeightMap, yDifferences)
         //do quickselect to get k closest values (using getDistance)

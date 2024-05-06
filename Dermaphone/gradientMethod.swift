@@ -71,7 +71,7 @@ class gradientMethod{
             vertices.append(SCNVector3(x, y, z))
 
             // ... or just log it
-            print("x: \(x), y: \(y), z: \(z)")
+          //  print("x: \(x), y: \(y), z: \(z)")
         }
 
         return vertices
@@ -116,18 +116,45 @@ class gradientMethod{
         return (SCNVector3(inputPoint.x, averagedHeight, inputPoint.z))
     }
     
-    func smoothPointCloud(from geometry: SCNGeometry) -> [SCNVector3]{
-        let pointCloud = extractVertices(from: geometry)
+    func smoothPointCloud(from geometry: SCNGeometry) -> (smoothed: [SCNVector3], transient: [SCNVector3]){
+        let pointCloud : [SCNVector3] = extractVertices(from: geometry) ?? []
+        print("check1")
         var smoothedHeightMap : [SCNVector3] = []//should this be a dictionary? what if the x,z coordinate that is touched isn't exactly equal to a key in the dictionary?
         //go to each value in point cloud
-        for point in pointCloud ?? []{
-            let changedPoint = addNewAverage(inputPoint: point, originalPointCloud: pointCloud ?? [], k: 3)
+        var yDifferences : [SCNVector3] = []
+        var i = 0
+        for point in pointCloud {
+            print(i)
+            let changedPoint = addNewAverage(inputPoint: point, originalPointCloud: pointCloud, k: 3)
             smoothedHeightMap.append(changedPoint)
+            yDifferences.append(SCNVector3(point.x, point.y - changedPoint.y, point.z))
+            i += 1
         }
-        return smoothedHeightMap
+        
+       /* let yDifferences = zip(pointCloud, smoothedHeightMap).map { (coord1, coord2) in
+            return SCNVector3(x: coord1.x, y: coord1.y - coord2.y, z: coord1.z)
+        }*/
+        
+    
+        return (smoothedHeightMap, yDifferences)
         //do quickselect to get k closest values (using getDistance)
         //average these heights
         //create new SCNVector3 where point.x/z is the point and point.y = average value
         //create gradient map where value = difference between smoothed and original
     }
+    
+ /*   func getTransientCloud(originalPoints: [SCNVector3], smoothPointCloud: [SCNVector3]) -> [SCNVector3]{
+        //what to do if they end up being different lengths?
+        guard originalPoints.count == smoothPointCloud.count else {
+                fatalError("Coordinate lists must have the same length.")
+            }
+            
+            // Use map to calculate differences
+            let yDifferences = zip(originalPoints, smoothPointCloud).map { (coord1, coord2) in
+                return SCNVector3(x: coord1.x, y: coord1.y - coord2.y, z: coord1.z)
+            }
+            
+            return yDifferences
+        
+    }*/
 }

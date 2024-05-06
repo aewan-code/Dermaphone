@@ -197,13 +197,29 @@ class skinmodel: UIViewController {
         let testElement = SCNGeometryElement(indices: indices, primitiveType: .triangles)
         let testShape = SCNGeometry(sources: [testSource], elements: [testElement])
             // -0.1293827, y: 0.019729614, z: 0.14373043
-        print(gaussMethod.smoothPointCloud(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
+        DispatchQueue.global(qos: .background).async{
+            let clouds = gaussMethod.smoothPointCloud(from: (self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry)!)
+            DispatchQueue.main.async{
+                print("smoothed:")
+                print(clouds.smoothed)
+                print("transient")
+                print(clouds.transient)
+            }
+        }
+       //print(gaussMethod.smoothPointCloud(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
+      //  print(gaussMethod.smoothPointCloud(from: testShape))
+       // let clouds = gaussMethod.smoothPointCloud(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
+        //let smoothedCloud = clouds//.smoothed
+       // let transientCloud = clouds.transient
+      //  print(smoothedCloud)
+        print("gaussian")
+      //  print(transientCloud)
         //might need to buffer the edges** like with image processing to ensure that those on the ends arent affected by not having nearby pointslet xAxis = SCNCylinder(radius: 0.001, height: 1)
        // print(gaussMethod.averageValues(closestPoints: points, inputPoint: point1))
        // print(gaussMethod.addNewAverage(inputPoint: point1, originalPointCloud: points, currentSmoothed: [], k: 3))
         //edge case: k > length of pointcloud
        // vertices = extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
-        print("gaussian")
+        
         
 
 
@@ -219,9 +235,9 @@ class skinmodel: UIViewController {
         print(scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.transform)
         print(scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.worldTransform)*/
        // try showVertices1(of: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, childNode: scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)! )
-        print("check", vertices)
+      //  print("check", vertices)
     
-        kernel = smoothedModel.generateKernel(kernelSize: 3, sigma: 0.5)
+       // kernel = smoothedModel.generateKernel(kernelSize: 3, sigma: 0.5)
     }
     @IBAction func applyGaussian(_ sender: Any) {
        // var newCoordinates : [[[Float]]]

@@ -28,6 +28,7 @@
 		FF5C1CA92BDFD0D200C097E9 /* testTriangle in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1CA82BDFD0D100C097E9 /* testTriangle */; };
 		FF5C1CAB2BE026D400C097E9 /* smoothModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1CAA2BE026D400C097E9 /* smoothModel.swift */; };
 		FF5C1CAD2BE117CA00C097E9 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1CAC2BE117CA00C097E9 /* NotesView.swift */; };
+		FF5C1CAF2BE8D18C00C097E9 /* heightMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1CAE2BE8D18C00C097E9 /* heightMap.swift */; };
 		FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A802BAE183600A94673 /* AppDelegate.swift */; };
 		FFB13A832BAE183600A94673 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A822BAE183600A94673 /* SceneDelegate.swift */; };
 		FFB13A852BAE183600A94673 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A842BAE183600A94673 /* ViewController.swift */; };
@@ -108,6 +109,7 @@
 		FF5C1CA82BDFD0D100C097E9 /* testTriangle */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = testTriangle; path = ../../testTriangle; sourceTree = "<group>"; };
 		FF5C1CAA2BE026D400C097E9 /* smoothModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smoothModel.swift; sourceTree = "<group>"; };
 		FF5C1CAC2BE117CA00C097E9 /* NotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesView.swift; sourceTree = "<group>"; };
+		FF5C1CAE2BE8D18C00C097E9 /* heightMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = heightMap.swift; sourceTree = "<group>"; };
 		FFB13A7D2BAE183600A94673 /* Dermaphone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dermaphone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFB13A802BAE183600A94673 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FFB13A822BAE183600A94673 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -229,6 +231,7 @@
 				FFB13A822BAE183600A94673 /* SceneDelegate.swift */,
 				FFB13A842BAE183600A94673 /* ViewController.swift */,
 				FF5C1C792BD2F99400C097E9 /* skinModelViewController.swift */,
+				FF5C1CAE2BE8D18C00C097E9 /* heightMap.swift */,
 				FF5C1CAA2BE026D400C097E9 /* smoothModel.swift */,
 				FF5C1CA62BDF8F1700C097E9 /* modelLocation.swift */,
 				FF5C1CA82BDFD0D100C097E9 /* testTriangle */,
@@ -488,6 +491,7 @@
 				FFC1CEAB2BBB22AA00FD49B7 /* Capture.swift in Sources */,
 				FFC1CEBE2BBB22AA00FD49B7 /* AsyncImageHelpers.swift in Sources */,
 				FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */,
+				FF5C1CAF2BE8D18C00C097E9 /* heightMap.swift in Sources */,
 				FFB13A832BAE183600A94673 /* SceneDelegate.swift in Sources */,
 				FF5C1C7E2BD2FA8E00C097E9 /* HapticDataPoint.swift in Sources */,
 				FFC1CEB62BBB22AA00FD49B7 /* CameraView.swift in Sources */,

@@ -123,7 +123,8 @@ class skinmodel: UIViewController {
         ambientLightNode.light = ambientLight
         scene!.rootNode.addChildNode(ambientLightNode)
         
-      //  cameraNode.camera = SCNCamera()
+        cameraNode.camera = SCNCamera()
+
         sceneView.cameraControlConfiguration.allowsTranslation = false
         sceneView.defaultCameraController.pointOfView?.position = SCNVector3(x: Float.pi/36, y: Float.pi/3, z: Float.pi/24)
         sceneView.defaultCameraController.pointOfView?.orientation = SCNQuaternion(-Float.pi/4, 0.0, 0.0, Float.pi/4)
@@ -362,7 +363,11 @@ class skinmodel: UIViewController {
         }
     }
 
-
+    func inverseQuaternion(_ q: SCNQuaternion) -> SCNQuaternion {
+        let conjugate = SCNQuaternion(x: -q.x, y: -q.y, z: -q.z, w: q.w)
+        let squaredMagnitude = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w
+        return SCNQuaternion(x: conjugate.x / squaredMagnitude, y: conjugate.y / squaredMagnitude, z: conjugate.z / squaredMagnitude, w: conjugate.w / squaredMagnitude)
+    }
 
 
     
@@ -407,6 +412,60 @@ class skinmodel: UIViewController {
                             } catch let error {
                                 print("Error starting the continuous haptic player: \(error)")
                             }
+
+                           // let rotation = SCNQuaternion(x: 0.0, y: (position.y * Float.pi)/180, z: 0.0, w: (position.y * Float.pi)/180)
+
+                            
+                        }
+                        if hapticsToggle{
+                            let angle = (position.y * Float.pi)/180
+                            print("angle", angle)
+                            // Calculate the half angle and its sine and cosine
+                            let halfAngle = angle/2.0
+                            let sinHalfAngle = sin(halfAngle)
+                            let cosHalfAngle = cos(halfAngle)
+                            // Create the quaternion with y-component representing the rotation
+                            let rotation = SCNQuaternion(x: 0.0, y: sinHalfAngle, z: 0.0, w: cosHalfAngle)
+                           // sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.rot
+                            
+                            //let deltaX: Float = 0.1 // Adjust this value as needed for horizontal rotation
+                            //let deltaY: Float = 1.0 // Adjust this value as needed for vertical rotation
+                            //need to get average x/z to find centre position? for now just base on value
+                            print(position.x)
+                            print(position.z)
+                            let angleInRadians: Float = 1 * (Float.pi / 180) // Convert 1 degree to radians
+
+                            // Create a rotation matrix for rotation around the z-axis
+                            let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, 0, 0, 1)
+
+                            // Get the current transform of the camera's point of view
+                            var currentTransform = sceneView.defaultCameraController.pointOfView?.transform ?? SCNMatrix4Identity
+
+                            // Apply the rotation to the current transform
+                            currentTransform = SCNMatrix4Mult(currentTransform, rotationMatrix)
+
+                            // Set the new transform to the camera's point of view
+                          //  sceneView.defaultCameraController.pointOfView?.transform = currentTransform
+                            if position.z > 0{
+                               //sceneView.defaultCameraController.rotateBy(x: -position.y*100, y: 0.0)
+                               // sceneView.defaultCameraController.rollAroundTarget(-position.y*100)
+                               // sceneView.defaultCameraController.pointOfView?.eulerAngles.z += position.y
+                                sceneView.defaultCameraController.pointOfView?.transform = currentTransform
+                            }
+                            else{
+                               // sceneView.defaultCameraController.rotateBy(x: position.y*100, y: 0.0)
+                                //sceneView.defaultCameraController.rollAroundTarget(position.y*100)
+                               // sceneView.defaultCameraController.pointOfView?.transform += position.y
+                                sceneView.defaultCameraController.pointOfView?.transform = currentTransform
+                            }
+                            //sceneView.defaultCameraController.rot//.pointOfView?.orientation = inverseQuaternion(rotation)
+                        //    Calculate the new position of the camera node based on the object's position
+                            // and desired distance from the object
+                         //   let distanceFromObject: Float = 10.0 // Adjust this value as needed
+                         //   let newPosition = sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.position + SCNVector3(0, 0, distanceFromObject)
+                            
+                            // Set the camera node's position to the new position
+                          //  sceneView.defaultCameraController.pointOfView?.position = newPosition
                         }
                         return
                     }
@@ -574,6 +633,28 @@ class skinmodel: UIViewController {
                                 try tempHaptics?.playHeightHaptic(height:intensity*10)
                                 prevTimestamp = touch.timestamp
                                 //print(intensity1*100)
+                    let angleInRadians: Float = 1 * (Float.pi / 180) // Convert 1 degree to radians
+
+                    // Create a rotation matrix for rotation around the z-axis
+                    let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, 0, 0, 1)
+
+                    // Get the current transform of the camera's point of view
+                    var currentTransform = sceneView.defaultCameraController.pointOfView?.transform ?? SCNMatrix4Identity
+
+                    // Apply the rotation to the current transform
+                    currentTransform = SCNMatrix4Mult(currentTransform, rotationMatrix)
+                    if position.z > 0{
+                        //sceneView.defaultCameraController.rotateBy(x: -position.y*10, y: 0.0)
+                     //   sceneView.defaultCameraController.rollAroundTarget(-position.y*100)
+                       // sceneView.defaultCameraController.pointOfView?.eulerAngles.y += position.y
+                        sceneView.defaultCameraController.pointOfView?.transform = currentTransform
+                    }
+                    else{
+                        //sceneView.defaultCameraController.rotateBy(x: position.y*10, y: 0.0)
+                    //    sceneView.defaultCameraController.rollAroundTarget(position.y*100)
+                        //sceneView.defaultCameraController.pointOfView?.eulerAngles.y += position.y
+                        sceneView.defaultCameraController.pointOfView?.transform = currentTransform
+                    }
                                 if recordHaptics{
                                  //   let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
                                     let dataPoint = HapticDataPoint(intensity: intensity*10, time:Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
@@ -723,7 +804,7 @@ class skinmodel: UIViewController {
         if !rotationOn{
             rotationOn = true
             sceneView.allowsCameraControl = true
-            sceneView.cameraControlConfiguration.allowsTranslation = false
+           // sceneView.cameraControlConfiguration.allowsTranslation = false
             RotateToggle.tintColor = UIColor.systemGreen
         }
         else{

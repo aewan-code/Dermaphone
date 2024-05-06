@@ -185,8 +185,13 @@ class skinmodel: UIViewController {
       //  allVertices = try extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
      //   print("before")
       //  print(allVertices)
-      //  try print(extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
-        vertices = extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
+        //try print(extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
+        let point1 = SCNVector3(x: 0.0, y: 6.0, z: 0.0)
+        let points = [point1, SCNVector3(x: 0.1, y: 5.7, z: 0.0), SCNVector3(x: -0.1, y: 5.7, z: 0.0)]
+       // let points2 = []
+        let gaussMethod = gradientMethod()
+        print(gaussMethod.averageValues(closestPoints: points, inputPoint: point1))
+       // vertices = extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
         print("gaussian")
         
 

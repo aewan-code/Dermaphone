@@ -105,21 +105,26 @@ class gradientMethod{
                 sum += (1.0 - Float(i)/Float(closestPoints.count))
             }
             averagedHeight += closestPoints[i].y * (1.0 - Float(i)/Float(closestPoints.count))
-            print(i)
-            print(Float(i/closestPoints.count))
-            print(Float(i)/Float(closestPoints.count))
-            print(closestPoints[i].y * (1.0 - Float(i/closestPoints.count)))
         }
-        print(sum)
         return averagedHeight/sum
     }
-
     
-    func smoothPointCloud(from geometry: SCNGeometry){
+    //returns the smoothed height value for the coordinate as an SCNVector3
+    func addNewAverage(inputPoint: SCNVector3, originalPointCloud: [SCNVector3], k: Int) -> SCNVector3{
+        let closestPoints = closestDistance(points: originalPointCloud, inputPoint: inputPoint, k: k)
+        let averagedHeight = averageValues(closestPoints: closestPoints, inputPoint: inputPoint)
+        return (SCNVector3(inputPoint.x, averagedHeight, inputPoint.z))
+    }
+    
+    func smoothPointCloud(from geometry: SCNGeometry) -> [SCNVector3]{
         let pointCloud = extractVertices(from: geometry)
         var smoothedHeightMap : [SCNVector3] = []//should this be a dictionary? what if the x,z coordinate that is touched isn't exactly equal to a key in the dictionary?
         //go to each value in point cloud
-        
+        for point in pointCloud ?? []{
+            let changedPoint = addNewAverage(inputPoint: point, originalPointCloud: pointCloud ?? [], k: 3)
+            smoothedHeightMap.append(changedPoint)
+        }
+        return smoothedHeightMap
         //do quickselect to get k closest values (using getDistance)
         //average these heights
         //create new SCNVector3 where point.x/z is the point and point.y = average value

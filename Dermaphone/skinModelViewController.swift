@@ -13,6 +13,7 @@ import SwiftUI
 
 
 class skinmodel: UIViewController {
+    var condition : SkinCondition?
     var modelName: String?// = "Mesh"
     var modelFile : String?// = "testTransform.scn"
     var currentIntensity : Float?
@@ -1075,12 +1076,13 @@ class skinmodel: UIViewController {
         
     }
     
-    func set(name : String, fileName : String){
-        
-        self.modelName = name
-        self.modelFile = fileName
-        scene = SCNScene(named: fileName)//do i need to deallocate the current scene?
-        print(self.modelName)
+    func set(model : SkinCondition){
+        self.condition = model
+        self.modelFile = model.modelFile
+        self.modelName = model.modelName
+        scene = SCNScene(named: model.modelFile)//do i need to deallocate the current scene?
+
+    
     }
     
     @IBAction func hapticMethodChanged(_ sender: Any) {

@@ -241,6 +241,11 @@
                                 <color key="tintColor" name="AccentColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Clinical Notes"/>
+                                <connections>
+                                    <segue destination="Fxm-DI-V4H" kind="popoverPresentation" popoverAnchorView="Djs-bE-UuZ" id="0Zv-ST-Jrw">
+                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                    </segue>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QPi-yy-4Q6">
                                 <rect key="frame" x="205" y="184" width="115" height="45"/>
@@ -248,6 +253,11 @@
                                 <color key="tintColor" name="AccentColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Similar Conditions"/>
+                                <connections>
+                                    <segue destination="Fxm-DI-V4H" kind="popoverPresentation" popoverAnchorView="QPi-yy-4Q6" id="eCO-Ow-7eU">
+                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                    </segue>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wCq-0w-L5o">
                                 <rect key="frame" x="9" y="139" width="101" height="35"/>
@@ -342,6 +352,11 @@
                                 <color key="tintColor" name="AccentColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Treatment"/>
+                                <connections>
+                                    <segue destination="Fxm-DI-V4H" kind="popoverPresentation" popoverAnchorView="K54-LO-Tnl" id="G6e-4k-ZlH">
+                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                    </segue>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="M37-VV-F4t">
                                 <rect key="frame" x="266" y="598" width="130" height="35"/>
@@ -576,6 +591,9 @@
             <point key="canvasLocation" x="2481.679389312977" y="-113.38028169014085"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="StO-wC-rdQ"/>
+    </inferredMetricsTieBreakers>
     <resources>
         <image name="arrow.left.to.line.alt" catalog="system" width="128" height="100"/>
         <image name="arrow.right.to.line.alt" catalog="system" width="128" height="100"/>

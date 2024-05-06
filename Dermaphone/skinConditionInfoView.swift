@@ -43,15 +43,4 @@ class skinConditionInfoView : UIViewController{
         modelImage.image = image
     }
     
-    func set(skinCondition : SkinCondition){
-        self.skinCondition = skinCondition
-        self.name = self.skinCondition?.name
-        self.conditionDescription = self.skinCondition?.description
-        self.conditionCauses = self.skinCondition?.cause
-        //self.conditionPeople = self.skinCondition.
-        var conditionImage = self.skinCondition?.image
-        var treatment = self.skinCondition?.treatment
-        var diagnosisMethod = self.skinCondition?.diagnosis
-        var features = self.skinCondition?.texture
-    }
 }

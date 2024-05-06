@@ -146,7 +146,7 @@ class skinmodel: UIViewController {
         view.addSubview(sceneView)
         sceneView.frame = CGRect(x: 0, y: notesButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (notesButton.frame.maxY + 10)) // Adjust the values as needed
         originalOrientation = (sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)!.orientation)!
-        urgencylabel.text = "Precancerous"
+        urgencylabel.text = self.condition?.urgency ?? ""
         
         //Add to function
         view.bringSubviewToFront(RotateToggle)
@@ -174,7 +174,7 @@ class skinmodel: UIViewController {
         hapticsToggle = false
         createAxes()
         hideAxes()
-        navBar.title = "Skin Lesion: Actinic Keratosis"
+        navBar.title = "Skin Lesion: \(self.condition?.name ?? "")"
         navBar.titleView?.isHidden = false
         for image in magnifier{
             view.bringSubviewToFront(image)
@@ -1132,7 +1132,43 @@ class skinmodel: UIViewController {
         }
     }
     
+    
+    @IBAction func touchNotes(_ sender: Any) {
+        guard let popUp = storyboard?.instantiateViewController(withIdentifier: "NotesView") as? NotesView else {
+            return
+        }
+        if let skinCondition = condition {
+            popUp.set(condition: skinCondition, type: "Notes")
+            
+            //navigationController?.pushViewController(popUp, animated: true)
+            navigationController?.present(popUp, animated: true, completion: nil)
+        }
 
-
+    }
+    
+    @IBAction func touchSymptoms(_ sender: Any) {
+        guard let popUp = storyboard?.instantiateViewController(withIdentifier: "NotesView") as? NotesView else {
+            return
+        }
+        if let skinCondition = condition {
+            popUp.set(condition: skinCondition, type: "Symptoms")
+            
+            //navigationController?.pushViewController(popUp, animated: true)
+            navigationController?.present(popUp, animated: true, completion: nil)
+        }
+    }
+    
+    @IBAction func touchTreatment(_ sender: Any) {
+        guard let popUp = storyboard?.instantiateViewController(withIdentifier: "NotesView") as? NotesView else {
+            return
+        }
+        if let skinCondition = condition {
+            popUp.set(condition: skinCondition, type: "Treatment")
+            
+            //navigationController?.pushViewController(popUp, animated: true)
+            navigationController?.present(popUp, animated: true, completion: nil)
+        }
+    }
+    
 }
 

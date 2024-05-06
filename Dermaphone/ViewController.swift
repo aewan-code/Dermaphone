@@ -13,7 +13,7 @@ import SwiftUI
 
 class ViewController: UIViewController {
  
-    var currentModel : SkinCondition = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "")
+    var currentModel : SkinCondition = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "", urgency: "")
     //Change currentModel so that if no models have been created either portrays a test one or presents a popup
     var skinConditions : [SkinCondition] = []
     @IBOutlet weak var ViewModel: UIButton!
@@ -57,8 +57,8 @@ class ViewController: UIViewController {
         //edge case - no conditions created - resolve this
        
         ViewModel.menu = UIMenu(children : [
-            
-            UIAction(title : skinConditions[0].name, state: .on, handler : optionClosure),
+            //bug - without pressing anything - should go to the currently selected item
+            UIAction(title : skinConditions[0].name, handler : optionClosure),
             UIAction(title : skinConditions[1].name, handler : optionClosure),
             
         ])
@@ -69,8 +69,8 @@ class ViewController: UIViewController {
     }
     //this will later be 'loadModels' - to be loaded from the database
     func createModels(){
-        let skin3Model = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "")
-        let skin2Model = SkinCondition(name: "Basal Cell Carcinoma", description: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun", texture: "", symptoms: "recurring sore that bleeds and heals", treatment: "", modelName: "Mesh", images: [], modelFile: "test2scene.scn", similarConditions: [], notes: "")
+        let skin3Model = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma. Crusty rough spots", urgency: "Precancerous")
+        let skin2Model = SkinCondition(name: "Basal Cell Carcinoma", description: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun", texture: "", symptoms: "recurring sore that bleeds and heals", treatment: "", modelName: "Mesh", images: [], modelFile: "test2scene.scn", similarConditions: [], notes: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun.", urgency: "Cancerous")
         skinConditions.append(skin3Model)
         skinConditions.append(skin2Model)
     }

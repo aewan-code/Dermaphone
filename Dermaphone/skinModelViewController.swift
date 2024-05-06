@@ -604,7 +604,11 @@ class skinmodel: UIViewController {
             if result.node.name == modelName {
                 let position = result.localCoordinates
                 let height = result.localCoordinates.y
-                
+                let tempGradient = gradientMethod()
+                let firstTime = Date()
+                let approxPoint = tempGradient.closestDistance(points: transientCloud ?? [], inputPoint: position, k: 1)[0]
+                print(approxPoint)
+                //print(Date().timeIntervalSince(firstTime))
                 let intersectionPoint = result.worldCoordinates
                 let previousLocation = touch.previousLocation(in: sceneView)
                         let currentLocation = touch.location(in: sceneView)
@@ -750,7 +754,9 @@ class skinmodel: UIViewController {
                                 previousPosition.zPos = position.z*/
                                 let timeChange = touch.timestamp - ((prevTimestamp ?? firstTimestamp) ?? 0)
                         //      let intensityChange = intensity1/Float(timeChange)
-                                try tempHaptics?.playHeightHaptic(height:intensity*10)
+                               //try tempHaptics?.playHeightHaptic(height:intensity*10)
+                    try tempHaptics?.playHeightHaptic(height:approxPoint.y * 100)
+                   //pritn(a)
                                 prevTimestamp = touch.timestamp
                                 //print(intensity1*100)
                     let angleInRadians: Float = (position.y - (previousPosition?.yPos ?? 0.0)) * 100 * (Float.pi / 180) // Convert 1 degree to radians

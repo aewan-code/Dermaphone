@@ -755,33 +755,46 @@ class skinmodel: UIViewController {
                                 let timeChange = touch.timestamp - ((prevTimestamp ?? firstTimestamp) ?? 0)
                         //      let intensityChange = intensity1/Float(timeChange)
                                //try tempHaptics?.playHeightHaptic(height:intensity*10)
-                    try tempHaptics?.playHeightHaptic(height:approxPoint.y * 100)
+                    try tempHaptics?.playHeightHaptic(height:approxPoint.y * 10000)
+                    print(approxPoint.y * 100)
                    //pritn(a)
                                 prevTimestamp = touch.timestamp
                                 //print(intensity1*100)
-                    let angleInRadians: Float = (position.y - (previousPosition?.yPos ?? 0.0)) * 100 * (Float.pi / 180) // Convert 1 degree to radians
+                    let angleInRadians: Float = (position.y - (previousPosition?.yPos ?? 0.0)) * 10 * (Float.pi / 180) // Convert 1 degree to radians
+                    print("angle in radians")
+                    print(angleInRadians)
+                    print(position)
+                    print(previousPosition?.xPos, previousPosition?.yPos, previousPosition?.zPos)
                     let xChange = position.x - (previousPosition?.xPos ?? 0.0)
                     let zChange = position.z - (previousPosition?.zPos ?? 0.0)
-                    let newX = xChange/(abs(xChange) + abs(zChange))
-                    let newZ = zChange/(abs(xChange) + abs(zChange))
-                    
-                    // Create a rotation matrix for rotation around the z-axis
-                    //let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, 1, 0, 0)
-                    let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, newX, 0, newZ)
-
-                    // Get the current transform of the camera's point of view
-                    var currentTransform = sceneView.defaultCameraController.pointOfView?.transform ?? SCNMatrix4Identity
-
-                    // Apply the rotation to the current transform
-                    currentTransform = SCNMatrix4Mult(currentTransform, rotationMatrix)
-                    previousPosition?.xPos = position.x
-                    previousPosition?.yPos = position.y
-                    previousPosition?.zPos = position.z
-                    sceneView.defaultCameraController.pointOfView?.transform = currentTransform
-                    print("currentTransform")
-                    print(angleInRadians)
-                    print(newX)
-                    print(newZ)
+                    print(xChange)
+                    print(zChange)
+                    if !((xChange == 0) && (zChange == 0)){
+                        let newX = xChange/(abs(xChange) + abs(zChange))
+                        let newZ = zChange/(abs(xChange) + abs(zChange))
+                        
+                        // Create a rotation matrix for rotation around the z-axis
+                        // let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, 1, 0, 0.5)
+                        print("checkrotationmatrix")
+                        
+                        let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, newX, 0, newZ)
+                        print(rotationMatrix)
+                        print("checkcurrenttransform")
+                        // Get the current transform of the camera's point of view
+                        var currentTransform = sceneView.defaultCameraController.pointOfView?.transform ?? SCNMatrix4Identity
+                        print(currentTransform)
+                        print("checkmultiply")
+                        // Apply the rotation to the current transform
+                        currentTransform = SCNMatrix4Mult(currentTransform, rotationMatrix)
+                        previousPosition?.xPos = position.x
+                        previousPosition?.yPos = position.y
+                        previousPosition?.zPos = position.z
+                        sceneView.defaultCameraController.pointOfView?.transform = currentTransform
+                        print("currentTransform")
+                        print(angleInRadians)
+                        print(newX)
+                        print(newZ)
+                    }
                     if position.z > 0{
                         //sceneView.defaultCameraController.rotateBy(x: -position.y*10, y: 0.0)
                      //   sceneView.defaultCameraController.rollAroundTarget(-position.y*100)
@@ -796,7 +809,7 @@ class skinmodel: UIViewController {
                     }
                                 if recordHaptics{
                                  //   let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
-                                    let dataPoint = HapticDataPoint(intensity: intensity*10, time:Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
+                                    let dataPoint = HapticDataPoint(intensity: approxPoint.y * 10000, time:Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
                                     chartData?.append(dataPoint)
                                 }
                         } else {

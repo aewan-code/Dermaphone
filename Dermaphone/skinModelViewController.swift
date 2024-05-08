@@ -537,146 +537,18 @@ class skinmodel: UIViewController {
                             
                         }
                         if hapticsToggle && palpationToggle{
-                            let angle = (position.y * Float.pi)/180
-                            print("angle", angle)
-                            // Calculate the half angle and its sine and cosine
-                            let halfAngle = angle/2.0
-                            let sinHalfAngle = sin(halfAngle)
-                            let cosHalfAngle = cos(halfAngle)
-                            
-                            // Create the quaternion with y-component representing the rotation
-                            let rotation = SCNQuaternion(x: 0.0, y: sinHalfAngle, z: 0.0, w: cosHalfAngle)
-                           // sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.rot
-                            
-                            //let deltaX: Float = 0.1 // Adjust this value as needed for horizontal rotation
-                            //let deltaY: Float = 1.0 // Adjust this value as needed for vertical rotation
-                            //need to get average x/z to find centre position? for now just base on value
-                            print(position.x)
-                            print(position.z)
-                            let localNormalVector = result.localNormal
                             let surfaceNormalVector = result.worldNormal
-                            var tempNormalVector = result.simdWorldNormal
-var surfaceNormalCamera = surfaceNormalVector
                             var test = sceneView.defaultCameraController.pointOfView?.worldFront ?? SCNVector3(x: 0, y: -1, z: 0)
-                            
                             test.y = -(test.y)
-                            var transform = sceneView.defaultCameraController.pointOfView?.simdWorldTransform
-                            var transformTranspose = transform?.transpose
-                            let tempNormalVector1 = simd_float4(tempNormalVector.x, tempNormalVector.y, tempNormalVector.z, 0)
-                            if let matrix = transformTranspose{
-                                let resultVector = matrix * tempNormalVector1
-                                // Use resultVector...
-                            } else {
-                                // Handle the case when the optionalMatrix is nil
-                                print("Optional matrix is nil")
-                            }
-                            
-                            var test2 = transformTranspose! * tempNormalVector1
-                       //     simd.simd_mul(<#T##a: Double##Double#>, <#T##q: simd_quatd##simd_quatd#>)
-                          //  var testTransform = simd.simd_mul(transformTranspose, simd_normalize(tempNormalVector))
-                         //   print(testTransform)
-                            // Transform surface normal from world coordinates to camera coordinates
-                            if let cameraNode = sceneView.defaultCameraController.pointOfView{
-                                 surfaceNormalCamera = SCNVector3(
-                                    x: surfaceNormalVector.x * test.x + surfaceNormalVector.y * test.y + surfaceNormalVector.z * test.z,
-                                    y: surfaceNormalVector.x * test.x + surfaceNormalVector.y * test.y + surfaceNormalVector.z * test.z,
-                                    z: surfaceNormalVector.x * test.x + surfaceNormalVector.y * test.y + surfaceNormalVector.z * test.z
-                                )
-                            }
-                            if let cameraNode = sceneView.defaultCameraController.pointOfView{
-                                let cameraTransform = cameraNode.worldTransform
-                                
-                                let surfaceNormalInCameraSpace = SCNVector3Make(surfaceNormalVector.x * cameraTransform.m11 + surfaceNormalVector.y * cameraTransform.m21 + surfaceNormalVector.z * cameraTransform.m31 + cameraTransform.m41,
-                                                                                surfaceNormalVector.x * cameraTransform.m12 + surfaceNormalVector.y * cameraTransform.m22 + surfaceNormalVector.z * cameraTransform.m32 + cameraTransform.m42,
-                                                                                surfaceNormalVector.x * cameraTransform.m13 + surfaceNormalVector.y * cameraTransform.m23 + surfaceNormalVector.z * cameraTransform.m33 + cameraTransform.m43)
-                                print("Surface Normal in Camera Space: \(surfaceNormalCamera)")
-                                print("Surface Normal", surfaceNormalVector)
-                            }
-
                             print(test)
-                            sceneView.defaultCameraController.pointOfView
-                            let node = sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.convertPosition(localNormalVector, to: sceneView.defaultCameraController.pointOfView)
-                            print("local normal", localNormalVector)
-                            print("coordinate transform", node)
-                           // let rotationQuaternion = SCNQuaternion.fromTwoVectors(test, surfaceNormalVector)
-                            // Get the current transform of the camera's point of view
-                            guard var currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
+                            guard let currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
 
-                            // Apply the rotation to the current transform
-                        //    let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
-                            
-                          //  let rotationAxis = SCNVector3.cross(test, surfaceNormalVector).normalized() // Axis of rotation is perpendicular to camera front and surface normal
-                            let vectorA = test
-                            let vectorB = surfaceNormalVector
-                            let axis = SCNVector3(
-                                x: vectorA.y * vectorB.z - vectorA.z * vectorB.y,
-                                y: vectorA.z * vectorB.x - vectorA.x * vectorB.z,
-                                z: vectorA.x * vectorB.y - vectorA.y * vectorB.x
-                            )
-                            
-                            // Calculate the magnitude of the resulting vector
-                            let magnitude = sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z)
-
-                            // Normalize the vector by dividing each component by its magnitude
-                            let normalizedAxis = SCNVector3(
-                                x: axis.x / magnitude,
-                                y: axis.y / magnitude,
-                                z: axis.z / magnitude
-                            )
-                            
-                            // Calculate the dot product
-                            let dotProduct = vectorA.x * vectorB.x + vectorA.y * vectorB.y + vectorA.z * vectorB.z
-                            
-                            //   let rotationAngle = acos(test.dot(surfaceNormalVector.normalized())) // Angle between camera front and surface normal
-                            // Calculate the magnitudes of the vectors
-                            let magnitudeA = sqrt(vectorA.x * vectorA.x + vectorA.y * vectorA.y + vectorA.z * vectorA.z)
-                            let magnitudeB = sqrt(vectorB.x * vectorB.x + vectorB.y * vectorB.y + vectorB.z * vectorB.z)
-
-                            // Calculate the cosine of the angle between the vectors
-                            let cosineAngle = dotProduct / (magnitudeA * magnitudeB)
-
-                            // Calculate the angle in radians
-                            let rotationAngle = acos(cosineAngle)
-
-                            // Convert the angle to degrees
-                   //         let angleDegrees = angleRadians * 180 / .pi
-                            // Create a rotation matrix
-                            let rotationMatrix = SCNMatrix4MakeRotation(rotationAngle, normalizedAxis.x, normalizedAxis.y, normalizedAxis.z)
-                            // Convert rotation matrix to quaternion
-                           // let rotationQuaternion = SCNQuaternion(x: normalizedAxis.x, y: normalizedAxis.y, z: normalizedAxis.z, w: rotationAngle)
-                            let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test)
+                            let rotationQuaternion = SCNQuaternion.fromTwoVectors(test, surfaceNormalVector)
                             let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
-                            // Convert quaternion to vector representation
-                         //   let rotationVector = SCNMatrix4(rotationQuaternion.x, rotationQuaternion.y, rotationQuaternion.z, rotationQuaternion.w)
-                            
-                            // Apply the rotation to the camera node
-                                //     cameraNode.rotation = rotationMatrix
-                      //      sceneView.defaultCameraController.pointOfView?.rotation = rotationMatrix
 
-                            print("New camera orientation:", cameraNode.rotation)
+                            //print("New camera orientation:", cameraNode.rotation)
                             sceneView.defaultCameraController.pointOfView?.transform = newTransform
-                          //  sceneView.defaultCameraController.pointOfView?.transform = rotationQuaternion
-                            // Set the camera's orientation to the calculated quaternion
-                      //      sceneView.defaultCameraController.pointOfView?.orientation = rotationQuaternion
-                     /*       let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, newX, 0, newZ)
-                            // Get the current transform of the camera's point of view
-                            var currentTransform = sceneView.defaultCameraController.pointOfView?.transform ?? SCNMatrix4Identity
-                            // Apply the rotation to the current transform
-                            currentTransform = SCNMatrix4Mult(currentTransform, rotationMatrix)
-                            previousPosition?.xPos = approxPoint.x//position.x
-                            previousPosition?.yPos = approxPoint.y//position.y
-                            previousPosition?.zPos = approxPoint.z//position.z*/
-                          //  sceneView.defaultCameraController.pointOfView?.transform = currentTransform
-                            let angleInRadians: Float = 1 * (Float.pi / 180) // Convert 1 degree to radians
-
-                            // Create a rotation matrix for rotation around the z-axis
-                       //     let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, 0, 0, -1)
-
-                            // Get the current transform of the camera's point of view
-                       //     var currentTransform = sceneView.defaultCameraController.pointOfView?.transform ?? SCNMatrix4Identity
-
-                            // Apply the rotation to the current transform
-                      //      currentTransform = SCNMatrix4Mult(currentTransform, rotationMatrix)
+                        //    let angleInRadians: Float = 1 * (Float.pi / 180) // Convert 1 degree to radians
 
                         }
                         return
@@ -687,9 +559,12 @@ var surfaceNormalCamera = surfaceNormalVector
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
-        let touch = touches.first!
-        let location = touch.location(in: sceneView)
-        let hitTestResults = sceneView.hitTest(location, options: nil)
+        print("hello check scene touch")
+        if let touch = touches.first, let sceneViewScene = sceneView.scene {
+            
+            let location = touch.location(in: sceneView)
+            let hitTestResults = sceneView.hitTest(location, options: nil)
+            // Process hit test results
         
         // Check if the desired node is touched
         for result in hitTestResults {
@@ -856,29 +731,21 @@ var surfaceNormalCamera = surfaceNormalVector
                         }
                     }
                     else if (hapticsToggle && palpationToggle){
-                        print("here")
-                        let angleInRadians: Float = (position.y - (previousPosition?.yPos ?? 0.0)) * 1000 * (Float.pi / 180) // Convert 1 degree to radians
-                        let xChange = position.x - (previousPosition?.xPos ?? 0.0)
-                        let zChange = position.z - (previousPosition?.zPos ?? 0.0)
+                        let surfaceNormalVector = result.worldNormal
+                        var test = sceneView.defaultCameraController.pointOfView?.worldFront ?? SCNVector3(x: 0, y: -1, z: 0)
+                        test.y = -(test.y)
+                        print(test)
+                        guard var currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
                         
-                        if !((xChange == 0) && (zChange == 0)){
-                            print("angle1", angleInRadians)
-                            let newX = xChange/(abs(xChange) + abs(zChange))
-                            let newZ = zChange/(abs(xChange) + abs(zChange))
-                            
-                            // Create a rotation matrix for rotation around the z-axis
-                            // let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, 1, 0, 0.5)
-                            
-                            let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, newX, 0, newZ)
-                            // Get the current transform of the camera's point of view
-                            var currentTransform = sceneView.defaultCameraController.pointOfView?.transform ?? SCNMatrix4Identity
-                            // Apply the rotation to the current transform
-                            currentTransform = SCNMatrix4Mult(currentTransform, rotationMatrix)
-                            previousPosition?.xPos = approxPoint.x//position.x
-                            previousPosition?.yPos = approxPoint.y//position.y
-                            previousPosition?.zPos = approxPoint.z//position.z
-                          //  sceneView.defaultCameraController.pointOfView?.transform = currentTransform
-                        }
+                        let rotationQuaternion = SCNQuaternion.fromTwoVectors(test, surfaceNormalVector)
+                        let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
+                        
+                        print("check start")
+                        print(sceneView.defaultCameraController.pointOfView?.orientation)
+                        sceneView.defaultCameraController.pointOfView?.transform = newTransform
+                        print("camera", test)
+                        print(newTransform)
+                        print(sceneView.defaultCameraController.pointOfView?.orientation)
                     }
                                 if recordHaptics{
                                  //   let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
@@ -893,6 +760,9 @@ var surfaceNormalCamera = surfaceNormalVector
                 }
        
                 return
+        } else {
+            print("No touch or sceneView is nil")
+        }
         
     }
     
@@ -1414,20 +1284,24 @@ extension SCNQuaternion {
             y: vectorA.z * vectorB.x - vectorA.x * vectorB.z,
             z: vectorA.x * vectorB.y - vectorA.y * vectorB.x
         )
-        
+        print("axis", axis)
         // Calculate the dot product
         let dotProduct = vectorA.x * vectorB.x + vectorA.y * vectorB.y + vectorA.z * vectorB.z
         
         // Calculate the magnitudes
         let magnitudeA = sqrt(vectorA.x * vectorA.x + vectorA.y * vectorA.y + vectorA.z * vectorA.z)
         let magnitudeB = sqrt(vectorB.x * vectorB.x + vectorB.y * vectorB.y + vectorB.z * vectorB.z)
-        
+        print("magnitudeA", magnitudeA)
+        print("magnitudeB", magnitudeB)
         // Calculate the angle
         let angle = acos(dotProduct / (magnitudeA * magnitudeB))
-        
+        print(dotProduct / (magnitudeA * magnitudeB))
+        if(abs(1 - (dotProduct / (magnitudeA * magnitudeB))) < 0.1){
+            return SCNMatrix4Identity
+        }
         // Construct the rotation axis
         let rotationAxis = SCNQuaternion(x: axis.x, y: axis.y, z: axis.z, w: angle)
-        
+        //return SCNMatrix4Identity
         // Create and return the quaternion
         return SCNMatrix4MakeRotation(angle, axis.x, axis.y, axis.z)
     }

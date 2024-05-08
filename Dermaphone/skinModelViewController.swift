@@ -65,6 +65,9 @@ class skinmodel: UIViewController {
     var originalCameraOrientation: SCNQuaternion?
     
     var gradientToggle : Bool = false
+    var palpationToggle : Bool = false
+    //if true -> visual
+    //if false -> texture
     
     var recordHaptics = false
     
@@ -80,7 +83,8 @@ class skinmodel: UIViewController {
     var xAxisNode : SCNNode?
     var yAxisNode : SCNNode?
     var zAxisNode : SCNNode?
-    
+    //0 = palpate, 1 = visual
+    @IBOutlet weak var palpationOption: UISegmentedControl!
     @IBOutlet weak var RotateToggle: UIButton!
  
     @IBOutlet weak var SelectPivot: UIButton!
@@ -155,6 +159,7 @@ class skinmodel: UIViewController {
         
         //Add to function
         view.bringSubviewToFront(RotateToggle)
+        view.bringSubviewToFront(palpationOption)
         view.bringSubviewToFront(SelectPivot)
         view.bringSubviewToFront(recordHaptic)
         view.bringSubviewToFront(xLabel)
@@ -508,7 +513,7 @@ class skinmodel: UIViewController {
                         }
                         prevPoint = position.y
                         previousPosition = modelLocation(xPos: position.x, yPos: position.y, zPos: position.z)
-                        if !(hapticTransient ?? true) && hapticsToggle{
+                        if !(hapticTransient ?? true) && hapticsToggle && !palpationToggle{
                             //continuous mode
                             tempHaptics?.createContinuousHapticPlayer(initialIntensity: position.y*10, initialSharpness: position.y*10)
                             currentIntensity = position.y*10
@@ -527,13 +532,14 @@ class skinmodel: UIViewController {
 
                             
                         }
-                        if hapticsToggle{
+                        if hapticsToggle && palpationToggle{
                             let angle = (position.y * Float.pi)/180
                             print("angle", angle)
                             // Calculate the half angle and its sine and cosine
                             let halfAngle = angle/2.0
                             let sinHalfAngle = sin(halfAngle)
                             let cosHalfAngle = cos(halfAngle)
+                            
                             // Create the quaternion with y-component representing the rotation
                             let rotation = SCNQuaternion(x: 0.0, y: sinHalfAngle, z: 0.0, w: cosHalfAngle)
                            // sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.rot
@@ -554,28 +560,6 @@ class skinmodel: UIViewController {
                             // Apply the rotation to the current transform
                             currentTransform = SCNMatrix4Mult(currentTransform, rotationMatrix)
 
-                            // Set the new transform to the camera's point of view
-                          //  sceneView.defaultCameraController.pointOfView?.transform = currentTransform
-                            if position.z > 0{
-                               //sceneView.defaultCameraController.rotateBy(x: -position.y*100, y: 0.0)
-                               // sceneView.defaultCameraController.rollAroundTarget(-position.y*100)
-                               // sceneView.defaultCameraController.pointOfView?.eulerAngles.z += position.y
-                             //   sceneView.defaultCameraController.pointOfView?.transform = currentTransform
-                            }
-                            else{
-                               // sceneView.defaultCameraController.rotateBy(x: position.y*100, y: 0.0)
-                                //sceneView.defaultCameraController.rollAroundTarget(position.y*100)
-                               // sceneView.defaultCameraController.pointOfView?.transform += position.y
-                              //  sceneView.defaultCameraController.pointOfView?.transform = currentTransform
-                            }
-                            //sceneView.defaultCameraController.rot//.pointOfView?.orientation = inverseQuaternion(rotation)
-                        //    Calculate the new position of the camera node based on the object's position
-                            // and desired distance from the object
-                         //   let distanceFromObject: Float = 10.0 // Adjust this value as needed
-                         //   let newPosition = sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.position + SCNVector3(0, 0, distanceFromObject)
-                            
-                            // Set the camera node's position to the new position
-                          //  sceneView.defaultCameraController.pointOfView?.position = newPosition
                         }
                         return
                     }
@@ -651,170 +635,132 @@ class skinmodel: UIViewController {
                 
                 prevPoint = height
                 if !rotationOn && hapticsToggle{
-                    if !(hapticTransient ?? true){
-                        let intensityParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
-                                                                          value: (height/(currentIntensity ?? 1)),
-                                                                          relativeTime: 0)
-                      //  let sharpnessParameter = CHHapticDynamicParameter(parameterID: .hapticSharpnessControl,
-                                                                   //       value: (height - (currentSharpness ?? 0)),
-                                                                  //        relativeTime: 0)
-                        print("continuous")
-                        currentIntensity = height
-                        currentSharpness = height
-                        print(currentIntensity)
-                        //print(currentSharpness)
-                        //print(height*10)
-                        // Send dynamic parameters to the haptic player.
-                        do {
-                            try tempHaptics?.continuousPlayer.sendParameters([intensityParameter],
-                                                                atTime: 0)
+                    if !palpationToggle{
+                        if !(hapticTransient ?? true){
+                            let intensityParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
+                                                                              value: (height/(currentIntensity ?? 1)),
+                                                                              relativeTime: 0)
+                            //  let sharpnessParameter = CHHapticDynamicParameter(parameterID: .hapticSharpnessControl,
+                            //       value: (height - (currentSharpness ?? 0)),
+                            //        relativeTime: 0)
+                            currentIntensity = height
+                            currentSharpness = height
+                            // Send dynamic parameters to the haptic player.
+                            do {
+                                try tempHaptics?.continuousPlayer.sendParameters([intensityParameter],
+                                                                                 atTime: 0)
+                                
+                            } catch let error {
+                                print("Dynamic Parameter Error: \(error)")
+                            }
+                        }
+                        else{
                             
-                        } catch let error {
-                            print("Dynamic Parameter Error: \(error)")
+                            
+                            /MARK - TRYING GRADIENT POINT CLOUD METHOD/
+                            //   let allVertices = try extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
+                            
+                            
+                            // Filter vertices within the specified radius of the touch location
+                            /*   let verticesWithinRadius = (allVertices?.filter { vertex in
+                             let xSquared = sqrt((vertex.x - position.x)*(vertex.x - position.x))
+                             let ySquared = sqrt((vertex.y - position.y)*(vertex.y - position.y))
+                             let zSquared = sqrt((vertex.z - position.z)*(vertex.z - position.z))
+                             let distanceSquared = xSquared + ySquared + zSquared
+                             return distanceSquared <= 0.01//radius
+                             })! */
+                            
+                            //gives me all the points in the point cloud within the radius
+                            //let gradients = extractPointCloudRegionAndGradients(from scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, at position, radius: 0.01)
+                            //  let gradients = extractPointCloudRegionAndGradients(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, at: position, radius: 0.01)
+                            
+                            /* if let previousPosition = previousPosition {
+                             if sqrt((previousPosition.xPos - position.x)*(previousPosition.xPos - position.x)) > 0.001 || sqrt((previousPosition.zPos - position.z)*(previousPosition.zPos - position.z)) > 0.001 {
+                             print("check here")
+                             //  let gradient = computeGradient(at: position, in: verticesWithinRadius)
+                             // Compute gradients for each vertex within the region
+                             let gradients = verticesWithinRadius.compactMap { vertex -> (vertex: SCNVector3, gradient: Float)? in
+                             //     guard let allVertices = allVertices else { return nil }
+                             let gradient = computeGradient(at: vertex, in: allVertices ?? [])
+                             return (vertex: vertex, gradient: gradient) as! (vertex: SCNVector3, gradient: Float)
+                             }
+                             if computeGradient(at: position, in: verticesWithinRadius) <= 0.001{
+                             print("STATIONARY POINT")
+                             //let hessian = computeHessian(at: position, in: verticesWithinRadius)
+                             let gradVals = gradients.map { $0.gradient }
+                             var pos = SCNVector3(x: position.x + 0.001, y: position.y, z: position.z)
+                             //  print(functionValue(at: pos, vertices: verticesWithinRadius))
+                             let grad2 = computeGradient(at: pos, in: verticesWithinRadius)
+                             pos = SCNVector3(x: position.x - 0.001, y: position.y, z: position.z)
+                             //  print(functionValue(at: pos, vertices: verticesWithinRadius))
+                             let grad1 = computeGradient(at: pos, in: verticesWithinRadius)
+                             pos = SCNVector3(x: position.x, y: position.y, z: position.z + 0.001)
+                             // print(functionValue(at: pos, vertices: verticesWithinRadius))
+                             let grad4 = computeGradient(at: pos, in: verticesWithinRadius)
+                             pos = SCNVector3(x: position.x, y: position.y, z: position.z - 0.001)
+                             //  print(functionValue(at: pos, vertices: verticesWithinRadius))
+                             let grad3 = computeGradient(at: pos, in: verticesWithinRadius)
+                             var hessianAttempt = sqrt((grad2-grad1)*(grad2-grad1))//
+                             hessianAttempt = hessianAttempt*sqrt((grad4-grad3)*(grad4-grad3))//[grad2, grad1, grad4, grad3]//dependent on the direction the user is moving
+                             print(grad2)
+                             print(grad1)
+                             print(grad3)
+                             print(grad4)
+                             
+                             print(hessianAttempt)
+                             //
+                             
+                             try tempHaptics?.playHeightHaptic(height:hessianAttempt*10)
+                             }
+                             else{
+                             print("gradient")
+                             print(computeGradient(at: position, in: verticesWithinRadius))
+                             }*/
+                            // for point in gradients {
+                            //  if point.gradient == 0 {
+                            //     print(point.vertex)
+                            //     print("STATIONARY POINT")
+                            //   let hessian = computeHessian(at: position, in: verticesWithinRadius)
+                            //    print(hessian)
+                            //        print("end")
+                            // try tempHaptics?.playHeightHaptic(height:height)
+                            //    }
+                            //   }
+                            
+                            //   let intensity1 = sqrt((height - previousPosition.yPos)*(height - previousPosition.yPos))
+                            let timeChange = touch.timestamp - ((prevTimestamp ?? firstTimestamp) ?? 0)
+                            //      let intensityChange = intensity1/Float(timeChange)
+                            //try tempHaptics?.playHeightHaptic(height:intensity*10)
+                            try tempHaptics?.playHeightHaptic(height:height)
+                            print(approxPoint.y * 100)
+                            prevTimestamp = touch.timestamp
+                            //print(intensity1*100)
                         }
                     }
-                    else{
-                     //   try tempHaptics?.playHeightHaptic(height:intensity)
-                        print("new point")
-                       // print(intensity)
-                      //  print(intensity1)
-                      //  print(result.localCoordinates.x)
-                      //  print(result.localCoordinates.z)
-
-                    }
-                    
-                    /MARK - TRYING GRADIENT POINT CLOUD METHOD/
-                 //   let allVertices = try extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
+                    else if (hapticsToggle && palpationToggle){
+                        print("here")
+                        let angleInRadians: Float = (position.y - (previousPosition?.yPos ?? 0.0)) * 1000 * (Float.pi / 180) // Convert 1 degree to radians
+                        let xChange = position.x - (previousPosition?.xPos ?? 0.0)
+                        let zChange = position.z - (previousPosition?.zPos ?? 0.0)
                         
-                    
-                    // Filter vertices within the specified radius of the touch location
-                 /*   let verticesWithinRadius = (allVertices?.filter { vertex in
-                        let xSquared = sqrt((vertex.x - position.x)*(vertex.x - position.x))
-                        let ySquared = sqrt((vertex.y - position.y)*(vertex.y - position.y))
-                        let zSquared = sqrt((vertex.z - position.z)*(vertex.z - position.z))
-                        let distanceSquared = xSquared + ySquared + zSquared
-                        return distanceSquared <= 0.01//radius
-                    })! */
-                    
-                    //gives me all the points in the point cloud within the radius
-                    //let gradients = extractPointCloudRegionAndGradients(from scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, at position, radius: 0.01)
-                  //  let gradients = extractPointCloudRegionAndGradients(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, at: position, radius: 0.01)
-                    
-                   /* if let previousPosition = previousPosition {
-                        if sqrt((previousPosition.xPos - position.x)*(previousPosition.xPos - position.x)) > 0.001 || sqrt((previousPosition.zPos - position.z)*(previousPosition.zPos - position.z)) > 0.001 {
-                            print("check here")
-                          //  let gradient = computeGradient(at: position, in: verticesWithinRadius)
-                            // Compute gradients for each vertex within the region
-                            let gradients = verticesWithinRadius.compactMap { vertex -> (vertex: SCNVector3, gradient: Float)? in
-                           //     guard let allVertices = allVertices else { return nil }
-                                let gradient = computeGradient(at: vertex, in: allVertices ?? [])
-                                return (vertex: vertex, gradient: gradient) as! (vertex: SCNVector3, gradient: Float)
-                            }
-                            if computeGradient(at: position, in: verticesWithinRadius) <= 0.001{
-                                print("STATIONARY POINT")
-                                //let hessian = computeHessian(at: position, in: verticesWithinRadius)
-                                let gradVals = gradients.map { $0.gradient }
-                                var pos = SCNVector3(x: position.x + 0.001, y: position.y, z: position.z)
-                              //  print(functionValue(at: pos, vertices: verticesWithinRadius))
-                                let grad2 = computeGradient(at: pos, in: verticesWithinRadius)
-                                pos = SCNVector3(x: position.x - 0.001, y: position.y, z: position.z)
-                              //  print(functionValue(at: pos, vertices: verticesWithinRadius))
-                                let grad1 = computeGradient(at: pos, in: verticesWithinRadius)
-                                pos = SCNVector3(x: position.x, y: position.y, z: position.z + 0.001)
-                               // print(functionValue(at: pos, vertices: verticesWithinRadius))
-                                let grad4 = computeGradient(at: pos, in: verticesWithinRadius)
-                                pos = SCNVector3(x: position.x, y: position.y, z: position.z - 0.001)
-                              //  print(functionValue(at: pos, vertices: verticesWithinRadius))
-                                let grad3 = computeGradient(at: pos, in: verticesWithinRadius)
-                                var hessianAttempt = sqrt((grad2-grad1)*(grad2-grad1))//
-                                hessianAttempt = hessianAttempt*sqrt((grad4-grad3)*(grad4-grad3))//[grad2, grad1, grad4, grad3]//dependent on the direction the user is moving
-                                print(grad2)
-                                print(grad1)
-                                print(grad3)
-                                print(grad4)
-                                
-                                print(hessianAttempt)
-                            //
-                                
-                                try tempHaptics?.playHeightHaptic(height:hessianAttempt*10)
-                            }
-                            else{
-                                print("gradient")
-                                print(computeGradient(at: position, in: verticesWithinRadius))
-                            }*/
-                       // for point in gradients {
-                          //  if point.gradient == 0 {
-                           //     print(point.vertex)
-                           //     print("STATIONARY POINT")
-                             //   let hessian = computeHessian(at: position, in: verticesWithinRadius)
-                        //    print(hessian)
-                    //        print("end")
-                               // try tempHaptics?.playHeightHaptic(height:height)
-                        //    }
-                     //   }
-                    /END MARK/
-
-                        
-
-                                print(position.y)
-                             /*   let intensity1 = sqrt((height - previousPosition.yPos)*(height - previousPosition.yPos))
-                                previousPosition.xPos = position.x
-                                previousPosition.yPos = position.y
-                                previousPosition.zPos = position.z*/
-                                let timeChange = touch.timestamp - ((prevTimestamp ?? firstTimestamp) ?? 0)
-                        //      let intensityChange = intensity1/Float(timeChange)
-                               //try tempHaptics?.playHeightHaptic(height:intensity*10)
-                    try tempHaptics?.playHeightHaptic(height:height)
-                    print(approxPoint.y * 100)
-                   //pritn(a)
-                                prevTimestamp = touch.timestamp
-                                //print(intensity1*100)
-                    let angleInRadians: Float = (position.y - (previousPosition?.yPos ?? 0.0)) * 10 * (Float.pi / 180) // Convert 1 degree to radians
-                   // print("angle in radians")
-                   // print(angleInRadians)
-                   // print(position)
-                    // print(previousPosition?.xPos, previousPosition?.yPos, previousPosition?.zPos)
-                    let xChange = position.x - (previousPosition?.xPos ?? 0.0)
-                    let zChange = position.z - (previousPosition?.zPos ?? 0.0)
-                 //   print(xChange)
-                //print(zChange)
-                    if !((xChange == 0) && (zChange == 0)){
-                        let newX = xChange/(abs(xChange) + abs(zChange))
-                        let newZ = zChange/(abs(xChange) + abs(zChange))
-                        
-                        // Create a rotation matrix for rotation around the z-axis
-                        // let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, 1, 0, 0.5)
-                     //   print("checkrotationmatrix")
-                        
-                        let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, newX, 0, newZ)
-                    //    print(rotationMatrix)
-                        //print("checkcurrenttransform")
-                        // Get the current transform of the camera's point of view
-                        var currentTransform = sceneView.defaultCameraController.pointOfView?.transform ?? SCNMatrix4Identity
-                  //      print(currentTransform)
-                  //      print("checkmultiply")
-                        // Apply the rotation to the current transform
-                        currentTransform = SCNMatrix4Mult(currentTransform, rotationMatrix)
-                        previousPosition?.xPos = approxPoint.x//position.x
-                        previousPosition?.yPos = approxPoint.y//position.y
-                        previousPosition?.zPos = approxPoint.z//position.z
-                        sceneView.defaultCameraController.pointOfView?.transform = currentTransform
-                    //    print("currentTransform")
-                            //    print(angleInRadians)
-                        //print(newX)
-                   //     print(newZ)
-                    }
-                    if position.z > 0{
-                        //sceneView.defaultCameraController.rotateBy(x: -position.y*10, y: 0.0)
-                     //   sceneView.defaultCameraController.rollAroundTarget(-position.y*100)
-                       // sceneView.defaultCameraController.pointOfView?.eulerAngles.y += position.y
-                       // sceneView.defaultCameraController.pointOfView?.transform = currentTransform
-                    }
-                    else{
-                        //sceneView.defaultCameraController.rotateBy(x: position.y*10, y: 0.0)
-                    //    sceneView.defaultCameraController.rollAroundTarget(position.y*100)
-                        //sceneView.defaultCameraController.pointOfView?.eulerAngles.y += position.y
-                    //    sceneView.defaultCameraController.pointOfView?.transform = currentTransform
+                        if !((xChange == 0) && (zChange == 0)){
+                            print("angle1", angleInRadians)
+                            let newX = xChange/(abs(xChange) + abs(zChange))
+                            let newZ = zChange/(abs(xChange) + abs(zChange))
+                            
+                            // Create a rotation matrix for rotation around the z-axis
+                            // let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, 1, 0, 0.5)
+                            
+                            let rotationMatrix = SCNMatrix4MakeRotation(angleInRadians, newX, 0, newZ)
+                            // Get the current transform of the camera's point of view
+                            var currentTransform = sceneView.defaultCameraController.pointOfView?.transform ?? SCNMatrix4Identity
+                            // Apply the rotation to the current transform
+                            currentTransform = SCNMatrix4Mult(currentTransform, rotationMatrix)
+                            previousPosition?.xPos = approxPoint.x//position.x
+                            previousPosition?.yPos = approxPoint.y//position.y
+                            previousPosition?.zPos = approxPoint.z//position.z
+                            sceneView.defaultCameraController.pointOfView?.transform = currentTransform
+                        }
                     }
                                 if recordHaptics{
                                  //   let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
@@ -827,6 +773,7 @@ class skinmodel: UIViewController {
                         
                     }
                 }
+       
                 return
         
     }
@@ -1244,9 +1191,14 @@ class skinmodel: UIViewController {
         if !hapticsToggle{
             hapticsToggle = true
             hapticsButton.tintColor = .green
+            print(palpationToggle)
             if let originalPosition = originalCameraPosition {
                 sceneView.defaultCameraController.pointOfView?.position = originalPosition
-                sceneView.defaultCameraController.pointOfView?.camera?.fieldOfView = 120
+                if !palpationToggle{
+                    sceneView.defaultCameraController.pointOfView?.camera?.fieldOfView = 120
+                }else{
+                    sceneView.defaultCameraController.pointOfView?.camera?.fieldOfView = 45
+                }
     
             } else {
                 // Handle the case where originalCameraPosition is nil
@@ -1312,6 +1264,25 @@ class skinmodel: UIViewController {
             
             //navigationController?.pushViewController(popUp, animated: true)
             navigationController?.present(popUp, animated: true, completion: nil)
+        }
+    }
+    
+    
+    @IBAction func palpateToggle(_ sender: Any) {
+        if palpationOption.selectedSegmentIndex == 0{
+            //texture method
+            palpationToggle = false
+            if hapticsToggle{
+                sceneView.defaultCameraController.pointOfView?.camera?.fieldOfView = 120
+            }
+        }
+        else{
+            //visual method
+            print("hello visual")
+            palpationToggle = true
+            if hapticsToggle{
+                sceneView.defaultCameraController.pointOfView?.camera?.fieldOfView = 45
+            }
         }
     }
     

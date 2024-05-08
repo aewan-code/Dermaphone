@@ -370,6 +370,17 @@
                                     <action selector="hapticsPressed:" destination="6oJ-M7-Edc" eventType="touchUpInside" id="v5q-ny-Xcl"/>
                                 </connections>
                             </button>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="mPf-Zx-PmS">
+                                <rect key="frame" x="267" y="516" width="127" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="Palpate"/>
+                                    <segment title="Visual"/>
+                                </segments>
+                                <connections>
+                                    <action selector="palpateToggle:" destination="6oJ-M7-Edc" eventType="valueChanged" id="E0k-BJ-lVW"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="EU6-GI-TbU"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -388,6 +399,7 @@
                         <outlet property="hapticsButton" destination="EFi-oA-ugE" id="plN-8e-q24"/>
                         <outlet property="navBar" destination="ggu-Tv-x1G" id="3f4-0d-7SJ"/>
                         <outlet property="notesButton" destination="Djs-bE-UuZ" id="xhK-zc-FMn"/>
+                        <outlet property="palpationOption" destination="mPf-Zx-PmS" id="Eo4-AJ-xr0"/>
                         <outlet property="recordHaptic" destination="7Ll-FG-3r2" id="52v-Hp-eEq"/>
                         <outlet property="similarButton" destination="QPi-yy-4Q6" id="4YP-eU-2lS"/>
                         <outlet property="smoothButton" destination="M37-VV-F4t" id="jPw-vk-Tm9"/>

@@ -79,6 +79,7 @@ struct Capture: Identifiable {
     
     @discardableResult
     private func writeImage(to captureDir: URL) -> Bool {
+        print("checking folder directory", captureDir)
         let imageUrl = CaptureInfo.imageUrl(in: captureDir, id: id)
         print("Saving: \(imageUrl.path)...")
         logger.log("Depth Data = \(String(describing: photo.depthData))")

@@ -60,8 +60,9 @@
 		FF662E742BF234EE00FD9411 /* FirebaseRemoteConfigSwift in Frameworks */ = {isa = PBXBuildFile; productRef = FF662E732BF234EE00FD9411 /* FirebaseRemoteConfigSwift */; };
 		FF662E762BF234EE00FD9411 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = FF662E752BF234EE00FD9411 /* FirebaseStorage */; };
 		FF662E782BF234EE00FD9411 /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = FF662E772BF234EE00FD9411 /* FirebaseStorageCombine-Community */; };
-		FF662E7C2BF251E100FD9411 /* cert.pem in Resources */ = {isa = PBXBuildFile; fileRef = FF662E7B2BF251E100FD9411 /* cert.pem */; };
-		FF662E802BF258AC00FD9411 /* server.der in Resources */ = {isa = PBXBuildFile; fileRef = FF662E7F2BF258AC00FD9411 /* server.der */; };
+		FF662E822BF2814B00FD9411 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF662E812BF2814B00FD9411 /* Message.swift */; };
+		FF662E842BF29FCC00FD9411 /* APIRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF662E832BF29FCB00FD9411 /* APIRequest.swift */; };
+		FF662E862BF2ADD800FD9411 /* DataExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF662E852BF2ADD800FD9411 /* DataExtensions.swift */; };
 		FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A802BAE183600A94673 /* AppDelegate.swift */; };
 		FFB13A832BAE183600A94673 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A822BAE183600A94673 /* SceneDelegate.swift */; };
 		FFB13A852BAE183600A94673 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A842BAE183600A94673 /* ViewController.swift */; };
@@ -147,8 +148,9 @@
 		FF662E332BECD43300FD9411 /* LinkConditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkConditions.swift; sourceTree = "<group>"; };
 		FF662E352BECD60F00FD9411 /* LinkConditionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkConditionCell.swift; sourceTree = "<group>"; };
 		FF662E3F2BF0FF4400FD9411 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		FF662E7B2BF251E100FD9411 /* cert.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cert.pem; sourceTree = "<group>"; };
-		FF662E7F2BF258AC00FD9411 /* server.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = server.der; sourceTree = "<group>"; };
+		FF662E812BF2814B00FD9411 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
+		FF662E832BF29FCB00FD9411 /* APIRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIRequest.swift; sourceTree = "<group>"; };
+		FF662E852BF2ADD800FD9411 /* DataExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtensions.swift; sourceTree = "<group>"; };
 		FFB13A7D2BAE183600A94673 /* Dermaphone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dermaphone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFB13A802BAE183600A94673 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FFB13A822BAE183600A94673 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -272,8 +274,6 @@
 		FFB13A742BAE183600A94673 = {
 			isa = PBXGroup;
 			children = (
-				FF662E7B2BF251E100FD9411 /* cert.pem */,
-				FF662E7F2BF258AC00FD9411 /* server.der */,
 				FF5C1C872BD310E400C097E9 /* skin3_tex0.png */,
 				FF5C1C812BD2FCBD00C097E9 /* HapticRendering.swift */,
 				FF5C1C7D2BD2FA8E00C097E9 /* HapticDataPoint.swift */,
@@ -365,6 +365,9 @@
 				FFC1CE9D2BBB22A900FD49B7 /* CaptureSampleApp.swift */,
 				FFC1CEA02BBB22A900FD49B7 /* CaptureGalleryView.swift */,
 				FFC1CEA12BBB22A900FD49B7 /* CameraView.swift */,
+				FF662E812BF2814B00FD9411 /* Message.swift */,
+				FF662E832BF29FCB00FD9411 /* APIRequest.swift */,
+				FF662E852BF2ADD800FD9411 /* DataExtensions.swift */,
 				FFC1CEA22BBB22A900FD49B7 /* CaptureInfo.swift */,
 				FFC1CEA32BBB22A900FD49B7 /* PhotoCaptureDelegate.swift */,
 				FFC1CEA42BBB22A900FD49B7 /* TriggerEveryTimer.swift */,
@@ -533,7 +536,6 @@
 			files = (
 				FF5C1CA92BDFD0D200C097E9 /* testTriangle in Resources */,
 				FFF154CB2BBC375700834F38 /* skin2_ao0.png in Resources */,
-				FF662E7C2BF251E100FD9411 /* cert.pem in Resources */,
 				FFF154CC2BBC375700834F38 /* skin2.mtl in Resources */,
 				FF5C1C922BD320E200C097E9 /* baked_mesh_tex0.png in Resources */,
 				FF5C1C902BD320E200C097E9 /* baked_mesh_ao0.png in Resources */,
@@ -557,7 +559,6 @@
 				FF5C1C932BD320E200C097E9 /* baked_mesh.mtl in Resources */,
 				FFF154CA2BBC375700834F38 /* skin2.usda in Resources */,
 				FFF154C92BBC375700834F38 /* skin2_norm0.png in Resources */,
-				FF662E802BF258AC00FD9411 /* server.der in Resources */,
 				FF5C1C882BD310E400C097E9 /* skin3_tex0.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -689,6 +690,7 @@
 				FFC1CEB52BBB22AA00FD49B7 /* CaptureGalleryView.swift in Sources */,
 				FF5C1C7C2BD2FA1000C097E9 /* HapticChart.swift in Sources */,
 				FFC1CEBB2BBB22AA00FD49B7 /* CaptureFolderState.swift in Sources */,
+				FF662E842BF29FCC00FD9411 /* APIRequest.swift in Sources */,
 				FFC1CEAE2BBB22AA00FD49B7 /* HelpPageView.swift in Sources */,
 				FF5C1C822BD2FCBD00C097E9 /* HapticRendering.swift in Sources */,
 				FFC1CEAD2BBB22AA00FD49B7 /* CameraPreviewView.swift in Sources */,
@@ -705,12 +707,14 @@
 				FF5C1C992BD43D0900C097E9 /* HapticManager.swift in Sources */,
 				FFC1CEB02BBB22AA00FD49B7 /* InfoPanelView.swift in Sources */,
 				FFC1CEAA2BBB22AA00FD49B7 /* ImageLoader.swift in Sources */,
+				FF662E862BF2ADD800FD9411 /* DataExtensions.swift in Sources */,
 				FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */,
 				FFC1CEB32BBB22AA00FD49B7 /* CaptureSampleApp.swift in Sources */,
 				FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */,
 				FF5C1CAB2BE026D400C097E9 /* smoothModel.swift in Sources */,
 				FFC1CEAF2BBB22AA00FD49B7 /* CameraViewModel.swift in Sources */,
 				FF662E362BECD60F00FD9411 /* LinkConditionCell.swift in Sources */,
+				FF662E822BF2814B00FD9411 /* Message.swift in Sources */,
 				FFC1CEAB2BBB22AA00FD49B7 /* Capture.swift in Sources */,
 				FFC1CEBE2BBB22AA00FD49B7 /* AsyncImageHelpers.swift in Sources */,
 				FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */,

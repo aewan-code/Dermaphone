@@ -125,36 +125,6 @@
             </objects>
             <point key="canvasLocation" x="1667.9389312977098" y="578.87323943661977"/>
         </scene>
-        <!--Skinmodel1-->
-        <scene sceneID="MXR-n8-ezY">
-            <objects>
-                <viewController storyboardIdentifier="skinmodel1" id="X5O-8l-ZCr" customClass="skinmodel1" customModule="Dermaphone" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="Vqb-kX-A4l">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lm1-i9-seb">
-                                <rect key="frame" x="133" y="783" width="126" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Rotate Model"/>
-                                <connections>
-                                    <action selector="buttonPressed:" destination="X5O-8l-ZCr" eventType="touchUpInside" id="df8-Aw-bcK"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="cDb-7s-Mwy"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="Fwa-U0-x5X"/>
-                    <connections>
-                        <outlet property="RotateToggle" destination="lm1-i9-seb" id="DZy-CK-eJr"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="dvs-JA-Ayd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1667.9389312977098" y="-113.38028169014085"/>
-        </scene>
         <!--Navigation Controller-->
         <scene sceneID="c8n-ZS-K2j">
             <objects>
@@ -252,9 +222,7 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Similar Conditions"/>
                                 <connections>
-                                    <segue destination="Fxm-DI-V4H" kind="popoverPresentation" popoverAnchorView="QPi-yy-4Q6" id="eCO-Ow-7eU">
-                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
-                                    </segue>
+                                    <action selector="touchSimilarConditions:" destination="6oJ-M7-Edc" eventType="touchUpInside" id="FWh-kI-WrD"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wCq-0w-L5o">
@@ -426,7 +394,7 @@
             <objects>
                 <viewController storyboardIdentifier="NotesView" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Fxm-DI-V4H" customClass="NotesView" customModule="Dermaphone" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="cO1-ks-Oe9">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ftn-FH-zrF">
@@ -474,6 +442,81 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QoI-kl-hkM" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="4136.6412213740459" y="-126.05633802816902"/>
+        </scene>
+        <!--Link Conditions-->
+        <scene sceneID="Fpc-oJ-u8d">
+            <objects>
+                <viewController storyboardIdentifier="LinkConditions" useStoryboardIdentifierAsRestorationIdentifier="YES" id="woj-4T-6km" customClass="LinkConditions" customModule="Dermaphone" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="2Fl-Lo-rUE">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="wVF-xM-f4y">
+                                <rect key="frame" x="0.0" y="59" width="393" height="759"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="LinkConditionCell" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" rowHeight="134" id="zmh-Q9-shg" customClass="LinkConditionCell" customModule="Dermaphone" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="134"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="zmh-Q9-shg" id="ZMe-eo-8Ej">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="134"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B8f-ZB-7i5">
+                                                    <rect key="frame" x="20" y="0.0" width="195" height="123"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Link to this Condition" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CKf-LI-HWd">
+                                                    <rect key="frame" x="223" y="70" width="161" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Condition Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dc7-Lf-mg1">
+                                                    <rect key="frame" x="223" y="25" width="161" height="21"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CkR-AH-bdS">
+                                                    <rect key="frame" x="273" y="88" width="61" height="35"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" title="Button"/>
+                                                    <buttonConfiguration key="configuration" style="plain" title="View"/>
+                                                    <connections>
+                                                        <action selector="buttonPressed:" destination="zmh-Q9-shg" eventType="touchUpInside" id="wOb-K3-8mW"/>
+                                                    </connections>
+                                                </button>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="modelImage" destination="B8f-ZB-7i5" id="BP3-FF-AZF"/>
+                                            <outlet property="modelLink" destination="CKf-LI-HWd" id="8RW-JC-1l3"/>
+                                            <outlet property="modelName" destination="Dc7-Lf-mg1" id="On3-yp-PMz"/>
+                                            <outlet property="viewModel" destination="CkR-AH-bdS" id="VTv-SW-lfi"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="k3h-1N-KFl"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="k3h-1N-KFl" firstAttribute="trailing" secondItem="wVF-xM-f4y" secondAttribute="trailing" id="IG1-Qp-vmO"/>
+                            <constraint firstItem="wVF-xM-f4y" firstAttribute="leading" secondItem="k3h-1N-KFl" secondAttribute="leading" id="XCJ-Nf-ooI"/>
+                            <constraint firstItem="wVF-xM-f4y" firstAttribute="top" secondItem="k3h-1N-KFl" secondAttribute="top" id="hai-P2-py0"/>
+                            <constraint firstItem="k3h-1N-KFl" firstAttribute="bottom" secondItem="wVF-xM-f4y" secondAttribute="bottom" id="ifn-IS-odK"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="table" destination="wVF-xM-f4y" id="163-Ua-93Z"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ftz-46-gi9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4783.9694656488546" y="-106.33802816901409"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="OEw-K4-OOf">
@@ -580,21 +623,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AaJ-aF-jKQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3142.7480916030531" y="578.87323943661977"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="EKJ-Lt-Vao">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="GMA-mr-GKD" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="vJ1-DZ-vxi">
-                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="QGU-RC-Tc9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2481.679389312977" y="-113.38028169014085"/>
         </scene>
     </scenes>
     <resources>

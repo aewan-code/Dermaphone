@@ -543,7 +543,7 @@ class skinmodel: UIViewController {
                             print(test)
                             guard let currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
 
-                            let rotationQuaternion = SCNQuaternion.fromTwoVectors(test, surfaceNormalVector)
+                            let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test)
                             let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
 
                             //print("New camera orientation:", cameraNode.rotation)
@@ -737,7 +737,7 @@ class skinmodel: UIViewController {
                         print(test)
                         guard var currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
                         
-                        let rotationQuaternion = SCNQuaternion.fromTwoVectors(test, surfaceNormalVector)
+                        let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector,test)
                         let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
                         
                         print("check start")
@@ -1273,6 +1273,18 @@ class skinmodel: UIViewController {
             }
         }
     }
+    @IBAction func touchSimilarConditions(_ sender: Any) {
+        guard let popUp = storyboard?.instantiateViewController(withIdentifier: "LinkConditions") as? LinkConditions else {
+            return
+        }
+        if let skinCondition = condition {
+            popUp.set(linkedModels: self.condition?.similarConditions ?? [])
+            
+            //navigationController?.pushViewController(popUp, animated: true)
+            navigationController?.present(popUp, animated: true, completion: nil)
+        }
+    }
+    
     
 }
 

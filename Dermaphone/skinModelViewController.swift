@@ -10,8 +10,12 @@ import SceneKit
 import RealityKit
 import CoreHaptics
 import SwiftUI
+import simd
+
+
 
 class skinmodel: UIViewController {
+    var condition : SkinCondition?
     var modelName: String?// = "Mesh"
     var modelFile : String?// = "testTransform.scn"
     var currentIntensity : Float?
@@ -24,6 +28,9 @@ class skinmodel: UIViewController {
     var closeView : UIButton?
     var firstTimestamp : TimeInterval?
     var allVertices : [SCNVector3]?
+    
+    var smoothedCloud : [SCNVector3]?
+    var transientCloud : [SCNVector3]?
 
     @IBOutlet weak var navBar: UINavigationItem!
     @IBOutlet weak var zScale: UISlider!
@@ -38,6 +45,7 @@ class skinmodel: UIViewController {
     @IBOutlet weak var cancelEdit: UIButton!
     @IBOutlet weak var symptonsButton: UIButton!
     
+    @IBOutlet weak var hapticsButton: UIButton!
     @IBOutlet weak var treatmentButton: UIButton!
     @IBOutlet weak var notesButton: UIButton!
     @IBOutlet weak var urgencylabel: UILabel!
@@ -54,6 +62,14 @@ class skinmodel: UIViewController {
     var nodeModel: SCNNode!
     let nodeName = "skin"
     var originalOrientation :SCNQuaternion?
+    var hapticsToggle = false
+    var originalCameraPosition: SCNVector3?
+    var originalCameraOrientation: SCNQuaternion?
+    
+    var gradientToggle : Bool = false
+    var palpationToggle : Bool = false
+    //if true -> visual
+    //if false -> texture
     
     var recordHaptics = false
     
@@ -69,7 +85,8 @@ class skinmodel: UIViewController {
     var xAxisNode : SCNNode?
     var yAxisNode : SCNNode?
     var zAxisNode : SCNNode?
-    
+    //0 = palpate, 1 = visual
+    @IBOutlet weak var palpationOption: UISegmentedControl!
     @IBOutlet weak var RotateToggle: UIButton!
  
     @IBOutlet weak var SelectPivot: UIButton!
@@ -105,6 +122,7 @@ class skinmodel: UIViewController {
             fatalError("Engine Creation Error: \(error)")
         }
         tempHaptics = Haptics(engine: engine)
+        
         sceneView.scene = scene
         
         sceneView.allowsCameraControl = false//add button to move the model
@@ -119,8 +137,11 @@ class skinmodel: UIViewController {
         scene!.rootNode.addChildNode(ambientLightNode)
         
         cameraNode.camera = SCNCamera()
+
         sceneView.cameraControlConfiguration.allowsTranslation = false
-        
+        sceneView.defaultCameraController.pointOfView?.position = SCNVector3(x: Float.pi/36, y: Float.pi/3, z: Float.pi/24)
+        sceneView.defaultCameraController.pointOfView?.orientation = SCNQuaternion(-Float.pi/4, 0.0, 0.0, Float.pi/4)
+        sceneView.defaultCameraController.pointOfView?.eulerAngles = SCNVector3(-Float.pi/2, 0.0,0.0)
         cameraNode.constraints = [SCNTransformConstraint.positionConstraint(
             inWorldSpace: true,
             with: { (node, position) -> SCNVector3 in
@@ -128,15 +149,19 @@ class skinmodel: UIViewController {
                 return node.position
             }
         )]
+      //  originalCameraPosition = cameraNode.position
+        originalCameraPosition = sceneView.defaultCameraController.pointOfView?.position
+        originalCameraOrientation = sceneView.defaultCameraController.pointOfView?.orientation
         sceneView.debugOptions = [.showCreases]
         //self.view = sceneView
         view.addSubview(sceneView)
         sceneView.frame = CGRect(x: 0, y: notesButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (notesButton.frame.maxY + 10)) // Adjust the values as needed
         originalOrientation = (sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)!.orientation)!
-        urgencylabel.text = "Precancerous"
+        urgencylabel.text = self.condition?.urgency ?? ""
         
         //Add to function
         view.bringSubviewToFront(RotateToggle)
+        view.bringSubviewToFront(palpationOption)
         view.bringSubviewToFront(SelectPivot)
         view.bringSubviewToFront(recordHaptic)
         view.bringSubviewToFront(xLabel)
@@ -146,6 +171,7 @@ class skinmodel: UIViewController {
         view.bringSubviewToFront(yScale)
         view.bringSubviewToFront(zScale)
         view.bringSubviewToFront(smoothButton)
+        view.bringSubviewToFront(hapticsButton)
         xLabel.isHidden = true
         yLabel.isHidden = true
         zLabel.isHidden = true
@@ -157,9 +183,10 @@ class skinmodel: UIViewController {
         completeEdit.isHidden = true
         
         changePivot = false
+        hapticsToggle = false
         createAxes()
         hideAxes()
-        navBar.title = "Skin Lesion: Actinic Keratosis"
+        navBar.title = "Skin Lesion: \(self.condition?.name ?? "")"
         navBar.titleView?.isHidden = false
         for image in magnifier{
             view.bringSubviewToFront(image)
@@ -170,9 +197,83 @@ class skinmodel: UIViewController {
       //  allVertices = try extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
      //   print("before")
       //  print(allVertices)
-      //  try print(extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
-        vertices = extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
+        //try print(extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
+        let point1 = SCNVector3(x: 0.0, y: 6.0, z: 0.0)
+        let indices: [Int32] = [
+            0, 1, 2 // Triangle with vertices 0, 1, 2
+        ]
+        let points = [point1, SCNVector3(x: 0.1, y: 5.7, z: 0.0), SCNVector3(x: -0.1, y: 5.7, z: 0.0), SCNVector3(x: 0.2, y: 6.2, z: 0.0)]
+       // let points2 = []
+        let gaussMethod = gradientMethod()
+        let testSource = SCNGeometrySource(vertices: points)
+        let testElement = SCNGeometryElement(indices: indices, primitiveType: .triangles)
+        let testShape = SCNGeometry(sources: [testSource], elements: [testElement])
+            // -0.1293827, y: 0.019729614, z: 0.14373043
+       // let url = URL.documentsDirectory.appendingPathComponent("coordinates.txt")
+      //  let url2 = URL.documentsDirectory.appendingPathComponent("tra.txt")
+        let url = URL.documentsDirectory.appendingPathComponent("smoothCloud.txt")
+       let url2 = URL.documentsDirectory.appendingPathComponent("transientCloud.txt")
+        
+        do {
+            let fileHandle = try FileHandle(forReadingFrom: url)
+            let data = fileHandle.readDataToEndOfFile()
+            fileHandle.closeFile()
+            
+            // Assuming the file contains text data, you can convert it to a String
+            if let text = String(data: data, encoding: .utf8) {
+                print("Smoothed cloud")
+                smoothedCloud = convertTextToSCNVector3(text: text)
+                print(smoothedCloud?[0])
+            } else {
+                print("Unable to convert data to text.")
+            }
+        } catch {
+            print("Error: \(error)")
+        }
+        do {
+            let fileHandle = try FileHandle(forReadingFrom: url2)
+            let data = fileHandle.readDataToEndOfFile()
+            fileHandle.closeFile()
+            
+            // Assuming the file contains text data, you can convert it to a String
+            if let text = String(data: data, encoding: .utf8) {
+                print("transientCloud.txt:")
+                transientCloud = convertTextToSCNVector3(text: text)
+                print(transientCloud)
+            } else {
+                print("Unable to convert data to text.")
+            }
+        } catch {
+            print("Error: \(error)")
+        }
+     /*   do {
+            try FileManager.default.removeItem(at: url)
+        }catch{
+            print("error deleting file")
+        }*/
+        DispatchQueue.global(qos: .background).async{
+           // let clouds = gaussMethod.smoothPointCloud(from: (self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry)!)
+            DispatchQueue.main.async{
+                print("smoothed:")
+            //    print(clouds.smoothed)
+                print("transient")
+          //      print(clouds.transient)
+            }
+        }
+       //print(gaussMethod.smoothPointCloud(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
+      //  print(gaussMethod.smoothPointCloud(from: testShape))
+       // let clouds = gaussMethod.smoothPointCloud(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
+        //let smoothedCloud = clouds//.smoothed
+       // let transientCloud = clouds.transient
+      //  print(smoothedCloud)
         print("gaussian")
+      //  print(transientCloud)
+        //might need to buffer the edges** like with image processing to ensure that those on the ends arent affected by not having nearby pointslet xAxis = SCNCylinder(radius: 0.001, height: 1)
+       // print(gaussMethod.averageValues(closestPoints: points, inputPoint: point1))
+       // print(gaussMethod.addNewAverage(inputPoint: point1, originalPointCloud: points, currentSmoothed: [], k: 3))
+        //edge case: k > length of pointcloud
+       // vertices = extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
+        
         
 
 
@@ -187,30 +288,59 @@ class skinmodel: UIViewController {
         
         print(scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.transform)
         print(scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.worldTransform)*/
-        try showVertices1(of: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, childNode: scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)! )
-        print("check", vertices)
-        kernel = smoothedModel.generateKernel(kernelSize: 3, sigma: 0.5)
+       // try showVertices1(of: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, childNode: scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)! )
+      //  print("check", vertices)
+    
+       // kernel = smoothedModel.generateKernel(kernelSize: 3, sigma: 0.5)
     }
-    @IBAction func applyGaussian(_ sender: Any) {
-       // var newCoordinates : [[[Float]]]
-       /* Task { @MainActor in
-            newCoordinates = await smoothedModel.convertToPointCloud(coordinates: extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)!) ?? [[[0]]]
-
+    
+    // Assuming text contains lines of space-separated coordinates, e.g., "x y z\n"
+    // Function to convert a line of text to SCNVector3
+    func convertTextToSCNVector3(text: String) -> [SCNVector3] {
+        var vectorList: [SCNVector3] = []
+        
+        // Split text into lines
+        let lines = text.components(separatedBy: .newlines)
+        
+        // Iterate over each line and convert it to SCNVector3
+        for line in lines {
+            // Example line format: SCNVector3(x: 0.102449834, y: 8.901209e-05, z: 0.15636508)
+            
+            // Remove "SCNVector3" and parentheses
+            var cleanLine = line.replacingOccurrences(of: "SCNVector3", with: "")
+            cleanLine = cleanLine.replacingOccurrences(of: "(", with: "")
+            cleanLine = cleanLine.replacingOccurrences(of: ")", with: "")
+            
+            // Split line by commas to get individual components
+            let components = cleanLine.components(separatedBy: ",")
+            
+            // Extract x, y, and z values
+            guard components.count == 3,
+                  let xString = components[0].split(separator: ":").last?.trimmingCharacters(in: .whitespaces),
+                  let yString = components[1].split(separator: ":").last?.trimmingCharacters(in: .whitespaces),
+                  let zString = components[2].split(separator: ":").last?.trimmingCharacters(in: .whitespaces),
+                  let x = Float(xString),
+                  let y = Float(yString),
+                  let z = Float(zString) else {
+                // Skip this line if it doesn't match the expected format
+                continue
+            }
+            
+            // Create SCNVector3 object and add it to the list
+            vectorList.append(SCNVector3(x, y, z))
         }
-        let gaussianModel =  smoothedModel.applyGaussianSmoothing(pointcloud: newCoordinates, kernel: kernel ?? [[[0]]])
-        print(gaussianModel)*/
-        Task {
-            // Asynchronously fetch new coordinates
-            /*guard let vertices = extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!) else {
-                print("Failed to extract vertices")
-                return
-            }*/
-
-            let newCoordinates = smoothedModel.convertToPointCloud(coordinates: vertices ?? [SCNVector3(x: 0, y: 0, z: 0)]) ?? [[[0]]]
-            print("new coordinates", vertices)
-            // Once new coordinates are obtained, apply Gaussian smoothing
-            let gaussianModel = smoothedModel.applyGaussianSmoothing(pointcloud: newCoordinates, kernel: kernel ?? [[[0]]])
-            print(gaussianModel)
+        
+        return vectorList
+    }
+    
+    @IBAction func applyGaussian(_ sender: Any) {
+        if !gradientToggle{
+            gradientToggle = true
+            smoothButton.tintColor = .green
+        }
+        else{
+            gradientToggle = false
+            smoothButton.tintColor = .blue
         }
     }
   /*  func applyGaussian(){
@@ -350,7 +480,11 @@ class skinmodel: UIViewController {
         }
     }
 
-
+    func inverseQuaternion(_ q: SCNQuaternion) -> SCNQuaternion {
+        let conjugate = SCNQuaternion(x: -q.x, y: -q.y, z: -q.z, w: q.w)
+        let squaredMagnitude = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w
+        return SCNQuaternion(x: conjugate.x / squaredMagnitude, y: conjugate.y / squaredMagnitude, z: conjugate.z / squaredMagnitude, w: conjugate.w / squaredMagnitude)
+    }
 
 
     
@@ -369,7 +503,9 @@ class skinmodel: UIViewController {
 
                 // Check if the desired node is touched
                 for result in hitTestResults {
+                    
                     if result.node.name == modelName{
+                        print("surface normal", result.localNormal)
                         // Node is touched, perform desired action
                         let position = result.localCoordinates
                         //later remove so that first point is only added if continued onto touches moved
@@ -381,7 +517,7 @@ class skinmodel: UIViewController {
                         }
                         prevPoint = position.y
                         previousPosition = modelLocation(xPos: position.x, yPos: position.y, zPos: position.z)
-                        if !(hapticTransient ?? true){
+                        if !(hapticTransient ?? true) && hapticsToggle && !palpationToggle{
                             //continuous mode
                             tempHaptics?.createContinuousHapticPlayer(initialIntensity: position.y*10, initialSharpness: position.y*10)
                             currentIntensity = position.y*10
@@ -395,6 +531,25 @@ class skinmodel: UIViewController {
                             } catch let error {
                                 print("Error starting the continuous haptic player: \(error)")
                             }
+
+                           // let rotation = SCNQuaternion(x: 0.0, y: (position.y * Float.pi)/180, z: 0.0, w: (position.y * Float.pi)/180)
+
+                            
+                        }
+                        if hapticsToggle && palpationToggle{
+                            let surfaceNormalVector = result.worldNormal
+                            var test = sceneView.defaultCameraController.pointOfView?.worldFront ?? SCNVector3(x: 0, y: -1, z: 0)
+                            test.y = -(test.y)
+                            print(test)
+                            guard let currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
+
+                            let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test)
+                            let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
+
+                            //print("New camera orientation:", cameraNode.rotation)
+                            sceneView.defaultCameraController.pointOfView?.transform = newTransform
+                        //    let angleInRadians: Float = 1 * (Float.pi / 180) // Convert 1 degree to radians
+
                         }
                         return
                     }
@@ -404,16 +559,48 @@ class skinmodel: UIViewController {
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
-        let touch = touches.first!
-        let location = touch.location(in: sceneView)
-        let hitTestResults = sceneView.hitTest(location, options: nil)
+        print("hello check scene touch")
+        if let touch = touches.first, let sceneViewScene = sceneView.scene {
+            
+            let location = touch.location(in: sceneView)
+            let hitTestResults = sceneView.hitTest(location, options: nil)
+            // Process hit test results
         
         // Check if the desired node is touched
         for result in hitTestResults {
             if result.node.name == modelName {
                 let position = result.localCoordinates
-                let height = result.localCoordinates.y
-                
+                var height = result.localCoordinates.y
+                let tempGradient = gradientMethod()
+                let firstTime = Date()
+                var approxPoint : SCNVector3 = SCNVector3(0, 0, 0)
+                if gradientToggle && (hapticTransient ?? true){
+                    approxPoint = tempGradient.closestDistance(points: transientCloud ?? [], inputPoint: position, k: 1)[0]
+                    let xChange = (position.x - (previousPosition?.xPos ?? 0.0))
+                    let zChange = (position.z - (previousPosition?.zPos ?? 0.0))
+                    let nextPoint = tempGradient.closestDistance(points: transientCloud ?? [], inputPoint: SCNVector3(position.x + xChange, position.y, position.z + zChange), k: 1)[0]
+                    let changeInGradient = (Float(approxPoint.y - nextPoint.y) + Float(approxPoint.y - (previousPosition?.yPos ?? 0.0)))/2.0
+                    print("points")
+                    print(position.y)
+                    print(approxPoint.y)
+                    print(nextPoint.y)
+                    print(previousPosition?.yPos)
+                    print(changeInGradient)
+                    print("end")
+                    
+                    //height = (approxPoint.y * 1000) + 1
+                    height = abs(changeInGradient * 10000)
+                }
+                else if gradientToggle && !(hapticTransient ?? true){
+                    approxPoint = tempGradient.closestDistance(points: smoothedCloud ?? [], inputPoint: position, k: 1)[0]
+                    height = approxPoint.y
+                }
+                else{
+                    approxPoint = position
+                    height = position.y * 10
+                }
+                print(approxPoint)
+                //print(Date().timeIntervalSince(firstTime))
                 let intersectionPoint = result.worldCoordinates
                 let previousLocation = touch.previousLocation(in: sceneView)
                         let currentLocation = touch.location(in: sceneView)
@@ -432,10 +619,6 @@ class skinmodel: UIViewController {
                 }
                 //let intensity = hapticAlgorithm.forceFeedback(height: height, velocity: speed)
                 let intensity = (((height - (prevPoint ?? 0))*1000)+5)/10
-                
-
-                
-                    
 
                 /*if recordHaptics{
                  //   let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
@@ -444,127 +627,129 @@ class skinmodel: UIViewController {
                 }*/
                 
                 prevPoint = height
-                if !rotationOn{
-                    if !(hapticTransient ?? true){
-                        let intensityParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
-                                                                          value: (height*10/(currentIntensity ?? 1)),
-                                                                          relativeTime: 0)
-                        let sharpnessParameter = CHHapticDynamicParameter(parameterID: .hapticSharpnessControl,
-                                                                          value: (height*10 - (currentSharpness ?? 0)),
-                                                                          relativeTime: 0)
-                        print("continuous")
-                        currentIntensity = height*10
-                        currentSharpness = height*10
-                        print(currentIntensity)
-                        //print(currentSharpness)
-                        //print(height*10)
-                        // Send dynamic parameters to the haptic player.
-                        do {
-                            try tempHaptics?.continuousPlayer.sendParameters([intensityParameter, sharpnessParameter],
-                                                                atTime: 0)
+                if !rotationOn && hapticsToggle{
+                    if !palpationToggle{
+                        if !(hapticTransient ?? true){
+                            let intensityParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
+                                                                              value: (height/(currentIntensity ?? 1)),
+                                                                              relativeTime: 0)
+                            //  let sharpnessParameter = CHHapticDynamicParameter(parameterID: .hapticSharpnessControl,
+                            //       value: (height - (currentSharpness ?? 0)),
+                            //        relativeTime: 0)
+                            currentIntensity = height
+                            currentSharpness = height
+                            // Send dynamic parameters to the haptic player.
+                            do {
+                                try tempHaptics?.continuousPlayer.sendParameters([intensityParameter],
+                                                                                 atTime: 0)
+                                
+                            } catch let error {
+                                print("Dynamic Parameter Error: \(error)")
+                            }
+                        }
+                        else{
                             
-                        } catch let error {
-                            print("Dynamic Parameter Error: \(error)")
+                            
+                            /MARK - TRYING GRADIENT POINT CLOUD METHOD/
+                            //   let allVertices = try extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
+                            
+                            
+                            // Filter vertices within the specified radius of the touch location
+                            /*   let verticesWithinRadius = (allVertices?.filter { vertex in
+                             let xSquared = sqrt((vertex.x - position.x)*(vertex.x - position.x))
+                             let ySquared = sqrt((vertex.y - position.y)*(vertex.y - position.y))
+                             let zSquared = sqrt((vertex.z - position.z)*(vertex.z - position.z))
+                             let distanceSquared = xSquared + ySquared + zSquared
+                             return distanceSquared <= 0.01//radius
+                             })! */
+                            
+                            //gives me all the points in the point cloud within the radius
+                            //let gradients = extractPointCloudRegionAndGradients(from scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, at position, radius: 0.01)
+                            //  let gradients = extractPointCloudRegionAndGradients(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, at: position, radius: 0.01)
+                            
+                            /* if let previousPosition = previousPosition {
+                             if sqrt((previousPosition.xPos - position.x)*(previousPosition.xPos - position.x)) > 0.001 || sqrt((previousPosition.zPos - position.z)*(previousPosition.zPos - position.z)) > 0.001 {
+                             print("check here")
+                             //  let gradient = computeGradient(at: position, in: verticesWithinRadius)
+                             // Compute gradients for each vertex within the region
+                             let gradients = verticesWithinRadius.compactMap { vertex -> (vertex: SCNVector3, gradient: Float)? in
+                             //     guard let allVertices = allVertices else { return nil }
+                             let gradient = computeGradient(at: vertex, in: allVertices ?? [])
+                             return (vertex: vertex, gradient: gradient) as! (vertex: SCNVector3, gradient: Float)
+                             }
+                             if computeGradient(at: position, in: verticesWithinRadius) <= 0.001{
+                             print("STATIONARY POINT")
+                             //let hessian = computeHessian(at: position, in: verticesWithinRadius)
+                             let gradVals = gradients.map { $0.gradient }
+                             var pos = SCNVector3(x: position.x + 0.001, y: position.y, z: position.z)
+                             //  print(functionValue(at: pos, vertices: verticesWithinRadius))
+                             let grad2 = computeGradient(at: pos, in: verticesWithinRadius)
+                             pos = SCNVector3(x: position.x - 0.001, y: position.y, z: position.z)
+                             //  print(functionValue(at: pos, vertices: verticesWithinRadius))
+                             let grad1 = computeGradient(at: pos, in: verticesWithinRadius)
+                             pos = SCNVector3(x: position.x, y: position.y, z: position.z + 0.001)
+                             // print(functionValue(at: pos, vertices: verticesWithinRadius))
+                             let grad4 = computeGradient(at: pos, in: verticesWithinRadius)
+                             pos = SCNVector3(x: position.x, y: position.y, z: position.z - 0.001)
+                             //  print(functionValue(at: pos, vertices: verticesWithinRadius))
+                             let grad3 = computeGradient(at: pos, in: verticesWithinRadius)
+                             var hessianAttempt = sqrt((grad2-grad1)*(grad2-grad1))//
+                             hessianAttempt = hessianAttempt*sqrt((grad4-grad3)*(grad4-grad3))//[grad2, grad1, grad4, grad3]//dependent on the direction the user is moving
+                             print(grad2)
+                             print(grad1)
+                             print(grad3)
+                             print(grad4)
+                             
+                             print(hessianAttempt)
+                             //
+                             
+                             try tempHaptics?.playHeightHaptic(height:hessianAttempt*10)
+                             }
+                             else{
+                             print("gradient")
+                             print(computeGradient(at: position, in: verticesWithinRadius))
+                             }*/
+                            // for point in gradients {
+                            //  if point.gradient == 0 {
+                            //     print(point.vertex)
+                            //     print("STATIONARY POINT")
+                            //   let hessian = computeHessian(at: position, in: verticesWithinRadius)
+                            //    print(hessian)
+                            //        print("end")
+                            // try tempHaptics?.playHeightHaptic(height:height)
+                            //    }
+                            //   }
+                            
+                            //   let intensity1 = sqrt((height - previousPosition.yPos)*(height - previousPosition.yPos))
+                            let timeChange = touch.timestamp - ((prevTimestamp ?? firstTimestamp) ?? 0)
+                            //      let intensityChange = intensity1/Float(timeChange)
+                            //try tempHaptics?.playHeightHaptic(height:intensity*10)
+                            try tempHaptics?.playHeightHaptic(height:height)
+                            print(approxPoint.y * 100)
+                            prevTimestamp = touch.timestamp
+                            //print(intensity1*100)
                         }
                     }
-                    else{
-                     //   try tempHaptics?.playHeightHaptic(height:intensity)
-                        print("new point")
-                       // print(intensity)
-                      //  print(intensity1)
-                      //  print(result.localCoordinates.x)
-                      //  print(result.localCoordinates.z)
-
+                    else if (hapticsToggle && palpationToggle){
+                        let surfaceNormalVector = result.worldNormal
+                        var test = sceneView.defaultCameraController.pointOfView?.worldFront ?? SCNVector3(x: 0, y: -1, z: 0)
+                        test.y = -(test.y)
+                        print(test)
+                        guard var currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
+                        
+                        let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector,test)
+                        let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
+                        
+                        print("check start")
+                        print(sceneView.defaultCameraController.pointOfView?.orientation)
+                        sceneView.defaultCameraController.pointOfView?.transform = newTransform
+                        print("camera", test)
+                        print(newTransform)
+                        print(sceneView.defaultCameraController.pointOfView?.orientation)
                     }
-                    
-                    /MARK - TRYING GRADIENT POINT CLOUD METHOD/
-                 //   let allVertices = try extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
-                        
-                    
-                    // Filter vertices within the specified radius of the touch location
-                 /*   let verticesWithinRadius = (allVertices?.filter { vertex in
-                        let xSquared = sqrt((vertex.x - position.x)*(vertex.x - position.x))
-                        let ySquared = sqrt((vertex.y - position.y)*(vertex.y - position.y))
-                        let zSquared = sqrt((vertex.z - position.z)*(vertex.z - position.z))
-                        let distanceSquared = xSquared + ySquared + zSquared
-                        return distanceSquared <= 0.01//radius
-                    })! */
-                    
-                    
-                    
-                    //gives me all the points in the point cloud within the radius
-                    //let gradients = extractPointCloudRegionAndGradients(from scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, at position, radius: 0.01)
-                  //  let gradients = extractPointCloudRegionAndGradients(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, at: position, radius: 0.01)
-                    
-                   /* if let previousPosition = previousPosition {
-                        if sqrt((previousPosition.xPos - position.x)*(previousPosition.xPos - position.x)) > 0.001 || sqrt((previousPosition.zPos - position.z)*(previousPosition.zPos - position.z)) > 0.001 {
-                            print("check here")
-                          //  let gradient = computeGradient(at: position, in: verticesWithinRadius)
-                            // Compute gradients for each vertex within the region
-                            let gradients = verticesWithinRadius.compactMap { vertex -> (vertex: SCNVector3, gradient: Float)? in
-                           //     guard let allVertices = allVertices else { return nil }
-                                let gradient = computeGradient(at: vertex, in: allVertices ?? [])
-                                return (vertex: vertex, gradient: gradient) as! (vertex: SCNVector3, gradient: Float)
-                            }
-                            if computeGradient(at: position, in: verticesWithinRadius) <= 0.001{
-                                print("STATIONARY POINT")
-                                //let hessian = computeHessian(at: position, in: verticesWithinRadius)
-                                let gradVals = gradients.map { $0.gradient }
-                                var pos = SCNVector3(x: position.x + 0.001, y: position.y, z: position.z)
-                              //  print(functionValue(at: pos, vertices: verticesWithinRadius))
-                                let grad2 = computeGradient(at: pos, in: verticesWithinRadius)
-                                pos = SCNVector3(x: position.x - 0.001, y: position.y, z: position.z)
-                              //  print(functionValue(at: pos, vertices: verticesWithinRadius))
-                                let grad1 = computeGradient(at: pos, in: verticesWithinRadius)
-                                pos = SCNVector3(x: position.x, y: position.y, z: position.z + 0.001)
-                               // print(functionValue(at: pos, vertices: verticesWithinRadius))
-                                let grad4 = computeGradient(at: pos, in: verticesWithinRadius)
-                                pos = SCNVector3(x: position.x, y: position.y, z: position.z - 0.001)
-                              //  print(functionValue(at: pos, vertices: verticesWithinRadius))
-                                let grad3 = computeGradient(at: pos, in: verticesWithinRadius)
-                                var hessianAttempt = sqrt((grad2-grad1)*(grad2-grad1))//
-                                hessianAttempt = hessianAttempt*sqrt((grad4-grad3)*(grad4-grad3))//[grad2, grad1, grad4, grad3]//dependent on the direction the user is moving
-                                print(grad2)
-                                print(grad1)
-                                print(grad3)
-                                print(grad4)
-                                
-                                print(hessianAttempt)
-                            //
-                                
-                                try tempHaptics?.playHeightHaptic(height:hessianAttempt*10)
-                            }
-                            else{
-                                print("gradient")
-                                print(computeGradient(at: position, in: verticesWithinRadius))
-                            }*/
-                       // for point in gradients {
-                          //  if point.gradient == 0 {
-                           //     print(point.vertex)
-                           //     print("STATIONARY POINT")
-                             //   let hessian = computeHessian(at: position, in: verticesWithinRadius)
-                        //    print(hessian)
-                    //        print("end")
-                               // try tempHaptics?.playHeightHaptic(height:height)
-                        //    }
-                     //   }
-                    /END MARK/
-
-                        
-
-                                print(position.y)
-                             /*   let intensity1 = sqrt((height - previousPosition.yPos)*(height - previousPosition.yPos))
-                                previousPosition.xPos = position.x
-                                previousPosition.yPos = position.y
-                                previousPosition.zPos = position.z*/
-                                let timeChange = touch.timestamp - ((prevTimestamp ?? firstTimestamp) ?? 0)
-                        //      let intensityChange = intensity1/Float(timeChange)
-                                try tempHaptics?.playHeightHaptic(height:intensity*10)
-                                prevTimestamp = touch.timestamp
-                                //print(intensity1*100)
                                 if recordHaptics{
                                  //   let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
-                                    let dataPoint = HapticDataPoint(intensity: intensity*10, time:Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
+                                    let dataPoint = HapticDataPoint(intensity: height, time:Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
                                     chartData?.append(dataPoint)
                                 }
                         } else {
@@ -573,7 +758,11 @@ class skinmodel: UIViewController {
                         
                     }
                 }
+       
                 return
+        } else {
+            print("No touch or sceneView is nil")
+        }
         
     }
     
@@ -711,7 +900,7 @@ class skinmodel: UIViewController {
         if !rotationOn{
             rotationOn = true
             sceneView.allowsCameraControl = true
-            sceneView.cameraControlConfiguration.allowsTranslation = false
+           // sceneView.cameraControlConfiguration.allowsTranslation = false
             RotateToggle.tintColor = UIColor.systemGreen
         }
         else{
@@ -734,6 +923,7 @@ class skinmodel: UIViewController {
         RotateToggle.isHidden = true
         SelectPivot.isHidden = true
         notesButton.isHidden = true
+        hapticsButton.isHidden = true
         treatmentButton.isHidden = true
         symptonsButton.isHidden = true
         urgencylabel.isHidden = true
@@ -762,6 +952,7 @@ class skinmodel: UIViewController {
         zScale.value = 0
         RotateToggle.isHidden = false
         SelectPivot.isHidden = false
+        hapticsButton.isHidden = false
         sceneView.debugOptions = [.showCreases]
         notesButton.isHidden = false
         symptonsButton.isHidden = false
@@ -966,12 +1157,13 @@ class skinmodel: UIViewController {
         
     }
     
-    func set(name : String, fileName : String){
-        
-        self.modelName = name
-        self.modelFile = fileName
-        scene = SCNScene(named: fileName)//do i need to deallocate the current scene?
-        print(self.modelName)
+    func set(model : SkinCondition){
+        self.condition = model
+        self.modelFile = model.modelFile
+        self.modelName = model.modelName
+        scene = SCNScene(named: model.modelFile)//do i need to deallocate the current scene?
+
+    
     }
     
     @IBAction func hapticMethodChanged(_ sender: Any) {
@@ -983,8 +1175,146 @@ class skinmodel: UIViewController {
         }
     }
     
+    @IBAction func hapticsPressed(_ sender: Any) {
+        if !hapticsToggle{
+            hapticsToggle = true
+            hapticsButton.tintColor = .green
+            print(palpationToggle)
+            if let originalPosition = originalCameraPosition {
+                sceneView.defaultCameraController.pointOfView?.position = originalPosition
+                if !palpationToggle{
+                    sceneView.defaultCameraController.pointOfView?.camera?.fieldOfView = 120
+                }else{
+                    sceneView.defaultCameraController.pointOfView?.camera?.fieldOfView = 45
+                }
     
+            } else {
+                // Handle the case where originalCameraPosition is nil
+                // Maybe log an error, provide a default position, or take other appropriate action
+                print("Error: originalCameraPosition is nil")
+            }
+            if let originalCamOrientation = originalCameraOrientation {
+                sceneView.defaultCameraController.pointOfView?.orientation = originalCamOrientation
+            } else {
+                // Handle the case where originalCameraPosition is nil
+                // Maybe log an error, provide a default position, or take other appropriate action
+                print("Error: originalCameraOrientation is nil")
+            }
+            sceneView.allowsCameraControl = false
+            rotationOn = false
+            RotateToggle.isEnabled = false
+            
+            
+          //  sceneView.defaultCameraController.pointOfView?.eulerAngles = SCNVector3(0.5, 0, 0)
 
+        }
+        else{
+            hapticsToggle = false
+            hapticsButton.tintColor = .blue
+            sceneView.allowsCameraControl = true
+            RotateToggle.isEnabled = true
+            sceneView.defaultCameraController.pointOfView?.camera?.fieldOfView = 45
+        }
+    }
+    
+    
+    @IBAction func touchNotes(_ sender: Any) {
+        guard let popUp = storyboard?.instantiateViewController(withIdentifier: "NotesView") as? NotesView else {
+            return
+        }
+        if let skinCondition = condition {
+            popUp.set(condition: skinCondition, type: "Notes")
+            
+            //navigationController?.pushViewController(popUp, animated: true)
+            navigationController?.present(popUp, animated: true, completion: nil)
+        }
 
+    }
+    
+    @IBAction func touchSymptoms(_ sender: Any) {
+        guard let popUp = storyboard?.instantiateViewController(withIdentifier: "NotesView") as? NotesView else {
+            return
+        }
+        if let skinCondition = condition {
+            popUp.set(condition: skinCondition, type: "Symptoms")
+            
+            //navigationController?.pushViewController(popUp, animated: true)
+            navigationController?.present(popUp, animated: true, completion: nil)
+        }
+    }
+    
+    @IBAction func touchTreatment(_ sender: Any) {
+        guard let popUp = storyboard?.instantiateViewController(withIdentifier: "NotesView") as? NotesView else {
+            return
+        }
+        if let skinCondition = condition {
+            popUp.set(condition: skinCondition, type: "Treatment")
+            
+            //navigationController?.pushViewController(popUp, animated: true)
+            navigationController?.present(popUp, animated: true, completion: nil)
+        }
+    }
+    
+    
+    @IBAction func palpateToggle(_ sender: Any) {
+        if palpationOption.selectedSegmentIndex == 0{
+            //texture method
+            palpationToggle = false
+            if hapticsToggle{
+                sceneView.defaultCameraController.pointOfView?.camera?.fieldOfView = 120
+            }
+        }
+        else{
+            //visual method
+            print("hello visual")
+            palpationToggle = true
+            if hapticsToggle{
+                sceneView.defaultCameraController.pointOfView?.camera?.fieldOfView = 45
+            }
+        }
+    }
+    @IBAction func touchSimilarConditions(_ sender: Any) {
+        guard let popUp = storyboard?.instantiateViewController(withIdentifier: "LinkConditions") as? LinkConditions else {
+            return
+        }
+        if let skinCondition = condition {
+            popUp.set(linkedModels: self.condition?.similarConditions ?? [])
+            
+            //navigationController?.pushViewController(popUp, animated: true)
+            navigationController?.present(popUp, animated: true, completion: nil)
+        }
+    }
+    
+    
 }
 
+extension SCNQuaternion {
+    static func fromTwoVectors(_ vectorA: SCNVector3, _ vectorB: SCNVector3) -> SCNMatrix4  {
+        // Calculate the cross product
+        let axis = SCNVector3(
+            x: vectorA.y * vectorB.z - vectorA.z * vectorB.y,
+            y: vectorA.z * vectorB.x - vectorA.x * vectorB.z,
+            z: vectorA.x * vectorB.y - vectorA.y * vectorB.x
+        )
+        print("axis", axis)
+        // Calculate the dot product
+        let dotProduct = vectorA.x * vectorB.x + vectorA.y * vectorB.y + vectorA.z * vectorB.z
+        
+        // Calculate the magnitudes
+        let magnitudeA = sqrt(vectorA.x * vectorA.x + vectorA.y * vectorA.y + vectorA.z * vectorA.z)
+        let magnitudeB = sqrt(vectorB.x * vectorB.x + vectorB.y * vectorB.y + vectorB.z * vectorB.z)
+        print("magnitudeA", magnitudeA)
+        print("magnitudeB", magnitudeB)
+        // Calculate the angle
+        let angle = acos(dotProduct / (magnitudeA * magnitudeB))
+        print(dotProduct / (magnitudeA * magnitudeB))
+        if(abs(1 - (dotProduct / (magnitudeA * magnitudeB))) < 0.1){
+            return SCNMatrix4Identity
+        }
+        // Construct the rotation axis
+        let rotationAxis = SCNQuaternion(x: axis.x, y: axis.y, z: axis.z, w: angle)
+        //return SCNMatrix4Identity
+        // Create and return the quaternion
+        return SCNMatrix4MakeRotation(angle, axis.x, axis.y, axis.z)
+    }
+}

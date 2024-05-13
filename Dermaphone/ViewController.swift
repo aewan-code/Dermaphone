@@ -13,20 +13,21 @@ import SwiftUI
 
 class ViewController: UIViewController {
  
-
-    var modelName : String = "Mesh"
-    var modelFile : String = "baked_mesh.scn"//"testTransform.scn"
+    var currentModel : SkinCondition = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "", urgency: "")
+    //Change currentModel so that if no models have been created either portrays a test one or presents a popup
+    var skinConditions : [SkinCondition] = []
     @IBOutlet weak var ViewModel: UIButton!
     @IBAction func touchViewModel(_ sender: Any) {
         guard let vc = storyboard?.instantiateViewController(withIdentifier: "skinmodel") as? skinmodel else {
             return
         }
-        vc.set(name: modelName, fileName: modelFile)
+        vc.set(model: currentModel)
         print("check")
         navigationController?.pushViewController(vc, animated: true)
     }
     override func viewDidLoad() {
-        super.viewDidLoad()        
+        createModels()
+        super.viewDidLoad()
         setModel()
 
     }
@@ -35,26 +36,30 @@ class ViewController: UIViewController {
         
         let optionClosure = {(action : UIAction) in
             print(action.title)
-            
-            if action.title == "skin2model"{
-                self.modelFile = "test2scene.scn"
-                self.modelName = "Mesh"
+            //edge case - don't allow multiple conditions with the same name
+            if self.skinConditions.isEmpty{
+                //have a test model that users can look at
+                
             }
-            else{
-                self.modelFile = "testTransform.scn"
-                self.modelName = "Mesh"
+            var foundCondition = false
+            while !foundCondition{
+                for condition in self.skinConditions{
+                    if action.title == condition.name{
+                        foundCondition = true
+                        self.currentModel = condition
+                    }
+                    
+                }
             }
-        //    self.currentModelname.name = action.title + ".scn"
-        //    print(self.currentModelname.name)
             
         }
         
+        //edge case - no conditions created - resolve this
+       
         ViewModel.menu = UIMenu(children : [
-            UIAction(title : "skin2model", state: .on, handler : optionClosure),
-            UIAction(title : "skin3model", handler : optionClosure),
-          //  UIAction(title : "skin3", handler : optionClosure),
-         //   UIAction(title : "skin4", handler : optionClosure),
-        //UIAction(title : "skin5", handler : optionClosure)
+            //bug - without pressing anything - should go to the currently selected item
+            UIAction(title : skinConditions[0].name, handler : optionClosure),
+            UIAction(title : skinConditions[1].name, handler : optionClosure),
             
         ])
         
@@ -62,7 +67,20 @@ class ViewController: UIViewController {
         ViewModel.changesSelectionAsPrimaryAction = true
                                 
     }
-
+    //this will later be 'loadModels' - to be loaded from the database
+    func createModels(){
+        
+        let skin3Model = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma. Crusty rough spots", urgency: "Precancerous")
+        let skin2Model = SkinCondition(name: "Basal Cell Carcinoma", description: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun", texture: "", symptoms: "recurring sore that bleeds and heals", treatment: "", modelName: "Mesh", images: [], modelFile: "test2scene.scn", similarConditions: [(skin3Model, "link to cancer")], notes: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun.", urgency: "Cancerous")
+        if let image1 = UIImage(named: "IMG_3929") {
+            skin3Model.image?.append(image1)
+            print("yes")
+        }
+        
+        skinConditions.append(skin3Model)
+        skinConditions.append(skin2Model)
+    }
+    
             
             
 

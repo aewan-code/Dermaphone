@@ -28,6 +28,12 @@
 		FF5C1CA92BDFD0D200C097E9 /* testTriangle in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1CA82BDFD0D100C097E9 /* testTriangle */; };
 		FF5C1CAB2BE026D400C097E9 /* smoothModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1CAA2BE026D400C097E9 /* smoothModel.swift */; };
 		FF5C1CAD2BE117CA00C097E9 /* NotesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1CAC2BE117CA00C097E9 /* NotesView.swift */; };
+		FF5C1CAF2BE8D18C00C097E9 /* heightMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1CAE2BE8D18C00C097E9 /* heightMap.swift */; };
+		FF5C1CB12BE90CE300C097E9 /* gradientMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5C1CB02BE90CE300C097E9 /* gradientMethod.swift */; };
+		FF662E342BECD43300FD9411 /* LinkConditions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF662E332BECD43300FD9411 /* LinkConditions.swift */; };
+		FF662E362BECD60F00FD9411 /* LinkConditionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF662E352BECD60F00FD9411 /* LinkConditionCell.swift */; };
+		FF662E3E2BF0F58400FD9411 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = FF662E3D2BF0F58400FD9411 /* FirebaseAnalytics */; };
+		FF662E402BF0FF4400FD9411 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FF662E3F2BF0FF4400FD9411 /* GoogleService-Info.plist */; };
 		FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A802BAE183600A94673 /* AppDelegate.swift */; };
 		FFB13A832BAE183600A94673 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A822BAE183600A94673 /* SceneDelegate.swift */; };
 		FFB13A852BAE183600A94673 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13A842BAE183600A94673 /* ViewController.swift */; };
@@ -39,7 +45,6 @@
 		FFB13AA42BAE183800A94673 /* DermaphoneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13AA32BAE183800A94673 /* DermaphoneUITestsLaunchTests.swift */; };
 		FFB13B412BAF034600A94673 /* testTexture.ahap in Resources */ = {isa = PBXBuildFile; fileRef = FFB13B402BAF034600A94673 /* testTexture.ahap */; };
 		FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13B422BB1D41500A94673 /* Haptics.swift */; };
-		FFB13B4B2BBB0A8B00A94673 /* skinmodel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */; };
 		FFC1CEAA2BBB22AA00FD49B7 /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE942BBB22A900FD49B7 /* ImageLoader.swift */; };
 		FFC1CEAB2BBB22AA00FD49B7 /* Capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE952BBB22A900FD49B7 /* Capture.swift */; };
 		FFC1CEAC2BBB22AA00FD49B7 /* CaptureFoldersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE962BBB22A900FD49B7 /* CaptureFoldersView.swift */; };
@@ -109,6 +114,11 @@
 		FF5C1CA82BDFD0D100C097E9 /* testTriangle */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = testTriangle; path = ../../testTriangle; sourceTree = "<group>"; };
 		FF5C1CAA2BE026D400C097E9 /* smoothModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = smoothModel.swift; sourceTree = "<group>"; };
 		FF5C1CAC2BE117CA00C097E9 /* NotesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesView.swift; sourceTree = "<group>"; };
+		FF5C1CAE2BE8D18C00C097E9 /* heightMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = heightMap.swift; sourceTree = "<group>"; };
+		FF5C1CB02BE90CE300C097E9 /* gradientMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gradientMethod.swift; sourceTree = "<group>"; };
+		FF662E332BECD43300FD9411 /* LinkConditions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkConditions.swift; sourceTree = "<group>"; };
+		FF662E352BECD60F00FD9411 /* LinkConditionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkConditionCell.swift; sourceTree = "<group>"; };
+		FF662E3F2BF0FF4400FD9411 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		FFB13A7D2BAE183600A94673 /* Dermaphone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dermaphone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFB13A802BAE183600A94673 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FFB13A822BAE183600A94673 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -124,7 +134,6 @@
 		FFB13AA32BAE183800A94673 /* DermaphoneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DermaphoneUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		FFB13B402BAF034600A94673 /* testTexture.ahap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = testTexture.ahap; path = ../../FYPTestingTemp/FYPTestingTemp/testTexture.ahap; sourceTree = "<group>"; };
 		FFB13B422BB1D41500A94673 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
-		FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = skinmodel.swift; sourceTree = "<group>"; };
 		FFC1CE942BBB22A900FD49B7 /* ImageLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
 		FFC1CE952BBB22A900FD49B7 /* Capture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Capture.swift; sourceTree = "<group>"; };
 		FFC1CE962BBB22A900FD49B7 /* CaptureFoldersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureFoldersView.swift; sourceTree = "<group>"; };
@@ -161,6 +170,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF662E3E2BF0F58400FD9411 /* FirebaseAnalytics in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,12 +241,13 @@
 				FFB13A822BAE183600A94673 /* SceneDelegate.swift */,
 				FFB13A842BAE183600A94673 /* ViewController.swift */,
 				FF5C1C792BD2F99400C097E9 /* skinModelViewController.swift */,
+				FF5C1CB02BE90CE300C097E9 /* gradientMethod.swift */,
+				FF5C1CAE2BE8D18C00C097E9 /* heightMap.swift */,
 				FF5C1CAA2BE026D400C097E9 /* smoothModel.swift */,
-				FF5C1CA82BDFD0D100C097E9 /* testTriangle */,
 				FF5C1CA62BDF8F1700C097E9 /* modelLocation.swift */,
+				FF5C1CA82BDFD0D100C097E9 /* testTriangle */,
 				FF5C1C832BD3109300C097E9 /* testTransform.scn */,
 				FFF154E12BBC986900834F38 /* skinConditionInfoView.swift */,
-				FFB13B4A2BBB0A8B00A94673 /* skinmodel.swift */,
 				FF5C1C982BD43D0900C097E9 /* HapticManager.swift */,
 				FF5C1CA22BD54B8500C097E9 /* test2scene.usda */,
 				FF5C1CA42BD54B8D00C097E9 /* test2scene.scn */,
@@ -246,10 +257,13 @@
 				FF5C1C9E2BD5481B00C097E9 /* skin2Model */,
 				FF5C1C8F2BD320E200C097E9 /* 3dmodelSkin5 */,
 				FFB13A862BAE183600A94673 /* Main.storyboard */,
+				FF662E352BECD60F00FD9411 /* LinkConditionCell.swift */,
+				FF662E332BECD43300FD9411 /* LinkConditions.swift */,
 				FF5C1CAC2BE117CA00C097E9 /* NotesView.swift */,
 				FFB13A892BAE183800A94673 /* Assets.xcassets */,
 				FFB13A8B2BAE183800A94673 /* LaunchScreen.storyboard */,
 				FFB13A8E2BAE183800A94673 /* Info.plist */,
+				FF662E3F2BF0FF4400FD9411 /* GoogleService-Info.plist */,
 			);
 			path = Dermaphone;
 			sourceTree = "<group>";
@@ -317,15 +331,20 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FFB13AA72BAE183800A94673 /* Build configuration list for PBXNativeTarget "Dermaphone" */;
 			buildPhases = (
+				273B0C5EC9DC80FBD0E65070 /* [CP] Check Pods Manifest.lock */,
 				FFB13A792BAE183600A94673 /* Sources */,
 				FFB13A7A2BAE183600A94673 /* Frameworks */,
 				FFB13A7B2BAE183600A94673 /* Resources */,
+				992CCB9E75AE92976BAB6958 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = Dermaphone;
+			packageProductDependencies = (
+				FF662E3D2BF0F58400FD9411 /* FirebaseAnalytics */,
+			);
 			productName = Dermaphone;
 			productReference = FFB13A7D2BAE183600A94673 /* Dermaphone.app */;
 			productType = "com.apple.product-type.application";
@@ -334,6 +353,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FFB13AAA2BAE183800A94673 /* Build configuration list for PBXNativeTarget "DermaphoneTests" */;
 			buildPhases = (
+				5442A15B746A22C43B633FA2 /* [CP] Check Pods Manifest.lock */,
 				FFB13A8F2BAE183800A94673 /* Sources */,
 				FFB13A902BAE183800A94673 /* Frameworks */,
 				FFB13A912BAE183800A94673 /* Resources */,
@@ -352,9 +372,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FFB13AAD2BAE183800A94673 /* Build configuration list for PBXNativeTarget "DermaphoneUITests" */;
 			buildPhases = (
+				9364A20BF2A69E38F42EB96A /* [CP] Check Pods Manifest.lock */,
 				FFB13A992BAE183800A94673 /* Sources */,
 				FFB13A9A2BAE183800A94673 /* Frameworks */,
 				FFB13A9B2BAE183800A94673 /* Resources */,
+				EB3C0E6F9338E4EEE03E0819 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -398,6 +420,9 @@
 				Base,
 			);
 			mainGroup = FFB13A742BAE183600A94673;
+			packageReferences = (
+				FF662E3C2BF0F58400FD9411 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			productRefGroup = FFB13A7E2BAE183600A94673 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -427,6 +452,7 @@
 				FF5C1C912BD320E200C097E9 /* baked_mesh_norm0.png in Resources */,
 				FFF154CD2BBC375700834F38 /* skin2_tex0.png in Resources */,
 				FF5C1C952BD320E200C097E9 /* baked_mesh.usda in Resources */,
+				FF662E402BF0FF4400FD9411 /* GoogleService-Info.plist in Resources */,
 				FFC1CEBA2BBB22AA00FD49B7 /* LICENSE.txt in Resources */,
 				FF5C1C9F2BD5481C00C097E9 /* skin2Model in Resources */,
 				FFF154C82BBC375700834F38 /* skin2.obj in Resources */,
@@ -458,12 +484,111 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		273B0C5EC9DC80FBD0E65070 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "
+";
+			showEnvVarsInLog = 0;
+		};
+		5442A15B746A22C43B633FA2 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-DermaphoneTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9364A20BF2A69E38F42EB96A /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Dermaphone-DermaphoneUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		992CCB9E75AE92976BAB6958 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "
+";
+			showEnvVarsInLog = 0;
+		};
+		EB3C0E6F9338E4EEE03E0819 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Dermaphone-DermaphoneUITests/Pods-Dermaphone-DermaphoneUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Dermaphone-DermaphoneUITests/Pods-Dermaphone-DermaphoneUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Dermaphone-DermaphoneUITests/Pods-Dermaphone-DermaphoneUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		FFB13A792BAE183600A94673 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FFB13B4B2BBB0A8B00A94673 /* skinmodel.swift in Sources */,
 				FFC1CEB92BBB22AA00FD49B7 /* TriggerEveryTimer.swift in Sources */,
 				FFC1CEBC2BBB22AA00FD49B7 /* ContentView.swift in Sources */,
 				FFC1CEAC2BBB22AA00FD49B7 /* CaptureFoldersView.swift in Sources */,
@@ -476,6 +601,8 @@
 				FFB13A852BAE183600A94673 /* ViewController.swift in Sources */,
 				FFC1CEB82BBB22AA00FD49B7 /* PhotoCaptureDelegate.swift in Sources */,
 				FFF154E02BBC8C3100834F38 /* SkinCondition.swift in Sources */,
+				FF5C1CB12BE90CE300C097E9 /* gradientMethod.swift in Sources */,
+				FF662E342BECD43300FD9411 /* LinkConditions.swift in Sources */,
 				FFC1CEB12BBB22AA00FD49B7 /* TimerView.swift in Sources */,
 				FFC1CEB72BBB22AA00FD49B7 /* CaptureInfo.swift in Sources */,
 				FF5C1CA72BDF8F1700C097E9 /* modelLocation.swift in Sources */,
@@ -489,9 +616,11 @@
 				FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */,
 				FF5C1CAB2BE026D400C097E9 /* smoothModel.swift in Sources */,
 				FFC1CEAF2BBB22AA00FD49B7 /* CameraViewModel.swift in Sources */,
+				FF662E362BECD60F00FD9411 /* LinkConditionCell.swift in Sources */,
 				FFC1CEAB2BBB22AA00FD49B7 /* Capture.swift in Sources */,
 				FFC1CEBE2BBB22AA00FD49B7 /* AsyncImageHelpers.swift in Sources */,
 				FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */,
+				FF5C1CAF2BE8D18C00C097E9 /* heightMap.swift in Sources */,
 				FFB13A832BAE183600A94673 /* SceneDelegate.swift in Sources */,
 				FF5C1C7E2BD2FA8E00C097E9 /* HapticDataPoint.swift in Sources */,
 				FFC1CEB62BBB22AA00FD49B7 /* CameraView.swift in Sources */,
@@ -844,6 +973,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		FF662E3C2BF0F58400FD9411 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.25.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FF662E3D2BF0F58400FD9411 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FF662E3C2BF0F58400FD9411 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FFB13A752BAE183600A94673 /* Project object */;
 }

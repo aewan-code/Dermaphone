@@ -10,9 +10,13 @@ import SceneKit
 import RealityKit
 import CoreHaptics
 import SwiftUI
+import FirebaseCore
+import FirebaseFirestore
 
 class ViewController: UIViewController {
- 
+    @IBOutlet weak var readUsers: UIButton!
+    var db: Firestore!
+    @IBOutlet weak var addUsers: UIButton!
     var currentModel : SkinCondition = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "", urgency: "")
     //Change currentModel so that if no models have been created either portrays a test one or presents a popup
     var skinConditions : [SkinCondition] = []
@@ -26,10 +30,74 @@ class ViewController: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     override func viewDidLoad() {
+        let settings = FirestoreSettings()
+
+        Firestore.firestore().settings = settings
+        // [END setup]
+        db = Firestore.firestore()
+        
         createModels()
         super.viewDidLoad()
         setModel()
+        
+        
+        
 
+    }
+    
+    @IBAction func createUserTouched(_ sender: Any) {
+        Task { @MainActor in
+            await addAdaLovelace()
+            await addAlanTuring()
+        }
+    }
+    private func addAdaLovelace() async {
+      // [START add_ada_lovelace]
+      // Add a new document with a generated ID
+      do {
+        let ref = try await db.collection("users").addDocument(data: [
+          "first": "Ada",
+          "last": "Lovelace",
+          "born": 1815
+        ])
+        print("Document added with ID: \(ref.documentID)")
+      } catch {
+        print("Error adding document: \(error)")
+      }
+      // [END add_ada_lovelace]
+    }
+    
+    private func addAlanTuring() async {
+      // [START add_alan_turing]
+      // Add a second document with a generated ID.
+      do {
+        let ref = try await db.collection("users").addDocument(data: [
+          "first": "Alan",
+          "middle": "Mathison",
+          "last": "Turing",
+          "born": 1912
+        ])
+        print("Document added with ID: \(ref.documentID)")
+      } catch {
+        print("Error adding document: \(error)")
+      }
+      // [END add_alan_turing]
+    }
+    
+    @IBAction func readUsersTouched(_ sender: Any) {
+        Task { @MainActor in
+            await readDatabase()
+        }
+    }
+    private func readDatabase() async {
+        do {
+          let snapshot = try await db.collection("users").getDocuments()
+          for document in snapshot.documents {
+            print("\(document.documentID) => \(document.data())")
+          }
+        } catch {
+          print("Error getting documents: \(error)")
+        }
     }
     
     func setModel(){

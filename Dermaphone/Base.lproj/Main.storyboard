@@ -47,6 +47,30 @@
                                 </menu>
                                 <state key="normal" title="View Model"/>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oON-O6-Wev">
+                                <rect key="frame" x="149" y="514" width="95" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Add User"/>
+                                <connections>
+                                    <action selector="createUserTouched:" destination="BYZ-38-t0r" eventType="touchUpInside" id="aVU-Ca-8q4"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YoN-L5-5i5">
+                                <rect key="frame" x="143" y="557" width="108" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Print Users"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gTK-lI-HD7">
+                                <rect key="frame" x="143" y="557" width="108" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Print Users"/>
+                                <connections>
+                                    <action selector="readUsersTouched:" destination="BYZ-38-t0r" eventType="touchUpInside" id="V4E-sb-hxL"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -54,6 +78,8 @@
                     <navigationItem key="navigationItem" id="iPr-lH-GY8"/>
                     <connections>
                         <outlet property="ViewModel" destination="G9T-xa-sbM" id="gYK-IW-D9f"/>
+                        <outlet property="addUsers" destination="oON-O6-Wev" id="tsq-bB-gzL"/>
+                        <outlet property="readUsers" destination="gTK-lI-HD7" id="bsw-98-icC"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -629,7 +655,7 @@
         <image name="arrow.left.to.line.alt" catalog="system" width="128" height="100"/>
         <image name="arrow.right.to.line.alt" catalog="system" width="128" height="100"/>
         <namedColor name="AccentColor">
-            <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.79199999570846558" blue="0.15700000524520874" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

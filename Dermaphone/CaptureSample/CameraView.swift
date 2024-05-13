@@ -124,10 +124,22 @@ struct ScanToolbarView: View {
                 Button(action: {
                     print("Pressed Done!")
                     withAnimation {
-                        let inputFolder = model.captureFolderState?.captureDir?.absoluteString
-                        let outputFile = CaptureFolderState.createModelDirectory()?.absoluteString
-                        let photogrammetry = HelloPhotogrammetry.init(inputFolder: inputFolder!, outputFilename: outputFile!)
-                        photogrammetry.run()
+
+                       if let url = URL(string: "http://146.169.244.136:8002") {
+                            let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+                                if let error = error {
+                                    print("Error: \(error)")
+                                } else if let response = response as? HTTPURLResponse {
+                                    print("Status code: \(response.statusCode)")
+                                }
+                            }
+                            task.resume()
+                        }
+
+                     //   let inputFolder = model.captureFolderState?.captureDir?.absoluteString
+                      //  let outputFile = CaptureFolderState.createModelDirectory()?.absoluteString
+                    //    let photogrammetry = HelloPhotogrammetry.init(inputFolder: inputFolder!, outputFilename: outputFile!)
+                   //     photogrammetry.run()
 
                     }
                 }) {

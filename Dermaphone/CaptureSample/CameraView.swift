@@ -503,3 +503,30 @@ extension CharacterSet {
         return allowed
     }()
 }
+
+func getImagesFromFolder(folderPath: String){
+    let fileManager = FileManager.default
+    var imageList: [UIImage] = [] // Your list to hold UIImages
+    
+    // Get the list of files in the folder
+    if let fileURLs = try? fileManager.contentsOfDirectory(at: URL(fileURLWithPath: folderPath), includingPropertiesForKeys: nil, options: []) {
+        // Iterate through each file URL
+        for fileURL in fileURLs {
+            // Call the loadImage method to asynchronously load the image
+            ImageLoader.loadImage(url: fileURL)
+                .receive(on: DispatchQueue.main)
+                .sink(receiveCompletion: { completion in
+                    // Handle any completion (success or failure) if necessary
+                    switch completion {
+                    case .finished:
+                        print("Image loading completed.")
+                    case .failure(let error):
+                        print("Error loading image: \(error)")
+                    }
+                }, receiveValue: { image in
+                    // When the image is successfully loaded, append it to the imageList
+                    imageList.append(image)
+                })
+        }
+    }
+}

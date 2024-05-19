@@ -2,8 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="LTM-Ud-GKA">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
-        <capability name="Named colors" minToolsVersion="9.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="UIMenu" message="Requires Xcode 11 or later." minToolsVersion="11.0" requiredIntegratedClassName="UICommandDiff"/>
@@ -169,6 +168,31 @@
             </objects>
             <point key="canvasLocation" x="-309.16030534351142" y="-144.36619718309859"/>
         </scene>
+        <!--View Controller-->
+        <scene sceneID="NiL-cx-gFX">
+            <objects>
+                <viewController id="SIJ-FD-ODD" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="hHR-Sg-koO">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="eYW-8H-GGa">
+                                <rect key="frame" x="131" y="240" width="131" height="31"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="First"/>
+                                    <segment title="Second"/>
+                                </segments>
+                            </segmentedControl>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="u8J-aC-4y5"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ymX-ek-gaL" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2585" y="-126"/>
+        </scene>
         <!--Skinmodel-->
         <scene sceneID="1gf-Ti-OSf">
             <objects>
@@ -234,7 +258,6 @@
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Djs-bE-UuZ">
                                 <rect key="frame" x="82" y="184" width="105" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" name="AccentColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Clinical Notes"/>
                                 <connections>
@@ -244,7 +267,6 @@
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QPi-yy-4Q6">
                                 <rect key="frame" x="205" y="184" width="115" height="45"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" name="AccentColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Similar Conditions"/>
                                 <connections>
@@ -254,32 +276,15 @@
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wCq-0w-L5o">
                                 <rect key="frame" x="9" y="139" width="101" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" name="AccentColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Symptoms"/>
                                 <connections>
                                     <action selector="touchSymptoms:" destination="6oJ-M7-Edc" eventType="touchUpInside" id="ZeY-2h-gYx"/>
                                 </connections>
                             </button>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="arrow.right.to.line.alt" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="5Dd-VU-Sc5">
-                                <rect key="frame" x="329" y="659" width="45" height="38"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </imageView>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" fixedFrame="YES" image="arrow.left.to.line.alt" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="au3-nH-4L1">
-                                <rect key="frame" x="285" y="660" width="64" height="36"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="1 mm" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1wB-mF-u8m">
-                                <rect key="frame" x="307" y="694" width="47" height="24"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vtc-u6-Iug">
                                 <rect key="frame" x="267" y="777" width="114" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" name="AccentColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Select Base"/>
                                 <connections>
@@ -289,7 +294,6 @@
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YEL-dK-9zI">
                                 <rect key="frame" x="127" y="777" width="128" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" name="AccentColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Rotate Lesion"/>
                                 <connections>
@@ -339,7 +343,6 @@
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K54-LO-Tnl">
                                 <rect key="frame" x="278" y="139" width="103" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" name="AccentColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Treatment"/>
                                 <connections>
@@ -375,6 +378,89 @@
                                     <action selector="palpateToggle:" destination="6oJ-M7-Edc" eventType="valueChanged" id="E0k-BJ-lVW"/>
                                 </connections>
                             </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YgM-ki-UE8">
+                                <rect key="frame" x="242" y="473" width="150" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Haptics Settings"/>
+                                <connections>
+                                    <action selector="settingsTouched:" destination="6oJ-M7-Edc" eventType="touchUpInside" id="Eee-N7-ZlM"/>
+                                </connections>
+                            </button>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oJ7-br-sDt">
+                                <rect key="frame" x="66" y="137" width="261" height="248"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Haptics Settings" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4tf-gZ-7E6">
+                                        <rect key="frame" x="52" y="16" width="157" height="24"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="20"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Type of Filter" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MkE-i2-sqT">
+                                        <rect key="frame" x="8" y="53" width="100" height="21"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="k" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iog-ak-qDp">
+                                        <rect key="frame" x="54" y="90" width="9" height="21"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Sigma" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eCN-c6-2fb">
+                                        <rect key="frame" x="34" y="127" width="48" height="21"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" showsMenuAsPrimaryAction="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Si3-wg-6OP">
+                                        <rect key="frame" x="139" y="48" width="114" height="30"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <menu key="menu" id="EDv-29-A3h">
+                                            <children>
+                                                <command title="Item 1" id="BWW-Jx-n6E"/>
+                                                <command title="Item 2" id="22V-Cp-ZYc"/>
+                                            </children>
+                                        </menu>
+                                        <state key="normal" title="Filter"/>
+                                    </button>
+                                    <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="AgC-KU-emj">
+                                        <rect key="frame" x="137" y="86" width="118" height="30"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </slider>
+                                    <slider opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="29d-7E-eBX">
+                                        <rect key="frame" x="137" y="123" width="118" height="30"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </slider>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JLS-Ms-QfN">
+                                        <rect key="frame" x="52" y="180" width="77" height="35"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <color key="backgroundColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="0.60459183670000005" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="tintColor" red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="0.60459183670000005" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" title="Cancel"/>
+                                        <connections>
+                                            <action selector="cancelledSettings:" destination="6oJ-M7-Edc" eventType="touchUpInside" id="lgW-cd-Uj3"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fQO-zo-B80">
+                                        <rect key="frame" x="144" y="180" width="65" height="35"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" title="Done"/>
+                                        <connections>
+                                            <action selector="changedSettings:" destination="6oJ-M7-Edc" eventType="touchUpInside" id="8e2-SG-ZzU"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="EU6-GI-TbU"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -388,13 +474,20 @@
                         <outlet property="RotateToggle" destination="YEL-dK-9zI" id="fAe-hK-fVE"/>
                         <outlet property="SelectPivot" destination="vtc-u6-Iug" id="apY-6c-utF"/>
                         <outlet property="cancelEdit" destination="Te1-Ta-19T" id="cCe-xU-4NV"/>
+                        <outlet property="cancelSettings" destination="JLS-Ms-QfN" id="oY2-QZ-EOH"/>
                         <outlet property="completeEdit" destination="nj7-my-Yzq" id="8Mz-h3-j7c"/>
+                        <outlet property="doneSettings" destination="fQO-zo-B80" id="tWq-SG-flB"/>
+                        <outlet property="filterSetting" destination="Si3-wg-6OP" id="nQz-Pg-1gb"/>
                         <outlet property="hapticMethod" destination="Icb-0O-N1B" id="H3x-0M-DYz"/>
                         <outlet property="hapticsButton" destination="EFi-oA-ugE" id="plN-8e-q24"/>
+                        <outlet property="hapticsSettings" destination="oJ7-br-sDt" id="DKe-Di-OXf"/>
+                        <outlet property="kSetting" destination="AgC-KU-emj" id="nS8-Zy-hXC"/>
                         <outlet property="navBar" destination="ggu-Tv-x1G" id="3f4-0d-7SJ"/>
                         <outlet property="notesButton" destination="Djs-bE-UuZ" id="xhK-zc-FMn"/>
                         <outlet property="palpationOption" destination="mPf-Zx-PmS" id="Eo4-AJ-xr0"/>
                         <outlet property="recordHaptic" destination="7Ll-FG-3r2" id="52v-Hp-eEq"/>
+                        <outlet property="settingsButton" destination="YgM-ki-UE8" id="GtJ-Bb-JHc"/>
+                        <outlet property="sigmaSetting" destination="29d-7E-eBX" id="gf0-SY-lbY"/>
                         <outlet property="similarButton" destination="QPi-yy-4Q6" id="4YP-eU-2lS"/>
                         <outlet property="smoothButton" destination="M37-VV-F4t" id="jPw-vk-Tm9"/>
                         <outlet property="symptonsButton" destination="wCq-0w-L5o" id="9XK-M9-fXx"/>
@@ -406,9 +499,6 @@
                         <outlet property="yScale" destination="81S-MH-5kR" id="Lq8-hB-dSq"/>
                         <outlet property="zLabel" destination="kek-Tu-qs4" id="nDe-hB-FX4"/>
                         <outlet property="zScale" destination="LKN-C7-iBa" id="7lW-65-fye"/>
-                        <outletCollection property="magnifier" destination="5Dd-VU-Sc5" collectionClass="NSMutableArray" id="1W9-WW-m6Q"/>
-                        <outletCollection property="magnifier" destination="au3-nH-4L1" collectionClass="NSMutableArray" id="ELb-f0-mUC"/>
-                        <outletCollection property="magnifierText" destination="1wB-mF-u8m" collectionClass="NSMutableArray" id="qNx-bD-MdR"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="MlQ-DC-lMc" sceneMemberID="firstResponder"/>
@@ -467,7 +557,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QoI-kl-hkM" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4136.6412213740459" y="-126.05633802816902"/>
+            <point key="canvasLocation" x="4098" y="-126"/>
         </scene>
         <!--Link Conditions-->
         <scene sceneID="Fpc-oJ-u8d">
@@ -652,11 +742,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="arrow.left.to.line.alt" catalog="system" width="128" height="100"/>
-        <image name="arrow.right.to.line.alt" catalog="system" width="128" height="100"/>
-        <namedColor name="AccentColor">
-            <color red="1" green="0.79199999570846558" blue="0.15700000524520874" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

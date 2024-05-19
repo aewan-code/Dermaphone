@@ -13,8 +13,17 @@ import SwiftUI
 import simd
 
 
+enum FilterType: String {
+    case none = "None"
+    case gaussian = "Gaussian"
+    case average = "Weighted Average"
+    case edge = "Ricker Wavelet"
+}
 
 class skinmodel: UIViewController {
+    var filter : FilterType = .none//save type
+    var kVal : Int = 5
+    var sigmaVal : Float = 1
     var condition : SkinCondition?
     var modelName: String?// = "Mesh"
     var modelFile : String?// = "testTransform.scn"
@@ -27,8 +36,9 @@ class skinmodel: UIViewController {
     var swiftuiView : UIView?
     var closeView : UIButton?
     var firstTimestamp : TimeInterval?
-    var allVertices : [SCNVector3]?
+    var modelVertices : [SCNVector3]?
     
+    @IBOutlet weak var settingsButton: UIButton!
     var smoothedCloud : [SCNVector3]?
     var transientCloud : [SCNVector3]?
 
@@ -51,9 +61,9 @@ class skinmodel: UIViewController {
     @IBOutlet weak var urgencylabel: UILabel!
     @IBOutlet weak var similarButton: UIButton!
 
-    @IBOutlet var magnifier: [UIImageView]!
+  //  @IBOutlet var magnifier: [UIImageView]!
     
-    @IBOutlet var magnifierText: [UILabel]!
+ //  @IBOutlet var magnifierText: [UILabel]!
     @IBOutlet weak var hapticMethod: UISegmentedControl!
     var currentXVal :Float?
     var currentYVal : Float?
@@ -101,6 +111,22 @@ class skinmodel: UIViewController {
     let smoothedModel = smoothModel()
     var kernel : [[[Double]]]?
     var vertices : [SCNVector3]?
+    
+    var maxContinuous : Float?
+    var minContinuous : Float?
+    var maxTransient : Float?
+    var minTransient : Float?
+    
+    
+    @IBOutlet weak var hapticsSettings: UIView!
+    
+    
+    @IBOutlet weak var cancelSettings: UIButton!
+    
+    @IBOutlet weak var sigmaSetting: UISlider!
+    @IBOutlet weak var filterSetting: UIButton!
+    @IBOutlet weak var kSetting: UISlider!
+    @IBOutlet weak var doneSettings: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         hapticMethod.selectedSegmentIndex = 0
@@ -172,12 +198,15 @@ class skinmodel: UIViewController {
         view.bringSubviewToFront(zScale)
         view.bringSubviewToFront(smoothButton)
         view.bringSubviewToFront(hapticsButton)
+        view.bringSubviewToFront(settingsButton)
+        view.bringSubviewToFront(hapticsSettings)
         xLabel.isHidden = true
         yLabel.isHidden = true
         zLabel.isHidden = true
         xScale.isHidden = true
         yScale.isHidden = true
         zScale.isHidden = true
+        hapticsSettings.isHidden = true
 
         cancelEdit.isHidden = true
         completeEdit.isHidden = true
@@ -188,12 +217,12 @@ class skinmodel: UIViewController {
         hideAxes()
         navBar.title = "Skin Lesion: \(self.condition?.name ?? "")"
         navBar.titleView?.isHidden = false
-        for image in magnifier{
+      /*  for image in magnifier{
             view.bringSubviewToFront(image)
         }
         for descript in magnifierText{
             view.bringSubviewToFront(descript)
-        }
+        }*/
       //  allVertices = try extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
      //   print("before")
       //  print(allVertices)
@@ -213,6 +242,7 @@ class skinmodel: UIViewController {
       //  let url2 = URL.documentsDirectory.appendingPathComponent("tra.txt")
         let url = URL.documentsDirectory.appendingPathComponent("smoothCloud.txt")
        let url2 = URL.documentsDirectory.appendingPathComponent("transientCloud.txt")
+        let url3 = URL.documentsDirectory.appendingPathComponent("vertices.txt")
         
         do {
             let fileHandle = try FileHandle(forReadingFrom: url)
@@ -224,6 +254,29 @@ class skinmodel: UIViewController {
                 print("Smoothed cloud")
                 smoothedCloud = convertTextToSCNVector3(text: text)
                 print(smoothedCloud?[0])
+                let yValues = smoothedCloud?.map { $0.y }
+                maxContinuous = yValues?.max()
+                minContinuous = yValues?.min()
+            } else {
+                print("Unable to convert data to text.")
+            }
+        } catch {
+            print("Error: \(error)")
+        }
+        
+        do {
+            let fileHandle = try FileHandle(forReadingFrom: url3)
+            let data = fileHandle.readDataToEndOfFile()
+            fileHandle.closeFile()
+            
+            // Assuming the file contains text data, you can convert it to a String
+            if let text = String(data: data, encoding: .utf8) {
+                print("Vertices")
+                modelVertices = convertTextToSCNVector3(text: text)
+                print(modelVertices)
+             //   let yValues = smoothedCloud?.map { $0.y }
+             //   maxContinuous = yValues?.max()
+             //   minContinuous = yValues?.min()
             } else {
                 print("Unable to convert data to text.")
             }
@@ -239,7 +292,10 @@ class skinmodel: UIViewController {
             if let text = String(data: data, encoding: .utf8) {
                 print("transientCloud.txt:")
                 transientCloud = convertTextToSCNVector3(text: text)
+                let yValues = smoothedCloud?.map { $0.y }
                 print(transientCloud)
+                maxTransient = yValues?.max()
+                minTransient = yValues?.min()
             } else {
                 print("Unable to convert data to text.")
             }
@@ -253,6 +309,7 @@ class skinmodel: UIViewController {
         }*/
         DispatchQueue.global(qos: .background).async{
            // let clouds = gaussMethod.smoothPointCloud(from: (self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry)!)
+            let allVertex = gaussMethod.storeExtractVertices(from: (self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry)!)
             DispatchQueue.main.async{
                 print("smoothed:")
             //    print(clouds.smoothed)
@@ -292,6 +349,42 @@ class skinmodel: UIViewController {
       //  print("check", vertices)
     
        // kernel = smoothedModel.generateKernel(kernelSize: 3, sigma: 0.5)
+        
+        setFilters()
+    }
+    
+    func setFilters(){
+        let optionClosure = {(action : UIAction) in
+            print(action.title)
+            switch action.title{
+            case "None":
+                self.filter = .none
+            case "Gaussian":
+                self.filter = .gaussian
+            case "Weighted Average":
+                self.filter = .average
+            case "Ricker Wavelet":
+                self.filter = .edge
+            default:
+                return
+            }
+            
+            
+        }
+        
+        //edge case - no conditions created - resolve this
+       
+        filterSetting.menu = UIMenu(children : [
+            //bug - without pressing anything - should go to the currently selected item
+            UIAction(title : "None", handler : optionClosure),
+            UIAction(title : "Gaussian", handler : optionClosure),
+            UIAction(title : "Weighted Average", handler : optionClosure),
+            UIAction(title : "Ricker Wavelet", handler : optionClosure),
+            
+        ])
+        
+        filterSetting.showsMenuAsPrimaryAction = true
+        filterSetting.changesSelectionAsPrimaryAction = true
     }
     
     // Assuming text contains lines of space-separated coordinates, e.g., "x y z\n"
@@ -500,7 +593,7 @@ class skinmodel: UIViewController {
         }
         // Perform hit test
                 let hitTestResults = sceneView.hitTest(location, options: nil)
-
+    
                 // Check if the desired node is touched
                 for result in hitTestResults {
                     
@@ -517,16 +610,21 @@ class skinmodel: UIViewController {
                         }
                         prevPoint = position.y
                         previousPosition = modelLocation(xPos: position.x, yPos: position.y, zPos: position.z)
-                        if !(hapticTransient ?? true) && hapticsToggle && !palpationToggle{
+                       // if !(hapticTransient ?? true) && hapticsToggle && !palpationToggle{
+                        if hapticsToggle && !palpationToggle{
                             //continuous mode
-                            tempHaptics?.createContinuousHapticPlayer(initialIntensity: position.y*10, initialSharpness: position.y*10)
-                            currentIntensity = position.y*10
-                            currentSharpness = currentIntensity
-                          //  tempHaptics?.continuousPlayer.start(atTime: <#T##TimeInterval#>)
+                            let tempGradient = gradientMethod()
+                            let approxPoint = tempGradient.closestDistance(points: smoothedCloud ?? [], inputPoint: position, k: 1)[0]
+                            //gets scaled height value between 1 and 0
+                            let scaledValue = HeightMap().scaleValue(value: approxPoint.y, maxValue: maxContinuous ?? 1, minValue: minContinuous ?? 0)
+                            tempHaptics?.createContinuousHapticPlayer(initialIntensity: scaledValue, initialSharpness: 1)
+                            currentIntensity = scaledValue
+                            currentSharpness = 1
+                         //   tempHaptics?.continuousPlayer.start(atTime: 0)
                             // Warm engine.
                             do {
                                 // Begin playing continuous pattern.
-                                try tempHaptics?.continuousPlayer.start(atTime: CHHapticTimeImmediate)
+                                try tempHaptics?.continuousPlayer?.start(atTime: CHHapticTimeImmediate)
                                 print("STARTED CONTINUOUS PLAYER")
                             } catch let error {
                                 print("Error starting the continuous haptic player: \(error)")
@@ -548,6 +646,7 @@ class skinmodel: UIViewController {
 
                             //print("New camera orientation:", cameraNode.rotation)
                             sceneView.defaultCameraController.pointOfView?.transform = newTransform
+                        //    rotatePalpation(result: result)
                         //    let angleInRadians: Float = 1 * (Float.pi / 180) // Convert 1 degree to radians
 
                         }
@@ -559,7 +658,7 @@ class skinmodel: UIViewController {
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
-        print("hello check scene touch")
+     //   print("hello check scene touch")
         if let touch = touches.first, let sceneViewScene = sceneView.scene {
             
             let location = touch.location(in: sceneView)
@@ -593,7 +692,8 @@ class skinmodel: UIViewController {
                 }
                 else if gradientToggle && !(hapticTransient ?? true){
                     approxPoint = tempGradient.closestDistance(points: smoothedCloud ?? [], inputPoint: position, k: 1)[0]
-                    height = approxPoint.y
+                    height = HeightMap().scaleValue(value: approxPoint.y, maxValue: maxTransient ?? 1, minValue: minTransient ?? 0)
+                 //   height = approxPoint.y
                 }
                 else{
                     approxPoint = position
@@ -629,25 +729,34 @@ class skinmodel: UIViewController {
                 prevPoint = height
                 if !rotationOn && hapticsToggle{
                     if !palpationToggle{
-                        if !(hapticTransient ?? true){
+                       // if !(hapticTransient ?? true){
+                            let tempGradient = gradientMethod()
+                            let approxPoint = tempGradient.closestDistance(points: smoothedCloud ?? [], inputPoint: position, k: 1)[0]
+                            //gets scaled height value between 1 and 0
+                            let scaledValue = HeightMap().scaleValue(value: approxPoint.y, maxValue: maxContinuous ?? 1, minValue: minContinuous ?? 0)
+                            print("new intensity multiplier")
+                            print(scaledValue/(currentIntensity ?? 1))
                             let intensityParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
-                                                                              value: (height/(currentIntensity ?? 1)),
+                                                                              value: (scaledValue/(currentIntensity ?? 1)),
                                                                               relativeTime: 0)
                             //  let sharpnessParameter = CHHapticDynamicParameter(parameterID: .hapticSharpnessControl,
-                            //       value: (height - (currentSharpness ?? 0)),
-                            //        relativeTime: 0)
-                            currentIntensity = height
-                            currentSharpness = height
+                              //     value: (scaledValue - (currentSharpness ?? 0)),
+                                //    relativeTime: 0)
+                            currentIntensity = scaledValue
+                            currentSharpness = 1
                             // Send dynamic parameters to the haptic player.
                             do {
-                                try tempHaptics?.continuousPlayer.sendParameters([intensityParameter],
+                              //  try tempHaptics?.continuousPlayer?.sendParameters([intensityParameter, sharpnessParameter],
+                               //                                                  atTime: 0)
+                                try tempHaptics?.continuousPlayer?.sendParameters([intensityParameter],
                                                                                  atTime: 0)
+                                
                                 
                             } catch let error {
                                 print("Dynamic Parameter Error: \(error)")
                             }
-                        }
-                        else{
+                     //   }
+                    //    else{
                             
                             
                             /MARK - TRYING GRADIENT POINT CLOUD METHOD/
@@ -724,14 +833,22 @@ class skinmodel: UIViewController {
                             let timeChange = touch.timestamp - ((prevTimestamp ?? firstTimestamp) ?? 0)
                             //      let intensityChange = intensity1/Float(timeChange)
                             //try tempHaptics?.playHeightHaptic(height:intensity*10)
+                        
+                        
                             try tempHaptics?.playHeightHaptic(height:height)
+                        
+                        if let allVertices = modelVertices {
+                            //edge detection effect
+                            print(tempGradient.applyGaussianFilter(to: position, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal))
+                            print(position.y - (tempGradient.applyGaussianFilter(to: position, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)).y)//bumpiness
+                        }
                             print(approxPoint.y * 100)
                             prevTimestamp = touch.timestamp
                             //print(intensity1*100)
-                        }
+                    //    }
                     }
                     else if (hapticsToggle && palpationToggle){
-                        let surfaceNormalVector = result.worldNormal
+                       let surfaceNormalVector = result.worldNormal
                         var test = sceneView.defaultCameraController.pointOfView?.worldFront ?? SCNVector3(x: 0, y: -1, z: 0)
                         test.y = -(test.y)
                         print(test)
@@ -746,6 +863,58 @@ class skinmodel: UIViewController {
                         print("camera", test)
                         print(newTransform)
                         print(sceneView.defaultCameraController.pointOfView?.orientation)
+                       // rotatePalpation(result: result)
+                        // Function to compute a quaternion from two vectors
+                        func quaternionFromVectors(_ vectorA: SCNVector3, _ vectorB: SCNVector3) -> simd_quatf {
+                            let from1 = simd_normalize(simd_make_float3(vectorA.x, vectorA.y, vectorA.z))
+                            let to1 = simd_normalize(simd_make_float3(vectorB.x, vectorB.y, vectorB.z))
+                            return simd_quaternion(from1, to1)
+                        }
+
+                        // Get the surface normal and camera front vector
+                     //   let surfaceNormalVector = result.worldNormal
+                        var cameraFrontVector = sceneView.defaultCameraController.pointOfView?.worldFront ?? SCNVector3(x: 0, y: -1, z: 0)
+                        cameraFrontVector.y = -cameraFrontVector.y  // Adjust as necessary
+
+                        // Compute the quaternions
+                        let currentQuaternion = quaternionFromVectors(cameraFrontVector, cameraFrontVector)  // This would be identity quaternion
+                        print("should be identity")
+                        print(currentQuaternion)
+                        
+                        var targetQuaternion = quaternionFromVectors(cameraFrontVector, surfaceNormalVector)
+                        let tQuarternion = SCNQuaternion.QfromTwoVectors(test, surfaceNormalVector)
+                    //    print(SCNMatrix4MakeRotation(tQuarternion.w, tQuarternion.x, tQuarternion.y, tQuarternion.z))
+                        var simdQuaternion = simd_quatf(ix: tQuarternion.x, iy: tQuarternion.y, iz: tQuarternion.z, r: tQuarternion.w)
+                        // SLERP interpolation
+                        let blendFactor: Float = 1 // Adjust this to control the amount of rotation
+                        let interpolatedQuaternion1 = simd_slerp(currentQuaternion, targetQuaternion, blendFactor)
+                        let normalizedStartQuaternion = simd_normalize(currentQuaternion)
+                        let normalizedEndQuaternion = simd_normalize(simdQuaternion)
+                        let interpolatedQuaternion = simd_slerp(normalizedStartQuaternion, normalizedEndQuaternion, blendFactor)
+                        if simd_dot(currentQuaternion, simdQuaternion) < 0 {
+                            simdQuaternion = -simdQuaternion
+                        }
+                        let interpolatedQuarternion = simd_slerp(currentQuaternion, simdQuaternion, blendFactor)
+                        print("rotation quarternion", rotationQuaternion)
+                    //    print("tQuarternion", tQuarternion)
+                       // sceneView.defaultCameraController.pointOfView?.orientation = SCNQuaternion(interpolatedQuaternion.vector.x, interpolatedQuaternion.vector.y, interpolatedQuaternion.vector.z, interpolatedQuaternion.vector.w)
+                        print("slerp")
+                        let newTransform1 = SCNMatrix4Mult(currentTransform, SCNMatrix4MakeRotation(interpolatedQuaternion.vector.w, interpolatedQuaternion.vector.x, interpolatedQuaternion.vector.y, interpolatedQuaternion.vector.z))
+                      //  sceneView.defaultCameraController.pointOfView?.transform = newTransform1
+                        print(SCNMatrix4MakeRotation(interpolatedQuaternion.vector.w, interpolatedQuaternion.vector.x, interpolatedQuaternion.vector.y, interpolatedQuaternion.vector.z))
+                        print(SCNQuaternion(interpolatedQuaternion.vector.x, interpolatedQuaternion.vector.y, interpolatedQuaternion.vector.z, interpolatedQuaternion.vector.w))
+                        // Apply the quaternion to the camera
+                     /*   if let cameraNode = sceneView.defaultCameraController.pointOfView {
+                            cameraNode.orientation = SCNQuaternion(interpolatedQuaternion.vector.x, interpolatedQuaternion.vector.y, interpolatedQuaternion.vector.z, interpolatedQuaternion.vector.w)
+                        }*/
+                        
+                        
+                        let localCoordinates = result.localCoordinates
+                               let surfaceNormal = result.worldNormal
+
+                               // Rotate the camera slightly towards the normal
+                       //        rotateCameraToward(normal: surfaceNormal)
+                        //print("New camera orientation:", cameraNode.rotation)
                     }
                                 if recordHaptics{
                                  //   let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
@@ -762,6 +931,11 @@ class skinmodel: UIViewController {
                 return
         } else {
             print("No touch or sceneView is nil")
+            do{
+                try tempHaptics?.continuousPlayer?.stop(atTime: CHHapticTimeImmediate)
+            }catch{
+                return
+            }
         }
         
     }
@@ -876,7 +1050,7 @@ class skinmodel: UIViewController {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
         previousPosition = nil
-        if(!(hapticTransient ?? true)){
+     //   if(!(hapticTransient ?? true)){
             
             do {
                 try tempHaptics?.continuousPlayer?.stop(atTime: CHHapticTimeImmediate)
@@ -884,14 +1058,14 @@ class skinmodel: UIViewController {
                      print("Error stopping the continuous haptic player: \(error)")
                      }*/
             {return}
-        }
+     //   }
     }
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesCancelled(touches, with: event)
         previousPosition = nil
         do {
-            try tempHaptics?.continuousPlayer.stop(atTime: CHHapticTimeImmediate)
+            try tempHaptics?.continuousPlayer?.stop(atTime: CHHapticTimeImmediate)
         } catch let error {
             print("Error stopping the continuous haptic player: \(error)")
         }
@@ -1054,6 +1228,130 @@ class skinmodel: UIViewController {
         
     }
     
+    ///Rotates model so that surface normal being touched corresponds with camera view?
+    func rotatePalpation1(result: SCNHitTestResult){
+        let surfaceNormalVector = result.worldNormal
+        var test = sceneView.defaultCameraController.pointOfView?.worldFront ?? SCNVector3(x: 0, y: -1, z: 0)
+        test.y = -(test.y)
+        print(test)
+        guard let currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
+
+        let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test)
+        let identityMatrix = SCNMatrix4Identity
+        let blendFactor: Float = 0.1  // Adjust this to make the rotation more or less pronounced
+        let interpolatedMatrix = interpolateMatrices(identityMatrix, rotationQuaternion, blendFactor: blendFactor)
+        let newTransform = SCNMatrix4Mult(currentTransform, interpolatedMatrix)
+        sceneView.defaultCameraController.pointOfView?.transform = newTransform
+
+    }
+    func rotatePalpation(result: SCNHitTestResult){
+        let surfaceNormalVector = result.worldNormal
+        var cameraFront = sceneView.defaultCameraController.pointOfView?.worldFront ?? SCNVector3(x: 0, y: -1, z: 0)
+        cameraFront.y = -cameraFront.y // Inverting y if needed based on your coordinate system
+        
+        guard let currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
+        
+        let rotationQuaternion = SCNQuaternion.fromTwoVectors(cameraFront, surfaceNormalVector)
+        let identityMatrix = SCNMatrix4Identity
+        let blendFactor: Float = 0.1  // Adjust this to make the rotation more or less pronounced
+        let interpolatedMatrix = interpolateTransforms(from: identityMatrix, to: rotationQuaternion, fraction: CGFloat(blendFactor))
+        let newTransform = SCNMatrix4Mult(currentTransform, interpolatedMatrix)
+        sceneView.defaultCameraController.pointOfView?.transform = newTransform
+    }
+    // Slerp between two quaternions
+    func slerp(from q1: SCNQuaternion, to q2: SCNQuaternion, fraction: CGFloat) -> SCNQuaternion {
+        let control1 = GLKQuaternionMake(q1.x, q1.y, q1.z, q1.w)
+        let control2 = GLKQuaternionMake(q2.x, q2.y, q2.z, q2.w)
+        let result = GLKQuaternionSlerp(control1, control2, Float(fraction))
+        return SCNQuaternion(x: result.x, y: result.y, z: result.z, w: result.w)
+    }
+
+    // Linear interpolation between two vectors
+    func lerp(from v1: SCNVector3, to v2: SCNVector3, fraction: CGFloat) -> SCNVector3 {
+        return SCNVector3(
+            x: v1.x + (v2.x - v1.x) * Float(fraction),
+            y: v1.y + (v2.y - v1.y) * Float(fraction),
+            z: v1.z + (v2.z - v1.z) * Float(fraction)
+        )
+    }
+
+    // Function to interpolate between two transformation matrices using quaternion for rotation and linear interpolation for translation
+    func interpolateTransforms(from m1: SCNMatrix4, to m2: SCNMatrix4, fraction: CGFloat) -> SCNMatrix4 {
+        let translation1 = SCNVector3(m1.m41, m1.m42, m1.m43)
+        let translation2 = SCNVector3(m2.m41, m2.m42, m2.m43)
+        let interpolatedTranslation = lerp(from: translation1, to: translation2, fraction: fraction)
+
+        let rotation1 = quaternionFromMatrix(matrix: m1)
+        let rotation2 = quaternionFromMatrix(matrix: m2)
+        let interpolatedRotation = slerp(from: rotation1, to: rotation2, fraction: fraction)
+
+        var resultMatrix = SCNMatrix4MakeRotation(interpolatedRotation.w, interpolatedRotation.x, interpolatedRotation.y, interpolatedRotation.z)
+        resultMatrix.m41 = interpolatedTranslation.x
+        resultMatrix.m42 = interpolatedTranslation.y
+        resultMatrix.m43 = interpolatedTranslation.z
+
+        return resultMatrix
+    }
+
+    // Extract quaternion from SCNMatrix4
+    func quaternionFromMatrix(matrix: SCNMatrix4) -> SCNQuaternion {
+        let rotation = SCNMatrix4ToGLKMatrix4(matrix)
+        let quaternion = GLKQuaternionMakeWithMatrix4(rotation)
+        return SCNQuaternion(x: quaternion.x, y: quaternion.y, z: quaternion.z, w: quaternion.w)
+    }
+
+    
+    func interpolateMatrices1(_ matrix1: SCNMatrix4, _ matrix2: SCNMatrix4, blendFactor: Float) -> SCNMatrix4 {
+        let interpolate = { (a: Float, b: Float) -> Float in
+            a * (1 - blendFactor) + b * blendFactor
+        }
+
+        return SCNMatrix4(
+            m11: interpolate(matrix1.m11, matrix2.m11),
+            m12: interpolate(matrix1.m12, matrix2.m12),
+            m13: interpolate(matrix1.m13, matrix2.m13),
+            m14: interpolate(matrix1.m14, matrix2.m14),
+            m21: interpolate(matrix1.m21, matrix2.m21),
+            m22: interpolate(matrix1.m22, matrix2.m22),
+            m23: interpolate(matrix1.m23, matrix2.m23),
+            m24: interpolate(matrix1.m24, matrix2.m24),
+            m31: interpolate(matrix1.m31, matrix2.m31),
+            m32: interpolate(matrix1.m32, matrix2.m32),
+            m33: interpolate(matrix1.m33, matrix2.m33),
+            m34: interpolate(matrix1.m34, matrix2.m34),
+            m41: interpolate(matrix1.m41, matrix2.m41),
+            m42: interpolate(matrix1.m42, matrix2.m42),
+            m43: interpolate(matrix1.m43, matrix2.m43),
+            m44: interpolate(matrix1.m44, matrix2.m44)
+        )
+    }
+    
+    func interpolateMatrices(_ matrix1: SCNMatrix4, _ matrix2: SCNMatrix4, blendFactor: Float) -> SCNMatrix4 {
+        let interpolate = { (a: Float, b: Float) -> Float in
+            a * (1 - blendFactor) + b * blendFactor
+        }
+        return SCNMatrix4(
+            m11: interpolate(matrix1.m11, matrix2.m11),
+            m12: interpolate(matrix1.m12, matrix2.m12),
+            m13: interpolate(matrix1.m13, matrix2.m13),
+            m14: 0,
+            m21: interpolate(matrix1.m21, matrix2.m21),
+            m22: interpolate(matrix1.m22, matrix2.m22),
+            m23: interpolate(matrix1.m23, matrix2.m23),
+            m24: 0,
+            m31: interpolate(matrix1.m31, matrix2.m31),
+            m32: interpolate(matrix1.m32, matrix2.m32),
+            m33: interpolate(matrix1.m33, matrix2.m33),
+            m34: 0,
+            m41: 0,
+            m42: 0,
+            m43: 0,
+            m44: 1
+        )
+    }
+
+
+
     func createAxes(){//fix code for axes - change!
         
         let xAxis = SCNCylinder(radius: 0.001, height: 1)
@@ -1285,6 +1583,81 @@ class skinmodel: UIViewController {
         }
     }
     
+    @IBAction func settingsTouched(_ sender: Any) {
+        hapticsSettings.isHidden = false
+    }
+    
+    func rotateCameraToward(normal: SCNVector3) {
+        // Current camera orientation
+        guard let currentOrientation = sceneView.defaultCameraController.pointOfView?.orientation else { return  }
+
+        // Create a target orientation: this assumes the normal is in world coordinates
+        // You may need to convert it from local to world coordinates depending on your setup
+        let targetOrientation = SCNQuaternion(x: -normal.x, y: -normal.y, z: -normal.z, w: 1)
+
+        // Interpolate between the current orientation and the target orientation
+        let slerpQuat = slerp(from: currentOrientation, to: targetOrientation, fraction: 0.1) // Adjust fraction for smoother or faster rotation
+
+        // Set the new orientation to the camera
+        sceneView.defaultCameraController.pointOfView?.orientation = slerpQuat
+        
+        let lookAtDirection = SCNVector3(-normal.x, -normal.y, -normal.z)
+            
+            // Assume the world 'up' direction is y-axis
+            let upDirection = SCNVector3(0, 1, 0)
+            
+            // Calculate the necessary rotation to point the camera in the direction of -normal
+        sceneView.defaultCameraController.pointOfView?.look(at: SCNVector3(
+            (sceneView.defaultCameraController.pointOfView?.position.x ?? 0) + lookAtDirection.x,
+            (sceneView.defaultCameraController.pointOfView?.position.y ?? 0) + lookAtDirection.y,
+            (sceneView.defaultCameraController.pointOfView?.position.z ?? 0) + lookAtDirection.z),
+                up: upDirection, localFront: cameraNode.worldFront)
+    }
+    func normalize(quaternion: SCNQuaternion) -> SCNQuaternion {
+        let norm = sqrt(quaternion.x * quaternion.x + quaternion.y * quaternion.y + quaternion.z * quaternion.z + quaternion.w * quaternion.w)
+        guard norm != 0 else {
+            return quaternion
+        }
+        return SCNQuaternion(
+            x: quaternion.x / norm,
+            y: quaternion.y / norm,
+            z: quaternion.z / norm,
+            w: quaternion.w / norm
+        )
+    }
+
+    func slerp1(from: SCNQuaternion, to: SCNQuaternion, fraction: CGFloat) -> SCNQuaternion {
+        // Simple lerp formula for demonstration; consider using simd.slerp for better results
+        let lerp = SCNQuaternion(x: from.x + (to.x - from.x) * Float(fraction),
+                                 y: from.y + (to.y - from.y) * Float(fraction),
+                                 z: from.z + (to.z - from.z) * Float(fraction),
+                                 w: from.w + (to.w - from.w) * Float(fraction))
+        
+        return normalize(quaternion: lerp)
+    }
+
+    @IBAction func cancelledSettings(_ sender: Any) {
+        hapticsSettings.isHidden = true
+    }
+    @IBAction func changedSettings(_ sender: Any) {
+        hapticsSettings.isHidden = true
+        
+        switch filterSetting.currentTitle{
+        case "None":
+            self.filter = .none
+        case "Gaussian":
+            self.filter = .gaussian
+            self.kVal = Int(kSetting.value)
+            self.sigmaVal = sigmaSetting.value
+        case "Weighted Average":
+            self.filter = .average
+            self.kVal = Int(kSetting.value)
+        case "Ricker Wavelet":
+            self.filter = .edge
+        default:
+            return
+        }
+    }
     
 }
 
@@ -1306,15 +1679,69 @@ extension SCNQuaternion {
         print("magnitudeA", magnitudeA)
         print("magnitudeB", magnitudeB)
         // Calculate the angle
-        let angle = acos(dotProduct / (magnitudeA * magnitudeB))
+        var angle = acos(dotProduct / (magnitudeA * magnitudeB))
+        print("angle", angle)
         print(dotProduct / (magnitudeA * magnitudeB))
+        angle = angle/4
+        if angle > 15.0 * Float.pi / 180.0{
+            angle = 15.0 * Float.pi / 180.0
+        }
+        print("changed angle", angle)
+
         if(abs(1 - (dotProduct / (magnitudeA * magnitudeB))) < 0.1){
             return SCNMatrix4Identity
+        }
+        
+        let maxAngle = Float.pi
+        
+        angle = min(angle, Float(maxAngle))
+
+            // If the calculated angle is too small (approaching 0), return identity matrix to avoid unnecessary rotation
+            if angle.isNaN || angle < 1e-4 {
+                return SCNMatrix4Identity
+            }
+        // Construct the rotation axis
+        let rotationAxis = SCNQuaternion(x: axis.x, y: axis.y, z: axis.z, w: angle)
+        //return SCNMatrix4Identity
+        let axisLength = sqrt(axis.x * axis.x + axis.y * axis.y + axis.z * axis.z)
+        let normalizedAxis = SCNVector3(x: axis.x / axisLength, y: axis.y / axisLength, z: axis.z / axisLength)
+        //SCNMatrix4MakeRotation(rotationAxis.w, rotationAxis.x, rotationAxis.y, rotationAxis.z)
+        // Create and return the quaternion
+        return SCNMatrix4MakeRotation(angle, normalizedAxis.x, normalizedAxis.y, normalizedAxis.z)
+    }
+}
+
+extension SCNQuaternion {
+    static func QfromTwoVectors(_ vectorA: SCNVector3, _ vectorB: SCNVector3) -> SCNQuaternion  {
+        // Calculate the cross product
+        let axis = SCNVector3(
+            x: vectorA.y * vectorB.z - vectorA.z * vectorB.y,
+            y: vectorA.z * vectorB.x - vectorA.x * vectorB.z,
+            z: vectorA.x * vectorB.y - vectorA.y * vectorB.x
+        )
+        print("axis", axis)
+        // Calculate the dot product
+        let dotProduct = vectorA.x * vectorB.x + vectorA.y * vectorB.y + vectorA.z * vectorB.z
+        
+        // Calculate the magnitudes
+        let magnitudeA = sqrt(vectorA.x * vectorA.x + vectorA.y * vectorA.y + vectorA.z * vectorA.z)
+        let magnitudeB = sqrt(vectorB.x * vectorB.x + vectorB.y * vectorB.y + vectorB.z * vectorB.z)
+        print("magnitudeA", magnitudeA)
+        print("magnitudeB", magnitudeB)
+        // Calculate the angle
+        let angle = acos(dotProduct / (magnitudeA * magnitudeB))
+        print("angle", angle)
+        
+        print(dotProduct / (magnitudeA * magnitudeB))
+        if(abs(1 - (dotProduct / (magnitudeA * magnitudeB))) < 0.15){
+            return SCNQuaternion(x: 0, y: 0, z: 0, w: 1)
         }
         // Construct the rotation axis
         let rotationAxis = SCNQuaternion(x: axis.x, y: axis.y, z: axis.z, w: angle)
         //return SCNMatrix4Identity
         // Create and return the quaternion
-        return SCNMatrix4MakeRotation(angle, axis.x, axis.y, axis.z)
+        return rotationAxis
     }
 }
+
+

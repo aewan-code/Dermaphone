@@ -30,11 +30,11 @@ class ViewController: UIViewController {
         navigationController?.pushViewController(vc, animated: true)
     }
     override func viewDidLoad() {
-        let settings = FirestoreSettings()
+      //  let settings = FirestoreSettings()
 
-        Firestore.firestore().settings = settings
+     //   Firestore.firestore().settings = settings
         // [END setup]
-        db = Firestore.firestore()
+     //   db = Firestore.firestore()
         
         createModels()
         super.viewDidLoad()
@@ -46,15 +46,15 @@ class ViewController: UIViewController {
     }
     
     @IBAction func createUserTouched(_ sender: Any) {
-        Task { @MainActor in
+       /* Task { @MainActor in
             await addAdaLovelace()
             await addAlanTuring()
-        }
+        }*/
     }
     private func addAdaLovelace() async {
       // [START add_ada_lovelace]
       // Add a new document with a generated ID
-      do {
+   /*   do {
         let ref = try await db.collection("users").addDocument(data: [
           "first": "Ada",
           "last": "Lovelace",
@@ -63,14 +63,14 @@ class ViewController: UIViewController {
         print("Document added with ID: \(ref.documentID)")
       } catch {
         print("Error adding document: \(error)")
-      }
+      }*/
       // [END add_ada_lovelace]
     }
     
     private func addAlanTuring() async {
       // [START add_alan_turing]
       // Add a second document with a generated ID.
-      do {
+   /*   do {
         let ref = try await db.collection("users").addDocument(data: [
           "first": "Alan",
           "middle": "Mathison",
@@ -81,23 +81,23 @@ class ViewController: UIViewController {
       } catch {
         print("Error adding document: \(error)")
       }
-      // [END add_alan_turing]
+      // [END add_alan_turing]*/
     }
     
     @IBAction func readUsersTouched(_ sender: Any) {
-        Task { @MainActor in
+     /*   Task { @MainActor in
             await readDatabase()
-        }
+        }*/
     }
     private func readDatabase() async {
-        do {
+    /*    do {
           let snapshot = try await db.collection("users").getDocuments()
           for document in snapshot.documents {
             print("\(document.documentID) => \(document.data())")
           }
         } catch {
           print("Error getting documents: \(error)")
-        }
+        }*/
     }
     
     func setModel(){

@@ -30,8 +30,8 @@
             filePath = "Dermaphone/skinModelViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "670"
-            endingLineNumber = "670"
+            startingLineNumber = "779"
+            endingLineNumber = "779"
             landmarkName = "touchesMoved(_:with:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -46,8 +46,8 @@
             filePath = "Dermaphone/skinModelViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "270"
-            endingLineNumber = "270"
+            startingLineNumber = "327"
+            endingLineNumber = "327"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>

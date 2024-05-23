@@ -15,6 +15,9 @@ class HeightMap{
     }
     
     func scaleValue(value: Float, maxValue: Float, minValue: Float) -> Float{
+        if maxValue == minValue{
+            return maxValue
+        }
         return (value - minValue)/(maxValue - minValue)
     }
 }

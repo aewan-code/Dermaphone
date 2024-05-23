@@ -18,6 +18,7 @@ enum FilterType: String {
     case gaussian = "Gaussian"
     case average = "Weighted Average"
     case edge = "Ricker Wavelet"
+    case heightMap = "Height Map"
 }
 
 class skinmodel: UIViewController {
@@ -38,33 +39,53 @@ class skinmodel: UIViewController {
     var firstTimestamp : TimeInterval?
     var modelVertices : [SCNVector3]?
     
-    @IBOutlet weak var settingsButton: UIButton!
+    var maxPoint : SCNVector3?
+    var minPoint : SCNVector3?
+    var filterMin : SCNVector3?
+    var filterMax : SCNVector3?
     var smoothedCloud : [SCNVector3]?
     var transientCloud : [SCNVector3]?
+    
+    
+    ///UI - Functional Buttons
+    @IBOutlet weak var settingsButton: UIButton!
+    @IBOutlet weak var hapticsButton: UIButton!
+    @IBOutlet weak var RotateToggle: UIButton!
+    @IBOutlet weak var SelectPivot: UIButton!
+    @IBOutlet weak var recordHaptic: UIButton!
+    @IBOutlet weak var smoothButton: UIButton!
+    @IBOutlet weak var hapticMethod: UISegmentedControl!
 
+
+
+
+///UI - Haptics Settings Mode
     @IBOutlet weak var navBar: UINavigationItem!
+    @IBOutlet weak var hapticsSettings: UIView!
+    @IBOutlet weak var cancelSettings: UIButton!
+    @IBOutlet weak var sigmaSetting: UISlider!
+    @IBOutlet weak var filterSetting: UIButton!
+    @IBOutlet weak var kSetting: UISlider!
+    @IBOutlet weak var doneSettings: UIButton!
+    
+    ///UI - Coordinate Mode
     @IBOutlet weak var zScale: UISlider!
-    
     @IBOutlet weak var yScale: UISlider!
-    
     @IBOutlet weak var xScale: UISlider!
     @IBOutlet weak var zLabel: UILabel!
     @IBOutlet weak var yLabel: UILabel!
     @IBOutlet weak var xLabel: UILabel!
     @IBOutlet weak var completeEdit: UIButton!
     @IBOutlet weak var cancelEdit: UIButton!
-    @IBOutlet weak var symptonsButton: UIButton!
     
-    @IBOutlet weak var hapticsButton: UIButton!
+    ///UI - Notes
+    @IBOutlet weak var symptonsButton: UIButton!
     @IBOutlet weak var treatmentButton: UIButton!
     @IBOutlet weak var notesButton: UIButton!
     @IBOutlet weak var urgencylabel: UILabel!
     @IBOutlet weak var similarButton: UIButton!
 
-  //  @IBOutlet var magnifier: [UIImageView]!
     
- //  @IBOutlet var magnifierText: [UILabel]!
-    @IBOutlet weak var hapticMethod: UISegmentedControl!
     var currentXVal :Float?
     var currentYVal : Float?
     var currentZVal : Float?
@@ -97,12 +118,7 @@ class skinmodel: UIViewController {
     var zAxisNode : SCNNode?
     //0 = palpate, 1 = visual
     @IBOutlet weak var palpationOption: UISegmentedControl!
-    @IBOutlet weak var RotateToggle: UIButton!
- 
-    @IBOutlet weak var SelectPivot: UIButton!
-    
-    @IBOutlet weak var recordHaptic: UIButton!
-    @IBOutlet weak var smoothButton: UIButton!
+
     let hapticAlgorithm = HapticRendering(maxHeight: 0.5, minHeight: -0.5)
     
     var prevTimestamp : TimeInterval?
@@ -117,21 +133,13 @@ class skinmodel: UIViewController {
     var maxTransient : Float?
     var minTransient : Float?
     
+    var enhancedMap : [[Float]]?
     
-    @IBOutlet weak var hapticsSettings: UIView!
     
-    
-    @IBOutlet weak var cancelSettings: UIButton!
-    
-    @IBOutlet weak var sigmaSetting: UISlider!
-    @IBOutlet weak var filterSetting: UIButton!
-    @IBOutlet weak var kSetting: UISlider!
-    @IBOutlet weak var doneSettings: UIButton!
+
     override func viewDidLoad() {
         super.viewDidLoad()
         hapticMethod.selectedSegmentIndex = 0
-        print(modelName)
-        print(modelFile)
         currentView = view
         hapticTransient = true
         scene = SCNScene(named: modelFile ?? "test2scene.scn")
@@ -243,6 +251,7 @@ class skinmodel: UIViewController {
         let url = URL.documentsDirectory.appendingPathComponent("smoothCloud.txt")
        let url2 = URL.documentsDirectory.appendingPathComponent("transientCloud.txt")
         let url3 = URL.documentsDirectory.appendingPathComponent("vertices.txt")
+        let url4 = URL.documentsDirectory.appendingPathComponent("vertices5.txt")
         
         do {
             let fileHandle = try FileHandle(forReadingFrom: url)
@@ -264,8 +273,12 @@ class skinmodel: UIViewController {
             print("Error: \(error)")
         }
         
+        var readingUrl = url3
+        if self.modelName == "Basal Cell Carcinoma"{
+            readingUrl = url4
+        }
         do {
-            let fileHandle = try FileHandle(forReadingFrom: url3)
+            let fileHandle = try FileHandle(forReadingFrom: readingUrl)
             let data = fileHandle.readDataToEndOfFile()
             fileHandle.closeFile()
             
@@ -273,7 +286,19 @@ class skinmodel: UIViewController {
             if let text = String(data: data, encoding: .utf8) {
                 print("Vertices")
                 modelVertices = convertTextToSCNVector3(text: text)
-                print(modelVertices)
+              //  print(modelVertices)
+            let gradient = gradientMethod()
+                print("height map")
+                let height = gradient.createHeightMap(from: modelVertices ?? [], gridSize: 50)//113)
+                // Example usage
+                let sigma: Float = 1  // Adjust sigma as needed
+                let kernelSize = 7  // Ensure this is an odd number
+                let kernel = gradient.mexicanHatKernel(size: kernelSize, sigma: sigma)
+                enhancedMap = gradient.applyKernel(kernel: kernel, to: height)
+                //print(gradient.applySobelOperator(to: height))
+                print(enhancedMap)
+                maxPoint = modelVertices?.max(by: { $0.y < $1.y })
+                minPoint = modelVertices?.min(by: { $0.y < $1.y })
              //   let yValues = smoothedCloud?.map { $0.y }
              //   maxContinuous = yValues?.max()
              //   minContinuous = yValues?.min()
@@ -309,7 +334,7 @@ class skinmodel: UIViewController {
         }*/
         DispatchQueue.global(qos: .background).async{
            // let clouds = gaussMethod.smoothPointCloud(from: (self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry)!)
-            let allVertex = gaussMethod.storeExtractVertices(from: (self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry)!)
+       //     let allVertex = gaussMethod.storeExtractVertices(from: (self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry)!)
             DispatchQueue.main.async{
                 print("smoothed:")
             //    print(clouds.smoothed)
@@ -365,6 +390,8 @@ class skinmodel: UIViewController {
                 self.filter = .average
             case "Ricker Wavelet":
                 self.filter = .edge
+            case "Height Map":
+                self.filter = .heightMap
             default:
                 return
             }
@@ -380,6 +407,7 @@ class skinmodel: UIViewController {
             UIAction(title : "Gaussian", handler : optionClosure),
             UIAction(title : "Weighted Average", handler : optionClosure),
             UIAction(title : "Ricker Wavelet", handler : optionClosure),
+            UIAction(title : "Height Map", handler : optionClosure),
             
         ])
         
@@ -573,12 +601,6 @@ class skinmodel: UIViewController {
         }
     }
 
-    func inverseQuaternion(_ q: SCNQuaternion) -> SCNQuaternion {
-        let conjugate = SCNQuaternion(x: -q.x, y: -q.y, z: -q.z, w: q.w)
-        let squaredMagnitude = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w
-        return SCNQuaternion(x: conjugate.x / squaredMagnitude, y: conjugate.y / squaredMagnitude, z: conjugate.z / squaredMagnitude, w: conjugate.w / squaredMagnitude)
-    }
-
 
     
     
@@ -617,14 +639,14 @@ class skinmodel: UIViewController {
                             let approxPoint = tempGradient.closestDistance(points: smoothedCloud ?? [], inputPoint: position, k: 1)[0]
                             //gets scaled height value between 1 and 0
                             let scaledValue = HeightMap().scaleValue(value: approxPoint.y, maxValue: maxContinuous ?? 1, minValue: minContinuous ?? 0)
-                            tempHaptics?.createContinuousHapticPlayer(initialIntensity: scaledValue, initialSharpness: 1)
-                            currentIntensity = scaledValue
-                            currentSharpness = 1
+                            tempHaptics?.createContinuousHapticPlayer(initialIntensity: scaledValue, initialSharpness: 0.73)
+                            currentIntensity = 0.1
+                            currentSharpness = scaledValue
                          //   tempHaptics?.continuousPlayer.start(atTime: 0)
                             // Warm engine.
                             do {
                                 // Begin playing continuous pattern.
-                                try tempHaptics?.continuousPlayer?.start(atTime: CHHapticTimeImmediate)
+                        //    try tempHaptics?.continuousPlayer?.start(atTime: CHHapticTimeImmediate)
                                 print("STARTED CONTINUOUS PLAYER")
                             } catch let error {
                                 print("Error starting the continuous haptic player: \(error)")
@@ -699,7 +721,7 @@ class skinmodel: UIViewController {
                     approxPoint = position
                     height = position.y * 10
                 }
-                print(approxPoint)
+                print(height)
                 //print(Date().timeIntervalSince(firstTime))
                 let intersectionPoint = result.worldCoordinates
                 let previousLocation = touch.previousLocation(in: sceneView)
@@ -733,103 +755,114 @@ class skinmodel: UIViewController {
                             let tempGradient = gradientMethod()
                             let approxPoint = tempGradient.closestDistance(points: smoothedCloud ?? [], inputPoint: position, k: 1)[0]
                             //gets scaled height value between 1 and 0
-                            let scaledValue = HeightMap().scaleValue(value: approxPoint.y, maxValue: maxContinuous ?? 1, minValue: minContinuous ?? 0)
-                            print("new intensity multiplier")
-                            print(scaledValue/(currentIntensity ?? 1))
+                        var scaledValue = HeightMap().scaleValue(value: approxPoint.y, maxValue: maxContinuous ?? 1, minValue: minContinuous ?? 0)
+                        print("filter name", self.filter)
+                        
+                        switch self.filter {
+                        case .none:
+                            scaledValue = HeightMap().scaleValue(value: position.y, maxValue: maxPoint?.y ?? 1, minValue: minPoint?.y ?? 0)
+                            height = scaledValue
+                            print("height", height)
+                        case .gaussian:
+                            if let allVertices = modelVertices {
+                                print("start gauss")
+
+                                print(position)
+                                let gaussianMax = self.filterMax?.y ?? 1
+                                let gaussianMin = self.filterMin?.y ?? 0
+                                let gaussian = tempGradient.applyGaussianFilter(to: position, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
+                                scaledValue = HeightMap().scaleValue(value: gaussian.y, maxValue: gaussianMax, minValue: gaussianMin)
+                                print(gaussian)
+                          //      print("gaussian bump")
+                           //     print(kVal)
+                           //     print(sigmaVal)
+                              //  print(allVertices)
+                                //bumpy
+                                let bumpyHeight = position.y - gaussian.y
+                                print("bumpyheight", bumpyHeight)
+                                print(gaussianMax)
+                                print(gaussianMin)
+                                print((minPoint?.y ?? 0) - gaussianMin)
+                                height = HeightMap().scaleValue(value: bumpyHeight, maxValue: (maxPoint?.y ?? 1) - (gaussianMax), minValue: (minPoint?.y ?? 0) - (gaussianMin))
+                            //    print(gaussianMax)
+                            //    print(gaussianMin)
+                                print("height", height)
+                            
+                                
+                            }
+                        
+                            else{
+                                //
+                            }
+                        case .heightMap:
+                            let gridPoint = mapPointToHeightMap(hitResult: result, gridSize: 50)//113)
+                            if let rickerMap = self.enhancedMap {
+                                let (gridX, gridY) = gridPoint
+                                if gridY >= 0 && gridY < rickerMap.count && gridX >= 0 && gridX < rickerMap[gridY].count {
+                                    let value = rickerMap[gridY][gridX]
+                                    height = value
+                                    print("Height Map Height")
+                                    print(height)
+                                    } else {
+                                        // Handle the case where the point is outside the bounds of the height map
+                                        print("invalid access")// Returning NaN or another sentinel value to indicate an invalid access
+                                    }
+                                
+                            }
+                        case .average:
+                            if let allVertices = modelVertices {
+                                let average = tempGradient.addNewAverage(inputPoint: position, originalPointCloud: allVertices, k: kVal)
+                                
+                            //    print("average bump")
+                                let bumpyHeight = position.y - average.y
+                                let averageMax = self.filterMax?.y ?? 1
+                                let averageMin = self.filterMin?.y ?? 0
+                                scaledValue = HeightMap().scaleValue(value: average.y, maxValue: averageMax, minValue: averageMin)
+                                height = HeightMap().scaleValue(value: bumpyHeight, maxValue: (maxPoint?.y ?? 1) - (averageMax), minValue: (minPoint?.y ?? 0) - (averageMin))
+                                print("height", height)
+                           //     print(averageMax)
+                           //     print(averageMin)
+                           //     print(self.filterMax?.y)
+                            }
+                            else{
+                                //
+                            }
+                        case .edge:
+                            if let allVertices = modelVertices {
+                                let accentuated = tempGradient.applyMexicanHatFilter(to: position, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
+                                
+                                let accentuatedMax = self.filterMax?.y ?? 1
+                                let accentuatedMin = self.filterMin?.y ?? 0
+                                scaledValue = HeightMap().scaleValue(value: (position.y - accentuated.y), maxValue: (maxPoint?.y ?? 1) - (accentuatedMax), minValue: (minPoint?.y ?? 0) - (accentuatedMin))
+                                height = HeightMap().scaleValue(value: accentuated.y, maxValue: accentuatedMax , minValue: accentuatedMin)
+                                print("height", height)
+                                
+                            }
+                        
+                    }
+
+                        
+                        
+                        
                             let intensityParameter = CHHapticDynamicParameter(parameterID: .hapticIntensityControl,
                                                                               value: (scaledValue/(currentIntensity ?? 1)),
                                                                               relativeTime: 0)
-                            //  let sharpnessParameter = CHHapticDynamicParameter(parameterID: .hapticSharpnessControl,
-                              //     value: (scaledValue - (currentSharpness ?? 0)),
-                                //    relativeTime: 0)
-                            currentIntensity = scaledValue
-                            currentSharpness = 1
+                              let sharpnessParameter = CHHapticDynamicParameter(parameterID: .hapticSharpnessControl,
+                                   value: (scaledValue - (currentSharpness ?? 0)),
+                                    relativeTime: 0)
+                        currentIntensity = 0.1
+                        currentSharpness = scaledValue
                             // Send dynamic parameters to the haptic player.
                             do {
                               //  try tempHaptics?.continuousPlayer?.sendParameters([intensityParameter, sharpnessParameter],
                                //                                                  atTime: 0)
-                                try tempHaptics?.continuousPlayer?.sendParameters([intensityParameter],
-                                                                                 atTime: 0)
+                            //    try tempHaptics?.continuousPlayer?.sendParameters([intensityParameter],
+                             //                                                    atTime: 0)
                                 
                                 
                             } catch let error {
                                 print("Dynamic Parameter Error: \(error)")
                             }
-                     //   }
-                    //    else{
-                            
-                            
-                            /MARK - TRYING GRADIENT POINT CLOUD METHOD/
-                            //   let allVertices = try extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
-                            
-                            
-                            // Filter vertices within the specified radius of the touch location
-                            /*   let verticesWithinRadius = (allVertices?.filter { vertex in
-                             let xSquared = sqrt((vertex.x - position.x)*(vertex.x - position.x))
-                             let ySquared = sqrt((vertex.y - position.y)*(vertex.y - position.y))
-                             let zSquared = sqrt((vertex.z - position.z)*(vertex.z - position.z))
-                             let distanceSquared = xSquared + ySquared + zSquared
-                             return distanceSquared <= 0.01//radius
-                             })! */
-                            
-                            //gives me all the points in the point cloud within the radius
-                            //let gradients = extractPointCloudRegionAndGradients(from scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, at position, radius: 0.01)
-                            //  let gradients = extractPointCloudRegionAndGradients(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, at: position, radius: 0.01)
-                            
-                            /* if let previousPosition = previousPosition {
-                             if sqrt((previousPosition.xPos - position.x)*(previousPosition.xPos - position.x)) > 0.001 || sqrt((previousPosition.zPos - position.z)*(previousPosition.zPos - position.z)) > 0.001 {
-                             print("check here")
-                             //  let gradient = computeGradient(at: position, in: verticesWithinRadius)
-                             // Compute gradients for each vertex within the region
-                             let gradients = verticesWithinRadius.compactMap { vertex -> (vertex: SCNVector3, gradient: Float)? in
-                             //     guard let allVertices = allVertices else { return nil }
-                             let gradient = computeGradient(at: vertex, in: allVertices ?? [])
-                             return (vertex: vertex, gradient: gradient) as! (vertex: SCNVector3, gradient: Float)
-                             }
-                             if computeGradient(at: position, in: verticesWithinRadius) <= 0.001{
-                             print("STATIONARY POINT")
-                             //let hessian = computeHessian(at: position, in: verticesWithinRadius)
-                             let gradVals = gradients.map { $0.gradient }
-                             var pos = SCNVector3(x: position.x + 0.001, y: position.y, z: position.z)
-                             //  print(functionValue(at: pos, vertices: verticesWithinRadius))
-                             let grad2 = computeGradient(at: pos, in: verticesWithinRadius)
-                             pos = SCNVector3(x: position.x - 0.001, y: position.y, z: position.z)
-                             //  print(functionValue(at: pos, vertices: verticesWithinRadius))
-                             let grad1 = computeGradient(at: pos, in: verticesWithinRadius)
-                             pos = SCNVector3(x: position.x, y: position.y, z: position.z + 0.001)
-                             // print(functionValue(at: pos, vertices: verticesWithinRadius))
-                             let grad4 = computeGradient(at: pos, in: verticesWithinRadius)
-                             pos = SCNVector3(x: position.x, y: position.y, z: position.z - 0.001)
-                             //  print(functionValue(at: pos, vertices: verticesWithinRadius))
-                             let grad3 = computeGradient(at: pos, in: verticesWithinRadius)
-                             var hessianAttempt = sqrt((grad2-grad1)*(grad2-grad1))//
-                             hessianAttempt = hessianAttempt*sqrt((grad4-grad3)*(grad4-grad3))//[grad2, grad1, grad4, grad3]//dependent on the direction the user is moving
-                             print(grad2)
-                             print(grad1)
-                             print(grad3)
-                             print(grad4)
-                             
-                             print(hessianAttempt)
-                             //
-                             
-                             try tempHaptics?.playHeightHaptic(height:hessianAttempt*10)
-                             }
-                             else{
-                             print("gradient")
-                             print(computeGradient(at: position, in: verticesWithinRadius))
-                             }*/
-                            // for point in gradients {
-                            //  if point.gradient == 0 {
-                            //     print(point.vertex)
-                            //     print("STATIONARY POINT")
-                            //   let hessian = computeHessian(at: position, in: verticesWithinRadius)
-                            //    print(hessian)
-                            //        print("end")
-                            // try tempHaptics?.playHeightHaptic(height:height)
-                            //    }
-                            //   }
-                            
-                            //   let intensity1 = sqrt((height - previousPosition.yPos)*(height - previousPosition.yPos))
                             let timeChange = touch.timestamp - ((prevTimestamp ?? firstTimestamp) ?? 0)
                             //      let intensityChange = intensity1/Float(timeChange)
                             //try tempHaptics?.playHeightHaptic(height:intensity*10)
@@ -837,12 +870,9 @@ class skinmodel: UIViewController {
                         
                             try tempHaptics?.playHeightHaptic(height:height)
                         
-                        if let allVertices = modelVertices {
+                        
                             //edge detection effect
-                            print(tempGradient.applyGaussianFilter(to: position, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal))
-                            print(position.y - (tempGradient.applyGaussianFilter(to: position, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)).y)//bumpiness
-                        }
-                            print(approxPoint.y * 100)
+                        //    print(approxPoint.y * 100)
                             prevTimestamp = touch.timestamp
                             //print(intensity1*100)
                     //    }
@@ -856,68 +886,12 @@ class skinmodel: UIViewController {
                         
                         let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector,test)
                         let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
-                        
-                        print("check start")
-                        print(sceneView.defaultCameraController.pointOfView?.orientation)
                         sceneView.defaultCameraController.pointOfView?.transform = newTransform
-                        print("camera", test)
-                        print(newTransform)
-                        print(sceneView.defaultCameraController.pointOfView?.orientation)
-                       // rotatePalpation(result: result)
-                        // Function to compute a quaternion from two vectors
-                        func quaternionFromVectors(_ vectorA: SCNVector3, _ vectorB: SCNVector3) -> simd_quatf {
-                            let from1 = simd_normalize(simd_make_float3(vectorA.x, vectorA.y, vectorA.z))
-                            let to1 = simd_normalize(simd_make_float3(vectorB.x, vectorB.y, vectorB.z))
-                            return simd_quaternion(from1, to1)
-                        }
-
-                        // Get the surface normal and camera front vector
-                     //   let surfaceNormalVector = result.worldNormal
-                        var cameraFrontVector = sceneView.defaultCameraController.pointOfView?.worldFront ?? SCNVector3(x: 0, y: -1, z: 0)
-                        cameraFrontVector.y = -cameraFrontVector.y  // Adjust as necessary
-
-                        // Compute the quaternions
-                        let currentQuaternion = quaternionFromVectors(cameraFrontVector, cameraFrontVector)  // This would be identity quaternion
-                        print("should be identity")
-                        print(currentQuaternion)
-                        
-                        var targetQuaternion = quaternionFromVectors(cameraFrontVector, surfaceNormalVector)
-                        let tQuarternion = SCNQuaternion.QfromTwoVectors(test, surfaceNormalVector)
-                    //    print(SCNMatrix4MakeRotation(tQuarternion.w, tQuarternion.x, tQuarternion.y, tQuarternion.z))
-                        var simdQuaternion = simd_quatf(ix: tQuarternion.x, iy: tQuarternion.y, iz: tQuarternion.z, r: tQuarternion.w)
-                        // SLERP interpolation
-                        let blendFactor: Float = 1 // Adjust this to control the amount of rotation
-                        let interpolatedQuaternion1 = simd_slerp(currentQuaternion, targetQuaternion, blendFactor)
-                        let normalizedStartQuaternion = simd_normalize(currentQuaternion)
-                        let normalizedEndQuaternion = simd_normalize(simdQuaternion)
-                        let interpolatedQuaternion = simd_slerp(normalizedStartQuaternion, normalizedEndQuaternion, blendFactor)
-                        if simd_dot(currentQuaternion, simdQuaternion) < 0 {
-                            simdQuaternion = -simdQuaternion
-                        }
-                        let interpolatedQuarternion = simd_slerp(currentQuaternion, simdQuaternion, blendFactor)
-                        print("rotation quarternion", rotationQuaternion)
-                    //    print("tQuarternion", tQuarternion)
-                       // sceneView.defaultCameraController.pointOfView?.orientation = SCNQuaternion(interpolatedQuaternion.vector.x, interpolatedQuaternion.vector.y, interpolatedQuaternion.vector.z, interpolatedQuaternion.vector.w)
-                        print("slerp")
-                        let newTransform1 = SCNMatrix4Mult(currentTransform, SCNMatrix4MakeRotation(interpolatedQuaternion.vector.w, interpolatedQuaternion.vector.x, interpolatedQuaternion.vector.y, interpolatedQuaternion.vector.z))
-                      //  sceneView.defaultCameraController.pointOfView?.transform = newTransform1
-                        print(SCNMatrix4MakeRotation(interpolatedQuaternion.vector.w, interpolatedQuaternion.vector.x, interpolatedQuaternion.vector.y, interpolatedQuaternion.vector.z))
-                        print(SCNQuaternion(interpolatedQuaternion.vector.x, interpolatedQuaternion.vector.y, interpolatedQuaternion.vector.z, interpolatedQuaternion.vector.w))
-                        // Apply the quaternion to the camera
-                     /*   if let cameraNode = sceneView.defaultCameraController.pointOfView {
-                            cameraNode.orientation = SCNQuaternion(interpolatedQuaternion.vector.x, interpolatedQuaternion.vector.y, interpolatedQuaternion.vector.z, interpolatedQuaternion.vector.w)
-                        }*/
-                        
-                        
-                        let localCoordinates = result.localCoordinates
-                               let surfaceNormal = result.worldNormal
-
-                               // Rotate the camera slightly towards the normal
-                       //        rotateCameraToward(normal: surfaceNormal)
-                        //print("New camera orientation:", cameraNode.rotation)
                     }
                                 if recordHaptics{
                                  //   let dataPoint = HapticDataPoint(intensity: height, time: Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
+                                    print("recordHeight", height)
+                                   // let dataPoint = HapticDataPoint(intensity: height, time:Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
                                     let dataPoint = HapticDataPoint(intensity: height, time:Float(touch.timestamp - (firstTimestamp ?? touch.timestamp)))
                                     chartData?.append(dataPoint)
                                 }
@@ -1103,6 +1077,10 @@ class skinmodel: UIViewController {
         urgencylabel.isHidden = true
         similarButton.isHidden = true
         recordHaptic.isHidden = true
+        settingsButton.isHidden = true
+        smoothButton.isHidden = true
+        palpationOption.isHidden = true
+        hapticMethod.isHidden = true
         sceneView.debugOptions = SCNDebugOptions(rawValue: 2048)//shows the grid
         originalOrientation = sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.orientation
         currentXVal = 0
@@ -1134,6 +1112,10 @@ class skinmodel: UIViewController {
         urgencylabel.isHidden = false
         similarButton.isHidden = false
         recordHaptic.isHidden = false
+        settingsButton.isHidden = false
+        smoothButton.isHidden = false
+        palpationOption.isHidden = false
+        hapticMethod.isHidden = false
         hideAxes()
         
     }
@@ -1649,15 +1631,58 @@ class skinmodel: UIViewController {
             self.filter = .gaussian
             self.kVal = Int(kSetting.value)
             self.sigmaVal = sigmaSetting.value
+            print(self.maxPoint)
+            print(self.minPoint)
+            print(self.modelVertices)
+            guard let maxPoint = self.maxPoint, let allVertices = self.modelVertices, let minPoint = self.minPoint else {
+                return
+            }
+            let tempGradient = gradientMethod()
+            self.filterMax = tempGradient.applyGaussianFilter(to: maxPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
+            self.filterMin = tempGradient.applyGaussianFilter(to: minPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
+            print(self.filterMax)
+            print(self.filterMin)
         case "Weighted Average":
             self.filter = .average
             self.kVal = Int(kSetting.value)
+
+            guard let maxPoint = self.maxPoint, let allVertices = self.modelVertices, let minPoint = self.minPoint else {
+                return
+            }
+            let tempGradient = gradientMethod()
+            self.filterMax = tempGradient.addNewAverage(inputPoint: maxPoint, originalPointCloud: allVertices, k: kVal)
+
+            self.filterMin = tempGradient.addNewAverage(inputPoint: minPoint, originalPointCloud: allVertices, k: kVal)
         case "Ricker Wavelet":
             self.filter = .edge
+            self.kVal = Int(kSetting.value)
+            self.sigmaVal = sigmaSetting.value
+            guard let maxPoint = self.maxPoint, let allVertices = self.modelVertices, let minPoint = self.minPoint else {
+                return
+            }
+            let tempGradient = gradientMethod()
+            self.filterMax = tempGradient.applyMexicanHatFilter(to: maxPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
+            self.filterMin = tempGradient.applyMexicanHatFilter(to: minPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
+            
         default:
             return
         }
     }
+    func mapPointToHeightMap(hitResult: SCNHitTestResult, gridSize: Int) -> (Int, Int) {
+        let localPoint = hitResult.localCoordinates
+        let (minBounds, maxBounds) = hitResult.node.boundingBox
+        
+        // Normalize the x and y coordinates
+        let normalizedX = (localPoint.x - minBounds.x) / (maxBounds.x - minBounds.x)
+        let normalizedY = (localPoint.y - minBounds.y) / (maxBounds.y - minBounds.y)
+        
+        // Map to grid
+        let gridX = Int(normalizedX * Float(gridSize - 1))
+        let gridY = Int(normalizedY * Float(gridSize - 1))
+        
+        return (gridX, gridY)
+    }
+
     
 }
 
@@ -1742,6 +1767,7 @@ extension SCNQuaternion {
         // Create and return the quaternion
         return rotationAxis
     }
+    
 }
 
 

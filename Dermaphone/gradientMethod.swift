@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import SceneKit
 
+
 class gradientMethod{
     
     //does it need to be in the form of a dictionary? How can I make this memory efficient?
@@ -79,7 +80,7 @@ class gradientMethod{
     
     func storeExtractVertices(from geometry: SCNGeometry) -> [SCNVector3]? {
         // Get vertex sources
-        let url = URL.documentsDirectory.appendingPathComponent("vertices.txt")
+        let url = URL.documentsDirectory.appendingPathComponent("vertices5.txt")
         
         if !FileManager.default.fileExists(atPath: url.path) {
             // File doesn't exist, create it
@@ -185,6 +186,9 @@ class gradientMethod{
     func averageValues(closestPoints: [SCNVector3], inputPoint: SCNVector3) -> Float{
         var sum : Float = 1
         var averagedHeight : Float =  0.0
+        if closestPoints.count == 0{
+            return inputPoint.y
+        }
         for i in 0...(closestPoints.count-1){
             if i != 0{
                 sum += (1.0 - Float(i)/Float(closestPoints.count))
@@ -318,16 +322,19 @@ class gradientMethod{
         var weightedSumY: Float = 0
         var weightedSumZ: Float = 0
         var weightSum: Float = 0
-        
+        print("kernelsize", kernelSize)
         for i in 0..<vertices.count {
             let distance = distanceBetween(point, and: vertices[i])
-            if distance < Float(kernelSize) {
+            if distance < Float(kernelSize)/50 {
                 let weight = exp(-0.5 * pow(distance / sigma, 2.0))
                 weightedSumX += vertices[i].x * weight
                 weightedSumY += vertices[i].y * weight
                 weightedSumZ += vertices[i].z * weight
                 weightSum += weight
             }
+        }
+        if weightSum == 0 {
+            return point
         }
         return SCNVector3(
             weightedSumX / weightSum,
@@ -364,5 +371,143 @@ class gradientMethod{
             weightedSumZ / weightSum
         )
     }
+    
+    func applyMexicanHatFilter(to point: SCNVector3, sigma: Float, vertices: [SCNVector3], kernelSize: Int) -> SCNVector3 {
+        var weightedSumX: Float = 0
+        var weightedSumY: Float = 0
+        var weightedSumZ: Float = 0
+        var weightSum: Float = 0
+        
+        for vertex in vertices {
+            let distance = distanceBetween(point, and: vertex)
+            if distance < Float(kernelSize) {
+                // Calculate Mexican Hat weight
+                let scaledDistance = distance / sigma
+                let weight = (1 - scaledDistance * scaledDistance) * exp(-0.5 * scaledDistance * scaledDistance)
+                
+                weightedSumX += vertex.x * weight
+                weightedSumY += vertex.y * weight
+                weightedSumZ += vertex.z * weight
+                weightSum += weight
+            }
+        }
+        
+        if weightSum != 0 {
+            return SCNVector3(
+                weightedSumX / weightSum,
+                weightedSumY / weightSum,
+                weightedSumZ / weightSum
+            )
+        } else {
+            return point  // Return the original point if no weights were applied
+        }
+    }
+    
+    func createHeightMap(from vertices: [SCNVector3], gridSize: Int) -> [[Float]] {
+        guard !vertices.isEmpty, gridSize > 1 else { return [[Float]]() }
+
+        let minX = vertices.min(by: { $0.x < $1.x })?.x ?? 0
+        let maxX = vertices.max(by: { $0.x < $1.x })?.x ?? 0
+        let minY = vertices.min(by: { $0.y < $1.y })?.y ?? 0
+        let maxY = vertices.max(by: { $0.y < $1.y })?.y ?? 0
+
+        let deltaX = (maxX - minX) / Float(gridSize - 1)
+        let deltaY = (maxY - minY) / Float(gridSize - 1)
+
+        // Creating grid for spatial hashing
+        var grid = [Int: [SCNVector3]]()
+        for vertex in vertices {
+            let indexX = Int((vertex.x - minX) / deltaX)
+            let indexY = Int((vertex.y - minY) / deltaY)
+            let hash = indexY * gridSize + indexX
+            grid[hash, default: []].append(vertex)
+        }
+
+        var heightMap = Array(repeating: Array(repeating: Float(0), count: gridSize), count: gridSize)
+        for i in 0..<gridSize {
+            for j in 0..<gridSize {
+                let hash = j * gridSize + i
+                let points = grid[hash] ?? []
+                // Simple averaging or nearest neighbor within the cell
+                if let nearest = points.min(by: { distanceSquared(from: $0, to: SCNVector3(minX + Float(i) * deltaX, minY + Float(j) * deltaY, 0)) < distanceSquared(from: $1, to: SCNVector3(minX + Float(i) * deltaX, minY + Float(j) * deltaY, 0)) }) {
+                    heightMap[i][j] = nearest.z
+                }
+            }
+        }
+        return heightMap
+    }
+
+    func distanceSquared(from: SCNVector3, to: SCNVector3) -> Float {
+        return (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
+    }
+    
+    func applySobelOperator(to heightMap: [[Float]]) -> [[Float]] {
+        let rows = heightMap.count
+        let cols = heightMap[0].count
+        var gradientMap = Array(repeating: Array(repeating: Float(0), count: cols), count: rows)
+
+        let Gx = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]] // Sobel kernel for horizontal changes
+        let Gy = [[-1, -2, -1], [0, 0, 0], [1, 2, 1]] // Sobel kernel for vertical changes
+
+        for i in 1..<rows-1 {
+            for j in 1..<cols-1 {
+                var sumX: Float = 0
+                var sumY: Float = 0
+
+                for k in 0...2 {
+                    for l in 0...2 {
+                        sumX += Float(heightMap[i-1+k][j-1+l]) * Float(Gx[k][l])
+                        sumY += Float(heightMap[i-1+k][j-1+l]) * Float(Gy[k][l])
+                    }
+                }
+
+                let magnitude = sqrt(sumX*sumX + sumY*sumY) // Gradient magnitude
+                gradientMap[i][j] = magnitude
+            }
+        }
+
+        return gradientMap
+    }
+    
+    func mexicanHatKernel(size: Int, sigma: Float) -> [[Float]] {
+        let radius = size / 2
+        var kernel = Array(repeating: Array(repeating: Float(0), count: size), count: size)
+        
+        for i in -radius...radius {
+            for j in -radius...radius {
+                let value = (1 - (Float(i*i + j*j) / (sigma * sigma))) * exp(-(Float(i*i + j*j) / (2 * sigma * sigma)))
+                kernel[i + radius][j + radius] = value
+            }
+        }
+        
+        return kernel
+    }
+
+    func applyKernel(kernel: [[Float]], to heightMap: [[Float]]) -> [[Float]] {
+        let rows = heightMap.count
+        let cols = heightMap[0].count
+        var outputMap = Array(repeating: Array(repeating: Float(0), count: cols), count: rows)
+        
+        let kernelSize = kernel.count
+        let kernelRadius = kernelSize / 2
+        
+        for i in kernelRadius..<(rows - kernelRadius) {
+            for j in kernelRadius..<(cols - kernelRadius) {
+                var sum: Float = 0
+                
+                for k in 0..<kernelSize {
+                    for l in 0..<kernelSize {
+                        sum += kernel[k][l] * heightMap[i - kernelRadius + k][j - kernelRadius + l]
+                    }
+                }
+                
+                outputMap[i][j] = sum
+            }
+        }
+        
+        return outputMap
+    }
+
+
     
 }

@@ -12,11 +12,13 @@ import CoreHaptics
 import SwiftUI
 import FirebaseCore
 import FirebaseFirestore
+import FirebaseStorage
 
 class ViewController: UIViewController {
     @IBOutlet weak var readUsers: UIButton!
     var db: Firestore!
     @IBOutlet weak var addUsers: UIButton!
+    @IBOutlet weak var addModel: UIButton!
     var currentModel : SkinCondition = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "", urgency: "")
     //Change currentModel so that if no models have been created either portrays a test one or presents a popup
     var skinConditions : [SkinCondition] = []
@@ -31,7 +33,7 @@ class ViewController: UIViewController {
     }
     override func viewDidLoad() {
       //  let settings = FirestoreSettings()
-
+        
      //   Firestore.firestore().settings = settings
         // [END setup]
      //   db = Firestore.firestore()
@@ -148,6 +150,83 @@ class ViewController: UIViewController {
         skinConditions.append(skin3Model)
         skinConditions.append(skin2Model)
     }
+    
+    @IBAction func addedModel(_ sender: Any) {
+        let storage = Storage.storage()
+        let storageRef = storage.reference()
+        //let modelsRef = storageRef.child("models")
+        // File located on disk
+       // let localFile = URL(string: "/Users/ace20/Documents/testTransform.scn")!
+        guard let fileURL = Bundle.main.url(forResource: "testTransform", withExtension: "scn")  else {
+          return
+        }
+        let localFile = fileURL
+        // Create a reference to the file you want to upload
+        var modelsRef = storageRef.child("models/ActinicKeratosis.scn")
+        guard let fileURLTexture = Bundle.main.url(forResource: "skin3_tex0", withExtension: "png")  else {
+          return
+        }
+        guard let fileURLNorm = Bundle.main.url(forResource: "baked_mesh_norm0", withExtension: "png")  else {
+          return
+        }
+        guard let fileURLA = Bundle.main.url(forResource: "baked_mesh_ao0", withExtension: "png")  else {
+          return
+        }
+        // Upload the file to the path "images/rivers.jpg"
+        let uploadTask = modelsRef.putFile(from: localFile, metadata: nil) { metadata, error in
+          guard let metadata = metadata else {
+            // Uh-oh, an error occurred!
+              print("error 1", error)
+            return
+          }
+          // Metadata contains file metadata such as size, content-type.
+          let size = metadata.size
+            print("metadata", metadata)
+            modelsRef = storageRef.child("models/skin3_tex0.png")
+            let uploadTaskTexture = modelsRef.putFile(from: fileURLTexture, metadata: nil) { metadata, error in
+                guard let metadataT = metadata else {
+                    // Uh-oh, an error occurred!
+                    print("error 1", error)
+                    return
+                }
+                // Metadata contains file metadata such as size, content-type.
+                print("metadata", metadataT)
+            }
+                modelsRef = storageRef.child("models/baked_mesh_norm0.png")
+                let uploadTaskNorm = modelsRef.putFile(from: fileURLNorm, metadata: nil) { metadata, error in
+                    guard let metadataNorm = metadata else {
+                        // Uh-oh, an error occurred!
+                        print("error 1", error)
+                        return
+                    }
+                    print("metadata", metadataNorm)
+                }
+                    
+                  // Metadata contains file metadata such as size, content-type.
+                    
+                    
+                    modelsRef = storageRef.child("models/baked_mesh_ao0.png")
+                    let uploadTaskA = modelsRef.putFile(from: fileURLA, metadata: nil) { metadata, error in
+                        guard let metadataA = metadata else {
+                            // Uh-oh, an error occurred!
+                            print("error 1", error)
+                            return
+                        }
+                        print("metadata", metadataA)
+                    }
+          // You can also access to download URL after upload.
+            modelsRef = storageRef.child("models")
+          modelsRef.downloadURL { (url, error) in
+            guard let downloadURL = url else {
+                
+              // Uh-oh, an error occurred!
+              return
+            }
+          }
+        }
+            
+    }
+    
     
             
             

@@ -126,7 +126,7 @@
 		FF5C1C7B2BD2FA1000C097E9 /* HapticChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticChart.swift; sourceTree = "<group>"; };
 		FF5C1C7D2BD2FA8E00C097E9 /* HapticDataPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticDataPoint.swift; sourceTree = "<group>"; };
 		FF5C1C812BD2FCBD00C097E9 /* HapticRendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticRendering.swift; sourceTree = "<group>"; };
-		FF5C1C832BD3109300C097E9 /* testTransform.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = testTransform.scn; path = ../../testTransform.scn; sourceTree = "<group>"; };
+		FF5C1C832BD3109300C097E9 /* testTransform.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = testTransform.scn; path = ../testTransform.scn; sourceTree = SOURCE_ROOT; };
 		FF5C1C872BD310E400C097E9 /* skin3_tex0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = skin3_tex0.png; sourceTree = "<group>"; };
 		FF5C1C892BD320E200C097E9 /* baked_mesh_ao0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = baked_mesh_ao0.png; sourceTree = "<group>"; };
 		FF5C1C8A2BD320E200C097E9 /* baked_mesh_norm0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = baked_mesh_norm0.png; sourceTree = "<group>"; };
@@ -154,7 +154,7 @@
 		FFB13A7D2BAE183600A94673 /* Dermaphone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dermaphone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FFB13A802BAE183600A94673 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FFB13A822BAE183600A94673 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		FFB13A842BAE183600A94673 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		FFB13A842BAE183600A94673 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ViewController.swift; path = Dermaphone/ViewController.swift; sourceTree = SOURCE_ROOT; };
 		FFB13A872BAE183600A94673 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		FFB13A892BAE183800A94673 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FFB13A8C2BAE183800A94673 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -918,6 +918,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = test.Dermaphone;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -947,6 +948,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = test.Dermaphone;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

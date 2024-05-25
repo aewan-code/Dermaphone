@@ -309,12 +309,41 @@ class gradientMethod{
         
         return kernel
     }
+    
+    
+    func gaussianKernel(size: Int, sigma: Float) -> [[Float]] {
+        let mid = size / 2
+        var kernel = Array(repeating: Array(repeating: Float(0.0), count: size), count: size)
+        let sigmaSquared = 2 * sigma * sigma
+        var sum = Float(0.0)
+        
+        for x in 0..<size {
+            for y in 0..<size {
+                let xDist = x - mid
+                let yDist = y - mid
+                let distSquared = Float(xDist * xDist + yDist * yDist)
+                let exponent = distSquared / sigmaSquared
+                kernel[x][y] = (1 / (Float.pi * sigmaSquared)) * exp(-exponent)
+                sum += kernel[x][y]
+            }
+        }
+        
+        // Normalize the kernel
+        for x in 0..<size {
+            for y in 0..<size {
+                kernel[x][y] /= sum
+            }
+        }
+        
+        return kernel
+    }
+    
     func distanceBetween(_ a: SCNVector3, and b: SCNVector3) -> Float {
         return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2))
     }
     func applyGaussianFilter(to point: SCNVector3, sigma: Float, vertices: [SCNVector3], kernelSize: Int) -> SCNVector3 {
         
-      //  let kernelSize = 5  // Define kernel size
+        //  let kernelSize = 5  // Define kernel size
         let kernel: [Float] = createGaussianKernel(size: kernelSize, sigma: sigma)
         
         
@@ -346,7 +375,7 @@ class gradientMethod{
     //fix
     func getWeightedAverage(to point: SCNVector3, sigma: Float, vertices: [SCNVector3], kernelSize: Int) -> SCNVector3 {
         
-      //  let kernelSize = 5  // Define kernel size
+        //  let kernelSize = 5  // Define kernel size
         let kernel: [Float] = createGaussianKernel(size: kernelSize, sigma: sigma)
         
         
@@ -403,69 +432,125 @@ class gradientMethod{
         }
     }
     
-    func createHeightMap(from vertices: [SCNVector3], gridSize: Int) -> [[Float]] {
+    func createHeightMap1(from vertices: [SCNVector3], gridSize: Int) -> [[Float]] {
         guard !vertices.isEmpty, gridSize > 1 else { return [[Float]]() }
-
+        
         let minX = vertices.min(by: { $0.x < $1.x })?.x ?? 0
         let maxX = vertices.max(by: { $0.x < $1.x })?.x ?? 0
-        let minY = vertices.min(by: { $0.y < $1.y })?.y ?? 0
-        let maxY = vertices.max(by: { $0.y < $1.y })?.y ?? 0
-
+        let minZ = vertices.min(by: { $0.z < $1.z })?.z ?? 0
+        let maxZ = vertices.max(by: { $0.z < $1.z })?.z ?? 0
+        
         let deltaX = (maxX - minX) / Float(gridSize - 1)
-        let deltaY = (maxY - minY) / Float(gridSize - 1)
-
+        let deltaZ = (maxZ - minZ) / Float(gridSize - 1)
+        
         // Creating grid for spatial hashing
         var grid = [Int: [SCNVector3]]()
         for vertex in vertices {
             let indexX = Int((vertex.x - minX) / deltaX)
-            let indexY = Int((vertex.y - minY) / deltaY)
-            let hash = indexY * gridSize + indexX
+            let indexZ = Int((vertex.z - minZ) / deltaZ)
+            let hash = indexZ * gridSize + indexX
             grid[hash, default: []].append(vertex)
         }
-
+        
         var heightMap = Array(repeating: Array(repeating: Float(0), count: gridSize), count: gridSize)
         for i in 0..<gridSize {
             for j in 0..<gridSize {
                 let hash = j * gridSize + i
                 let points = grid[hash] ?? []
                 // Simple averaging or nearest neighbor within the cell
-                if let nearest = points.min(by: { distanceSquared(from: $0, to: SCNVector3(minX + Float(i) * deltaX, minY + Float(j) * deltaY, 0)) < distanceSquared(from: $1, to: SCNVector3(minX + Float(i) * deltaX, minY + Float(j) * deltaY, 0)) }) {
-                    heightMap[i][j] = nearest.z
+                if let nearest = points.min(by: { distanceSquared(from: $0, to: SCNVector3(minX + Float(i) * deltaX, 0,  minZ + Float(j) * deltaZ)) < distanceSquared(from: $1, to: SCNVector3(minX + Float(i) * deltaX, 0, minZ + Float(j) * deltaZ)) }) {
+                    heightMap[i][j] = nearest.y
                 }
             }
         }
         return heightMap
     }
-
+    
+    func createHeightMap2(from vertices: [SCNVector3], gridSize: Int) -> [[Float]] {
+        guard !vertices.isEmpty, gridSize > 1 else { return [[Float]]() }
+        
+        let minX = vertices.min(by: { $0.x < $1.x })?.x ?? 0
+        let maxX = vertices.max(by: { $0.x < $1.x })?.x ?? 0
+        let minZ = vertices.min(by: { $0.z < $1.z })?.z ?? 0
+        let maxZ = vertices.max(by: { $0.z < $1.z })?.z ?? 0
+        
+        let deltaX = (maxX - minX) / Float(gridSize - 1)
+        let deltaZ = (maxZ - minZ) / Float(gridSize - 1)
+        
+        var heightMap = Array(repeating: Array(repeating: Float.nan, count: gridSize), count: gridSize)
+        
+        for vertex in vertices {
+            let indexX = min(Int((vertex.x - minX) / deltaX), gridSize - 1)
+            let indexZ = min(Int((vertex.z - minZ) / deltaZ), gridSize - 1)
+            heightMap[indexZ][indexX] = vertex.y
+        }
+        
+        interpolateHeightMap(&heightMap) // Apply interpolation to fill NaN values
+        //   gaussianSmoothing(&heightMap, sigma: 1.0) // Optional: Smooth the height map
+        
+        return heightMap
+    }
+    
+    func interpolateHeightMap(_ heightMap: inout [[Float]]) {
+        let gridSize = heightMap.count
+        for i in 0..<gridSize {
+            for j in 0..<gridSize {
+                if heightMap[i][j].isNaN {
+                    // Collect heights from neighboring cells for averaging
+                    var totalHeight: Float = 0
+                    var count: Int = 0
+                    
+                    for di in -1...1 {
+                        for dj in -1...1 {
+                            let ni = i + di
+                            let nj = j + dj
+                            if ni >= 0 && ni < gridSize && nj >= 0 && nj < gridSize && !heightMap[ni][nj].isNaN {
+                                totalHeight += heightMap[ni][nj]
+                                count += 1
+                            }
+                        }
+                    }
+                    
+                    if count > 0 {
+                        heightMap[i][j] = totalHeight / Float(count)
+                    }
+                    
+                }
+            }
+        }
+    }
+    
+    
+    
     func distanceSquared(from: SCNVector3, to: SCNVector3) -> Float {
-        return (from.x - to.x) * (from.x - to.x) + (from.y - to.y) * (from.y - to.y)
+        return (from.x - to.x) * (from.x - to.x) + (from.z - to.z) * (from.z - to.z)
     }
     
     func applySobelOperator(to heightMap: [[Float]]) -> [[Float]] {
         let rows = heightMap.count
         let cols = heightMap[0].count
         var gradientMap = Array(repeating: Array(repeating: Float(0), count: cols), count: rows)
-
+        
         let Gx = [[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]] // Sobel kernel for horizontal changes
         let Gy = [[-1, -2, -1], [0, 0, 0], [1, 2, 1]] // Sobel kernel for vertical changes
-
+        
         for i in 1..<rows-1 {
             for j in 1..<cols-1 {
                 var sumX: Float = 0
                 var sumY: Float = 0
-
+                
                 for k in 0...2 {
                     for l in 0...2 {
                         sumX += Float(heightMap[i-1+k][j-1+l]) * Float(Gx[k][l])
                         sumY += Float(heightMap[i-1+k][j-1+l]) * Float(Gy[k][l])
                     }
                 }
-
+                
                 let magnitude = sqrt(sumX*sumX + sumY*sumY) // Gradient magnitude
                 gradientMap[i][j] = magnitude
             }
         }
-
+        
         return gradientMap
     }
     
@@ -482,7 +567,7 @@ class gradientMethod{
         
         return kernel
     }
-
+    
     func applyKernel(kernel: [[Float]], to heightMap: [[Float]]) -> [[Float]] {
         let rows = heightMap.count
         let cols = heightMap[0].count
@@ -507,7 +592,349 @@ class gradientMethod{
         
         return outputMap
     }
+    
+    func applyGaussianToHeightMap(heightMap: [[Float]], k: Int, sigma: Float) -> [[Float]]{
+        let kernel = self.gaussianKernel(size: k, sigma: sigma)
+        let appliedKernel = self.applyKernel(kernel: kernel, to: heightMap)
+        var highPassHeightMap = Array(repeating: Array(repeating: Float(0), count: heightMap.count), count: heightMap.count)
+        for i in 0..<(heightMap.count){
+            for j in 0..<(heightMap.count){
+                highPassHeightMap[i][j] = heightMap[i][j] - appliedKernel[i][j]
+            }
+        }
+        //RETURN THE DIFFERENCE BETWEEN THE GAUSSIAN AND THAT VALUE
+        return appliedKernel//highPassHeightMap
+        
+    }
+    //returns gradient height map and min and max values to scale it by
+    func convertHeightMapToGradient(heightMap : [[Float]])->([[Float]], Float, Float){
+        var gradientHeightMap = Array(repeating: Array(repeating: Float(0), count: heightMap.count), count: heightMap.count)
+        var maxPoint : Float = 1
+        var minPoint : Float = 0
+        for i in 0..<(heightMap.count){
+            for j in 0..<(heightMap.count){
+                if i != 0 && j != 0 && i != (heightMap.count - 1) && j != (heightMap.count - 1){
+                    let gradient_x = (heightMap[i+1][j] - heightMap[i-1][j]) / 2
+                    let gradient_z = (heightMap[i][j+1] - heightMap[i][j-1]) / 2
+                    let gradientMag = (gradient_x * gradient_x) + (gradient_z * gradient_z)
+                    gradientHeightMap[i][j] = gradientMag
+                    if gradientMag < minPoint{
+                        minPoint = gradientMag
+                    }
+                    if gradientMag > maxPoint{
+                        maxPoint = gradientMag
+                    }
+                }
+            }
+        }
+        return (gradientHeightMap, minPoint, maxPoint)
+    }
+    
+    func dynamicGridSize(min: Float, max1: Float, desiredCellWidth: Float) -> Int {
+        let range = max1 - min
+        return max(10, Int(ceil(range / desiredCellWidth)))  // Ensure at least a minimum grid size
+    }
+    func extractHeightMap(from geometry: SCNGeometry, gridSizeX: Int, gridSizeZ: Int) -> [[Float]]? {
+        // Ensure the vertex source is available and correctly formatted
+        guard let vertexSource = geometry.sources.first(where: { $0.semantic == .vertex }) else { return nil }
+        
+        let stride = vertexSource.dataStride // in bytes
+        let offset = vertexSource.dataOffset // in bytes
+        let componentsPerVector = vertexSource.componentsPerVector
+        let bytesPerComponent = vertexSource.bytesPerComponent
+        let vectorCount = vertexSource.vectorCount
+        
+        // Initialize min and max variables
+        var minX = Float.greatestFiniteMagnitude
+        var maxX = -Float.greatestFiniteMagnitude
+        var minZ = Float.greatestFiniteMagnitude
+        var maxZ = -Float.greatestFiniteMagnitude
+        
+        // Temporary array to hold all vertices for min/max calculation
+        var vertices = [SCNVector3]()
+        
+        // Extract all vertices to compute min/max and fill vertices array
+        vertexSource.data.withUnsafeBytes { (rawBufferPointer: UnsafeRawBufferPointer) in
+            let bufferPointer = rawBufferPointer.bindMemory(to: Float.self)
+            
+            for i in 0..<vectorCount {
+                let baseIndex = (i * stride + offset) / MemoryLayout<Float>.stride
+                
+                let x = bufferPointer[baseIndex]     // Assuming x is the first component
+                let y = bufferPointer[baseIndex + 1] // Assuming y is the height (second component)
+                let z = bufferPointer[baseIndex + 2] // Assuming z is the third component
+                
+                vertices.append(SCNVector3(x, y, z))
+                
+                // Update min and max values
+                minX = min(minX, x)
+                maxX = max(maxX, x)
+                minZ = min(minZ, z)
+                maxZ = max(maxZ, z)
+            }
+        }
+        
+        // Extract vertices and find min/max as previously described
+        let desiredCellWidth = 0.01
+        // Calculate dynamic grid sizes based on min/max and desired cell width
+        let gridSizeX = dynamicGridSize(min: minX, max1: maxX, desiredCellWidth: Float(desiredCellWidth))
+        let gridSizeZ = dynamicGridSize(min: minZ, max1: maxZ, desiredCellWidth: Float(desiredCellWidth))
+        
+        // Initialize heightMap array
+        var heightMap = Array(repeating: Array(repeating: Float.nan, count: gridSizeZ), count: gridSizeX)
+        
+        // Process vertices to populate the height map
+        for vertex in vertices {
+            let x = vertex.x
+            let z = vertex.z
+            let y = vertex.y
+            
+            // Dynamic normalization to grid indices
+            let ix = min(gridSizeX - 1, max(0, Int((x - minX) / (maxX - minX) * Float(gridSizeX - 1))))
+            let iz = min(gridSizeZ - 1, max(0, Int((z - minZ) / (maxZ - minZ) * Float(gridSizeZ - 1))))
+            
+            // Set or average y value in the height map
+            heightMap[ix][iz] = y  // Adjust this line to handle averaging or max pooling if needed
+        }
+        
+        return heightMap
+    }
+    
+    func createGeom() -> SCNGeometry{
+        let height : [[Float]] = [[0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.25, 0.75, 1.25, 1.25, 0.75, 0.25, 0.0, 0.0], [0.0, 0.25, 1.25, 2.25, 3.25, 3.25, 2.25, 1.25, 0.25, 0.0], [0.0, 0.75, 2.25, 3.75, 4.75, 4.75, 3.75, 2.25, 0.75, 0.0], [0.0, 1.25, 3.25, 4.75, 5.0, 5.0, 4.75, 3.25, 1.25, 0.0], [0.25, 1.25, 3.25, 4.75, 5.0, 5.0, 4.75, 3.25, 1.25, 0.25], [0.0, 0.75, 2.25, 3.75, 4.75, 4.75, 3.75, 2.25, 0.75, 0.0], [0.0, 0.25, 1.25, 2.25, 3.25, 3.25, 2.25, 1.25, 0.25, 0.0], [0.0, 0.0, 0.25, 0.75, 1.25, 1.25, 0.75, 0.25, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0]]
+        
+        let rows = height.count
+        let cols = height[0].count
+
+        var vertices = [SCNVector3]()
+
+        for z in 0..<rows {
+            for x in 0..<cols {
+                let y = height[z][x]
+                vertices.append(SCNVector3(x: Float(x), y: y, z: Float(z)))
+            }
+        }
+        
+        var indices: [Int32] = []
+
+        for z in 0..<rows - 1 {
+            for x in 0..<cols - 1 {
+                let topLeft = z * cols + x
+                let topRight = topLeft + 1
+                let bottomLeft = (z + 1) * cols + x
+                let bottomRight = bottomLeft + 1
+
+                // First triangle: topLeft, bottomLeft, topRight
+                indices.append(contentsOf: [Int32(topLeft), Int32(bottomLeft), Int32(topRight)])
+                // Second triangle: topRight, bottomLeft, bottomRight
+                indices.append(contentsOf: [Int32(topRight), Int32(bottomLeft), Int32(bottomRight)])
+            }
+        }
+        print("create vertex data")
+        // Creating the geometry source with vertices
+        let vertexData = NSData(bytes: vertices, length: vertices.count * MemoryLayout<SCNVector3>.size) as Data
+        print("create vertex source")
+        
+        
+        let vertexSource = SCNGeometrySource(data: vertexData,
+                                             semantic: .vertex,
+                                             vectorCount: vertices.count,
+                                             usesFloatComponents: true,
+                                             componentsPerVector: 3,
+                                             bytesPerComponent: MemoryLayout<Float>.size,
+                                             dataOffset: 0,
+                                             dataStride: MemoryLayout<SCNVector3>.size)
+
+        print("create index data")
+        // Creating the geometry element with indices
+        let indexData = NSData(bytes: indices, length: indices.count * MemoryLayout<Int32>.size)
+        print("create element")
+        let element = SCNGeometryElement(data: indexData as Data,
+                                         primitiveType: .triangles,
+                                         primitiveCount: indices.count / 3,
+                                         bytesPerIndex: MemoryLayout<Int32>.size)
+        print("create geometry")
+        // Create the geometry
+        let geometry = SCNGeometry(sources: [vertexSource], elements: [element])
+        return geometry
+
+    }
+    func createHeightMap(from geometry: SCNGeometry, resolutionX: Int, resolutionZ: Int) -> [[Float]] {
+        guard let vertexSource = geometry.sources(for: .vertex).first else {
+            fatalError("Vertex source not found")
+        }
+        
+        let vertexData = vertexSource.data
+        let stride = vertexSource.dataStride
+        let offset = vertexSource.dataOffset
+        let vectorCount = vertexSource.vectorCount
+
+        // Initialize the height map with default values
+        var heightMap = Array(repeating: Array(repeating: Float.nan, count: resolutionZ), count: resolutionX)
+
+        // Bounds for normalization
+        var minX = Float.greatestFiniteMagnitude
+        var maxX = -Float.greatestFiniteMagnitude
+        var minZ = Float.greatestFiniteMagnitude
+        var maxZ = -Float.greatestFiniteMagnitude
+
+        // First pass: find min and max for normalization
+        for i in 0..<vectorCount {
+            vertexData.withUnsafeBytes { (buffer: UnsafeRawBufferPointer) in
+                let vertexPointer = buffer.baseAddress!.advanced(by: i * stride + offset).assumingMemoryBound(to: Float.self)
+                let x = vertexPointer.pointee
+                let z = vertexPointer.advanced(by: 2).pointee
+                
+                minX = min(minX, x)
+                maxX = max(maxX, x)
+                minZ = min(minZ, z)
+                maxZ = max(maxZ, z)
+            }
+        }
+        
+        // Second pass: populate height map
+        for i in 0..<vectorCount {
+            vertexData.withUnsafeBytes { (buffer: UnsafeRawBufferPointer) in
+                let vertexPointer = buffer.baseAddress!.advanced(by: i * stride + offset).assumingMemoryBound(to: Float.self)
+                let x = vertexPointer.pointee
+                let y = vertexPointer.advanced(by: 1).pointee
+                let z = vertexPointer.advanced(by: 2).pointee
+                
+                // Normalize and scale (x, z) to grid indices
+                let ix = Int(((x - minX) / (maxX - minX)) * Float(resolutionX - 1))
+                let iz = Int(((z - minZ) / (maxZ - minZ)) * Float(resolutionZ - 1))
+                
+                // Handle multiple y values: take the maximum or average them out
+                if heightMap[ix][iz].isNaN {
+                    heightMap[ix][iz] = y
+                } else {
+                    // Replace the next line with your chosen method (average, min, max, etc.)
+                    heightMap[ix][iz] = max(heightMap[ix][iz], y)
+                }
+            }
+        }
+        
+        return heightMap
+    }
+    
+    func createCustomCone(top: SCNVector3, radius: CGFloat, slices: Int) -> SCNGeometry {
+        var vertices = [SCNVector3]()
+        vertices.append(top) // Top vertex of the cone
+
+        // Calculate the vertices around the base with varying angular increments
+        let centerBase = SCNVector3(top.x, top.y - Float(radius), top.z)
+        vertices.append(centerBase) // Center of the base for easy base creation
+
+        for i in 0..<slices {
+            let angularIncrement = CGFloat(i) * 2.0 * .pi / CGFloat(slices)
+            let x = centerBase.x + Float(cos(angularIncrement) * radius)
+            let z = centerBase.z + Float(sin(angularIncrement) * radius)
+            let y = centerBase.y
+            
+            vertices.append(SCNVector3(x, y, z))
+        }
+        
+        return createGeometry(vertices: vertices, topIndex: 0, baseCenterIndex: 1, slices: slices)
+    }
+    
+    func createGeometry(vertices: [SCNVector3], topIndex: Int, baseCenterIndex: Int, slices: Int) -> SCNGeometry {
+        var indices: [Int32] = []
+        
+        // Side triangles
+        for i in 0..<slices {
+            let nextIndex = (i + 1) % slices
+            indices.append(Int32(topIndex))
+            indices.append(Int32(baseCenterIndex + i + 1))
+            indices.append(Int32(baseCenterIndex + nextIndex + 1))
+        }
+
+        // Base triangles
+        for i in 0..<slices {
+            let nextIndex = (i + 1) % slices
+            indices.append(Int32(baseCenterIndex))
+            indices.append(Int32(baseCenterIndex + i + 1))
+            indices.append(Int32(baseCenterIndex + nextIndex + 1))
+        }
+
+        // Create geometry
+        let vertexSource = SCNGeometrySource(vertices: vertices)
+        let element = SCNGeometryElement(indices: indices, primitiveType: .triangles)
+        return SCNGeometry(sources: [vertexSource], elements: [element])
+    }
+
+    func getTransformedVertices(node: SCNNode) -> [SCNVector3] {
+        guard let geometry = node.geometry,
+              let vertexSource = geometry.sources(for: .vertex).first else {
+            fatalError("No vertex data available")
+        }
+
+        let vertexData = vertexSource.data
+        let vertexCount = vertexSource.vectorCount
+        let stride = vertexSource.dataStride
+        let offset = vertexSource.dataOffset
+
+        var transformedVertices = [SCNVector3]()
+
+        // Retrieve transformation matrix from the node
+        let transformationMatrix = node.worldTransform
+
+        for index in 0..<vertexCount {
+            let baseAddress = vertexData.withUnsafeBytes { pointer -> UnsafePointer<Float> in
+                pointer.baseAddress!.advanced(by: index * stride + offset).assumingMemoryBound(to: Float.self)
+            }
+            let vertex = SCNVector3(x: baseAddress.pointee, y: baseAddress.advanced(by: 1).pointee, z: baseAddress.advanced(by: 2).pointee)
+            let transformedVertex = vertex.applyingTransformation(transformationMatrix)
+            transformedVertices.append(transformedVertex)
+        }
+
+        return transformedVertices
+    }
+
+    func createHeightMap4(from vertices: [SCNVector3], resolutionX: Int, resolutionZ: Int) -> [[Float]] {
+        // Initialize the height map with NaN values
+        var heightMap = Array(repeating: Array(repeating: Float.nan, count: resolutionZ), count: resolutionX)
+
+        // Determine bounds for normalization
+        let (minX, maxX, minZ, maxZ) = vertices.reduce((Float.infinity, -Float.infinity, Float.infinity, -Float.infinity)) { (bounds, vertex) in
+            (min(bounds.0, vertex.x), max(bounds.1, vertex.x), min(bounds.2, vertex.z), max(bounds.3, vertex.z))
+        }
+
+        // Populate the height map
+        vertices.forEach { vertex in
+            // Normalize coordinates to fit within the grid
+            let ix = Int(((vertex.x - minX) / (maxX - minX)) * Float(resolutionX - 1))
+            let iz = Int(((vertex.z - minZ) / (maxZ - minZ)) * Float(resolutionZ - 1))
+
+            // Check bounds (to handle edge cases where ix or iz might be out of range)
+            guard ix >= 0, ix < resolutionX, iz >= 0, iz < resolutionZ else {
+                return // Skip this vertex if out of bounds
+            }
+
+            // Assign height value using y-coordinate, choose method to handle multiple values (e.g., max, average)
+            if heightMap[ix][iz].isNaN {
+                heightMap[ix][iz] = vertex.y
+            } else {
+                // Use the maximum height for overlapping vertices or choose another method like average
+                heightMap[ix][iz] = max(heightMap[ix][iz], vertex.y)
+            }
+        }
+
+        return heightMap
+    }
+
+
 
 
     
+
+
+
+    
+}
+extension SCNVector3 {
+    func applyingTransformation(_ transform: SCNMatrix4) -> SCNVector3 {
+        let glkMatrix = SCNMatrix4ToGLKMatrix4(transform)
+        let glkVector = GLKMatrix4MultiplyVector3WithTranslation(glkMatrix, GLKVector3Make(x, y, z))
+        return SCNVector3(glkVector.x, glkVector.y, glkVector.z)
+    }
 }

@@ -93,6 +93,14 @@
 		FFC1CEBC2BBB22AA00FD49B7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA72BBB22A900FD49B7 /* ContentView.swift */; };
 		FFC1CEBE2BBB22AA00FD49B7 /* AsyncImageHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */; };
 		FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */; };
+		FFDB46862C022B5B005ECCF1 /* DatabaseManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDB46852C022B5B005ECCF1 /* DatabaseManagement.swift */; };
+		FFDB468A2C023D5E005ECCF1 /* testSceneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDB46892C023D5E005ECCF1 /* testSceneViewController.swift */; };
+		FFDBBA582BFF3F8C00CBEF79 /* LogIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDBBA572BFF3F8C00CBEF79 /* LogIn.swift */; };
+		FFDBBA5A2BFF400400CBEF79 /* LesionLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDBBA592BFF400400CBEF79 /* LesionLibrary.swift */; };
+		FFDBBA5F2BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FFDBBA5E2BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.xib */; };
+		FFDBBA602BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDBBA5D2BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.swift */; };
+		FFDBBA622BFFA5EF00CBEF79 /* Scene.usda in Resources */ = {isa = PBXBuildFile; fileRef = FFDBBA612BFFA5EF00CBEF79 /* Scene.usda */; };
+		FFDBBA642BFFA5FB00CBEF79 /* tri.scn in Resources */ = {isa = PBXBuildFile; fileRef = FFDBBA632BFFA5FB00CBEF79 /* tri.scn */; };
 		FFF154C82BBC375700834F38 /* skin2.obj in Resources */ = {isa = PBXBuildFile; fileRef = FFF154C22BBC375700834F38 /* skin2.obj */; };
 		FFF154C92BBC375700834F38 /* skin2_norm0.png in Resources */ = {isa = PBXBuildFile; fileRef = FFF154C32BBC375700834F38 /* skin2_norm0.png */; };
 		FFF154CA2BBC375700834F38 /* skin2.usda in Resources */ = {isa = PBXBuildFile; fileRef = FFF154C42BBC375700834F38 /* skin2.usda */; };
@@ -185,6 +193,14 @@
 		FFC1CEA72BBB22A900FD49B7 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncImageHelpers.swift; sourceTree = "<group>"; };
 		FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = photogrammetryAPI.swift; sourceTree = "<group>"; };
+		FFDB46852C022B5B005ECCF1 /* DatabaseManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManagement.swift; sourceTree = "<group>"; };
+		FFDB46892C023D5E005ECCF1 /* testSceneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testSceneViewController.swift; sourceTree = "<group>"; };
+		FFDBBA572BFF3F8C00CBEF79 /* LogIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogIn.swift; sourceTree = "<group>"; };
+		FFDBBA592BFF400400CBEF79 /* LesionLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LesionLibrary.swift; sourceTree = "<group>"; };
+		FFDBBA5D2BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LesionLibraryTableViewCell.swift; sourceTree = "<group>"; };
+		FFDBBA5E2BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LesionLibraryTableViewCell.xib; sourceTree = "<group>"; };
+		FFDBBA612BFFA5EF00CBEF79 /* Scene.usda */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Scene.usda; path = ../../defaultPoly/Sources/defaultPoly/defaultPoly.rkassets/Scene.usda; sourceTree = "<group>"; };
+		FFDBBA632BFFA5FB00CBEF79 /* tri.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; name = tri.scn; path = ../../defaultPoly/Sources/defaultPoly/defaultPoly.rkassets/tri.scn; sourceTree = "<group>"; };
 		FFF1548C2BBC30F300834F38 /* baked_mesh1.scn */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = baked_mesh1.scn; sourceTree = "<group>"; };
 		FFF154C22BBC375700834F38 /* skin2.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = skin2.obj; sourceTree = "<group>"; };
 		FFF154C32BBC375700834F38 /* skin2_norm0.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = skin2_norm0.png; sourceTree = "<group>"; };
@@ -316,6 +332,8 @@
 				FFF154E12BBC986900834F38 /* skinConditionInfoView.swift */,
 				FF5C1C982BD43D0900C097E9 /* HapticManager.swift */,
 				FF5C1CA22BD54B8500C097E9 /* test2scene.usda */,
+				FFDBBA612BFFA5EF00CBEF79 /* Scene.usda */,
+				FFDBBA632BFFA5FB00CBEF79 /* tri.scn */,
 				FF5C1CA42BD54B8D00C097E9 /* test2scene.scn */,
 				FFB13B402BAF034600A94673 /* testTexture.ahap */,
 				FFB13B422BB1D41500A94673 /* Haptics.swift */,
@@ -323,6 +341,11 @@
 				FF5C1C9E2BD5481B00C097E9 /* skin2Model */,
 				FF5C1C8F2BD320E200C097E9 /* 3dmodelSkin5 */,
 				FFB13A862BAE183600A94673 /* Main.storyboard */,
+				FFDB46892C023D5E005ECCF1 /* testSceneViewController.swift */,
+				FFDBBA592BFF400400CBEF79 /* LesionLibrary.swift */,
+				FFDBBA5D2BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.swift */,
+				FFDBBA5E2BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.xib */,
+				FFDBBA572BFF3F8C00CBEF79 /* LogIn.swift */,
 				FF662E352BECD60F00FD9411 /* LinkConditionCell.swift */,
 				FF662E332BECD43300FD9411 /* LinkConditions.swift */,
 				FF5C1CAC2BE117CA00C097E9 /* NotesView.swift */,
@@ -330,6 +353,7 @@
 				FFB13A8B2BAE183800A94673 /* LaunchScreen.storyboard */,
 				FFB13A8E2BAE183800A94673 /* Info.plist */,
 				FF662E3F2BF0FF4400FD9411 /* GoogleService-Info.plist */,
+				FFDB46852C022B5B005ECCF1 /* DatabaseManagement.swift */,
 			);
 			path = Dermaphone;
 			sourceTree = "<group>";
@@ -534,12 +558,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FFDBBA642BFFA5FB00CBEF79 /* tri.scn in Resources */,
 				FF5C1CA92BDFD0D200C097E9 /* testTriangle in Resources */,
 				FFF154CB2BBC375700834F38 /* skin2_ao0.png in Resources */,
 				FFF154CC2BBC375700834F38 /* skin2.mtl in Resources */,
 				FF5C1C922BD320E200C097E9 /* baked_mesh_tex0.png in Resources */,
 				FF5C1C902BD320E200C097E9 /* baked_mesh_ao0.png in Resources */,
 				FF5C1C972BD3212300C097E9 /* baked_mesh.scn in Resources */,
+				FFDBBA5F2BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.xib in Resources */,
 				FF5C1C942BD320E200C097E9 /* baked_mesh.obj in Resources */,
 				FF5C1C842BD3109300C097E9 /* testTransform.scn in Resources */,
 				FFB13A8D2BAE183800A94673 /* LaunchScreen.storyboard in Resources */,
@@ -556,6 +582,7 @@
 				FFF154CF2BBC377D00834F38 /* skin2.scn in Resources */,
 				FFB13B412BAF034600A94673 /* testTexture.ahap in Resources */,
 				FFB13A882BAE183600A94673 /* Main.storyboard in Resources */,
+				FFDBBA622BFFA5EF00CBEF79 /* Scene.usda in Resources */,
 				FF5C1C932BD320E200C097E9 /* baked_mesh.mtl in Resources */,
 				FFF154CA2BBC375700834F38 /* skin2.usda in Resources */,
 				FFF154C92BBC375700834F38 /* skin2_norm0.png in Resources */,
@@ -699,6 +726,8 @@
 				FFF154E02BBC8C3100834F38 /* SkinCondition.swift in Sources */,
 				FF5C1CB12BE90CE300C097E9 /* gradientMethod.swift in Sources */,
 				FF662E342BECD43300FD9411 /* LinkConditions.swift in Sources */,
+				FFDBBA5A2BFF400400CBEF79 /* LesionLibrary.swift in Sources */,
+				FFDBBA582BFF3F8C00CBEF79 /* LogIn.swift in Sources */,
 				FFC1CEB12BBB22AA00FD49B7 /* TimerView.swift in Sources */,
 				FFC1CEB72BBB22AA00FD49B7 /* CaptureInfo.swift in Sources */,
 				FF5C1CA72BDF8F1700C097E9 /* modelLocation.swift in Sources */,
@@ -711,6 +740,7 @@
 				FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */,
 				FFC1CEB32BBB22AA00FD49B7 /* CaptureSampleApp.swift in Sources */,
 				FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */,
+				FFDB46862C022B5B005ECCF1 /* DatabaseManagement.swift in Sources */,
 				FF5C1CAB2BE026D400C097E9 /* smoothModel.swift in Sources */,
 				FFC1CEAF2BBB22AA00FD49B7 /* CameraViewModel.swift in Sources */,
 				FF662E362BECD60F00FD9411 /* LinkConditionCell.swift in Sources */,
@@ -718,10 +748,12 @@
 				FFC1CEAB2BBB22AA00FD49B7 /* Capture.swift in Sources */,
 				FFC1CEBE2BBB22AA00FD49B7 /* AsyncImageHelpers.swift in Sources */,
 				FFB13A812BAE183600A94673 /* AppDelegate.swift in Sources */,
+				FFDB468A2C023D5E005ECCF1 /* testSceneViewController.swift in Sources */,
 				FF5C1CAF2BE8D18C00C097E9 /* heightMap.swift in Sources */,
 				FFB13A832BAE183600A94673 /* SceneDelegate.swift in Sources */,
 				FF5C1C7E2BD2FA8E00C097E9 /* HapticDataPoint.swift in Sources */,
 				FFC1CEB62BBB22AA00FD49B7 /* CameraView.swift in Sources */,
+				FFDBBA602BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.swift in Sources */,
 				FF5C1C7A2BD2F99400C097E9 /* skinModelViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

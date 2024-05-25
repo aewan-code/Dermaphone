@@ -45,6 +45,7 @@ class skinmodel: UIViewController {
     var filterMax : SCNVector3?
     var smoothedCloud : [SCNVector3]?
     var transientCloud : [SCNVector3]?
+    var originalHeightMap : [[Float]]?
     
     
     ///UI - Functional Buttons
@@ -66,6 +67,7 @@ class skinmodel: UIViewController {
     @IBOutlet weak var sigmaSetting: UISlider!
     @IBOutlet weak var filterSetting: UIButton!
     @IBOutlet weak var kSetting: UISlider!
+    @IBOutlet weak var gradientHeightMap: UISegmentedControl!
     @IBOutlet weak var doneSettings: UIButton!
     
     ///UI - Coordinate Mode
@@ -134,7 +136,7 @@ class skinmodel: UIViewController {
     var minTransient : Float?
     
     var enhancedMap : [[Float]]?
-    
+    var gradientEffect : Bool = false
     
 
     override func viewDidLoad() {
@@ -148,8 +150,31 @@ class skinmodel: UIViewController {
                     fatalError("Unable to find baseNode")
                 }
         // Create and configure a haptic engine.
+        // Create a Cone Geometry
+         let coneGeometry = SCNCone(topRadius: 10, bottomRadius: 40, height: 10.0)
+        let gradient1 = gradientMethod()
         
-        sceneView.scene?.rootNode.addChildNode(baseNode)
+        
+         // Optionally, set materials for the cone
+         let material = SCNMaterial()
+        material.diffuse.contents = UIColor.blue
+         coneGeometry.materials = [material]
+
+         // Create a Node with the Cone Geometry
+         let coneNode = SCNNode(geometry: coneGeometry)
+        if (modelName == "triangle"){
+            sceneView.scene?.rootNode.addChildNode(coneNode)
+            coneNode.position = SCNVector3(0, 0, 0)
+            print("ALEERA")
+          //  print(gradient1.extractHeightMap(from: coneNode.geometry!, gridSizeX: 30, gridSizeZ: 30))
+            print("hi")
+            
+        }
+        else{
+            sceneView.scene?.rootNode.addChildNode(baseNode)
+            print("model name", modelName)
+        }
+      //
         do {
             engine = try CHHapticEngine()
         } catch let error {
@@ -171,7 +196,7 @@ class skinmodel: UIViewController {
         scene!.rootNode.addChildNode(ambientLightNode)
         
         cameraNode.camera = SCNCamera()
-
+        
         sceneView.cameraControlConfiguration.allowsTranslation = false
         sceneView.defaultCameraController.pointOfView?.position = SCNVector3(x: Float.pi/36, y: Float.pi/3, z: Float.pi/24)
         sceneView.defaultCameraController.pointOfView?.orientation = SCNQuaternion(-Float.pi/4, 0.0, 0.0, Float.pi/4)
@@ -235,6 +260,7 @@ class skinmodel: UIViewController {
      //   print("before")
       //  print(allVertices)
         //try print(extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
+        print("HELLO 1")
         let point1 = SCNVector3(x: 0.0, y: 6.0, z: 0.0)
         let indices: [Int32] = [
             0, 1, 2 // Triangle with vertices 0, 1, 2
@@ -254,6 +280,7 @@ class skinmodel: UIViewController {
         let url4 = URL.documentsDirectory.appendingPathComponent("vertices5.txt")
         
         do {
+            print("HELLO 2")
             let fileHandle = try FileHandle(forReadingFrom: url)
             let data = fileHandle.readDataToEndOfFile()
             fileHandle.closeFile()
@@ -277,7 +304,12 @@ class skinmodel: UIViewController {
         if self.modelName == "Basal Cell Carcinoma"{
             readingUrl = url4
         }
+        else if (self.modelName == "Test Model"){
+
+
+        }
         do {
+            print("HELLO 3")
             let fileHandle = try FileHandle(forReadingFrom: readingUrl)
             let data = fileHandle.readDataToEndOfFile()
             fileHandle.closeFile()
@@ -289,7 +321,9 @@ class skinmodel: UIViewController {
               //  print(modelVertices)
             let gradient = gradientMethod()
                 print("height map")
-                let height = gradient.createHeightMap(from: modelVertices ?? [], gridSize: 50)//113)
+                let height : [[Float]] = [[0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.25, 0.75, 1.25, 1.25, 0.75, 0.25, 0.0, 0.0], [0.0, 0.25, 1.25, 2.25, 3.25, 3.25, 2.25, 1.25, 0.25, 0.0], [0.0, 0.75, 2.25, 3.75, 4.75, 4.75, 3.75, 2.25, 0.75, 0.0], [0.0, 1.25, 3.25, 4.75, 5.0, 5.0, 4.75, 3.25, 1.25, 0.0], [0.25, 1.25, 3.25, 4.75, 5.0, 5.0, 4.75, 3.25, 1.25, 0.25], [0.0, 0.75, 2.25, 3.75, 4.75, 4.75, 3.75, 2.25, 0.75, 0.0], [0.0, 0.25, 1.25, 2.25, 3.25, 3.25, 2.25, 1.25, 0.25, 0.0], [0.0, 0.0, 0.25, 0.75, 1.25, 1.25, 0.75, 0.25, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0]]
+//gradient.createHeightMap(from: modelVertices ?? [], gridSize: 5)//113)
+                originalHeightMap = height
                 // Example usage
                 let sigma: Float = 1  // Adjust sigma as needed
                 let kernelSize = 7  // Ensure this is an odd number
@@ -297,6 +331,8 @@ class skinmodel: UIViewController {
                 enhancedMap = gradient.applyKernel(kernel: kernel, to: height)
                 //print(gradient.applySobelOperator(to: height))
                 print(enhancedMap)
+                
+                
                 maxPoint = modelVertices?.max(by: { $0.y < $1.y })
                 minPoint = modelVertices?.min(by: { $0.y < $1.y })
              //   let yValues = smoothedCloud?.map { $0.y }
@@ -308,7 +344,9 @@ class skinmodel: UIViewController {
         } catch {
             print("Error: \(error)")
         }
+        
         do {
+            print("HELLO 4")
             let fileHandle = try FileHandle(forReadingFrom: url2)
             let data = fileHandle.readDataToEndOfFile()
             fileHandle.closeFile()
@@ -332,14 +370,59 @@ class skinmodel: UIViewController {
         }catch{
             print("error deleting file")
         }*/
+        gradientEffect = false
         DispatchQueue.global(qos: .background).async{
            // let clouds = gaussMethod.smoothPointCloud(from: (self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry)!)
-       //     let allVertex = gaussMethod.storeExtractVertices(from: (self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry)!)
+          //  let allVertex = gaussMethod.storeExtractVertices(from: coneNode.geometry!)
+            
+            
             DispatchQueue.main.async{
-                print("smoothed:")
+              //  print("smoothed:")
             //    print(clouds.smoothed)
-                print("transient")
-          //      print(clouds.transient)
+            //    print("transient")
+                let gradient = gradientMethod()
+       /*         let gradient = gradientMethod()
+                let height : [[Float]] = [[0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.25, 0.75, 1.25, 1.25, 0.75, 0.25, 0.0, 0.0], [0.0, 0.25, 1.25, 2.25, 3.25, 3.25, 2.25, 1.25, 0.25, 0.0], [0.0, 0.75, 2.25, 3.75, 4.75, 4.75, 3.75, 2.25, 0.75, 0.0], [0.0, 1.25, 3.25, 4.75, 5.0, 5.0, 4.75, 3.25, 1.25, 0.0], [0.25, 1.25, 3.25, 4.75, 5.0, 5.0, 4.75, 3.25, 1.25, 0.25], [0.0, 0.75, 2.25, 3.75, 4.75, 4.75, 3.75, 2.25, 0.75, 0.0], [0.0, 0.25, 1.25, 2.25, 3.25, 3.25, 2.25, 1.25, 0.25, 0.0], [0.0, 0.0, 0.25, 0.75, 1.25, 1.25, 0.75, 0.25, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0]]
+//gradient.createHeightMap(from: allVertex ?? [], gridSize: 20)//113)
+                print("height map cone")
+                print(height)
+                let sigma: Float = 5  // Adjust sigma as needed
+                let kernelSize = 3  // Ensure this is an odd number
+                let kernel = gradient.mexicanHatKernel(size: kernelSize, sigma: sigma)
+                print("ricker wavelet")
+                print(gradient.applyKernel(kernel: kernel, to: height))
+                
+                print("gaussian")
+                print(gradient.applyGaussianToHeightMap(heightMap: height, k: 3, sigma: 5))
+                
+                print("gradient height map")
+                let temp = gradient.convertHeightMapToGradient(heightMap: height)
+                print(temp)
+                
+                print("second derivative")
+                print(gradient.convertHeightMapToGradient(heightMap: temp.0))
+                
+                print("sobel")
+                print(gradient.applySobelOperator(to: height))
+                
+                print("done")
+          //      print(clouds.transient)*/
+                print("CHECK HERE")
+               // let geom = gradient.createGeom()
+               // let node = SCNNode(geometry: geom)
+                let geom = self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry
+                
+                let geom1 = gradient.createCustomCone(top: SCNVector3(0, 0.5, 0), radius: 0.5, slices: 20)
+                let coneNode = SCNNode(geometry: geom1)
+               // self.scene?.rootNode.addChildNode(node)
+                let node = self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)
+                let transformedVertices = gradient.getTransformedVertices(node: node ?? coneNode)
+                let heightMap = gradient.createHeightMap4(from: transformedVertices, resolutionX: 80, resolutionZ: 80)
+
+                print("start")
+                print(heightMap)
+               // print(gradient.createHeightMap(from: geom ?? geom1, resolutionX: 128, resolutionZ: 128))
+                print("done")
             }
         }
        //print(gaussMethod.smoothPointCloud(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
@@ -634,7 +717,7 @@ class skinmodel: UIViewController {
                         previousPosition = modelLocation(xPos: position.x, yPos: position.y, zPos: position.z)
                        // if !(hapticTransient ?? true) && hapticsToggle && !palpationToggle{
                         if hapticsToggle && !palpationToggle{
-                            //continuous mode
+                      /*      //continuous mode
                             let tempGradient = gradientMethod()
                             let approxPoint = tempGradient.closestDistance(points: smoothedCloud ?? [], inputPoint: position, k: 1)[0]
                             //gets scaled height value between 1 and 0
@@ -650,7 +733,7 @@ class skinmodel: UIViewController {
                                 print("STARTED CONTINUOUS PLAYER")
                             } catch let error {
                                 print("Error starting the continuous haptic player: \(error)")
-                            }
+                            }*/
 
                            // let rotation = SCNQuaternion(x: 0.0, y: (position.y * Float.pi)/180, z: 0.0, w: (position.y * Float.pi)/180)
 
@@ -753,9 +836,9 @@ class skinmodel: UIViewController {
                     if !palpationToggle{
                        // if !(hapticTransient ?? true){
                             let tempGradient = gradientMethod()
-                            let approxPoint = tempGradient.closestDistance(points: smoothedCloud ?? [], inputPoint: position, k: 1)[0]
+               //            let approxPoint = tempGradient.closestDistance(points: smoothedCloud ?? [], inputPoint: position, k: 1)[0]
                             //gets scaled height value between 1 and 0
-                        var scaledValue = HeightMap().scaleValue(value: approxPoint.y, maxValue: maxContinuous ?? 1, minValue: minContinuous ?? 0)
+                        var scaledValue = Float(0)  // HeightMap().scaleValue(value: approxPoint.y, maxValue: maxContinuous ?? 1, minValue: minContinuous ?? 0)
                         print("filter name", self.filter)
                         
                         switch self.filter {
@@ -1623,10 +1706,24 @@ class skinmodel: UIViewController {
     }
     @IBAction func changedSettings(_ sender: Any) {
         hapticsSettings.isHidden = true
-        
+        if gradientHeightMap.selectedSegmentIndex == 0{
+            self.gradientEffect = true
+        }else{
+            self.gradientEffect = false
+        }
         switch filterSetting.currentTitle{
         case "None":
             self.filter = .none
+            let tempGradient = gradientMethod()
+            if self.gradientEffect{
+                let convertGradient = tempGradient.convertHeightMapToGradient(heightMap: originalHeightMap ?? [[]])
+                enhancedMap = convertGradient.0
+                
+                //HOW TO GET MAX VALUE?? -> DO I RETURN THE SCNVECTOR WITH X AND Z AS THE CONVERTED I AND J VALUES
+            }
+            else{
+                enhancedMap = originalHeightMap ?? [[]]
+            }
         case "Gaussian":
             self.filter = .gaussian
             self.kVal = Int(kSetting.value)
@@ -1639,7 +1736,9 @@ class skinmodel: UIViewController {
             }
             let tempGradient = gradientMethod()
             self.filterMax = tempGradient.applyGaussianFilter(to: maxPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
+            
             self.filterMin = tempGradient.applyGaussianFilter(to: minPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
+            
             print(self.filterMax)
             print(self.filterMin)
         case "Weighted Average":
@@ -1663,12 +1762,13 @@ class skinmodel: UIViewController {
             let tempGradient = gradientMethod()
             self.filterMax = tempGradient.applyMexicanHatFilter(to: maxPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
             self.filterMin = tempGradient.applyMexicanHatFilter(to: minPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
-            
+        case "Height Map":
+            self.filter = .heightMap
         default:
             return
         }
     }
-    func mapPointToHeightMap(hitResult: SCNHitTestResult, gridSize: Int) -> (Int, Int) {
+    func mapPointToHeightMap1(hitResult: SCNHitTestResult, gridSize: Int) -> (Int, Int) {
         let localPoint = hitResult.localCoordinates
         let (minBounds, maxBounds) = hitResult.node.boundingBox
         
@@ -1682,7 +1782,26 @@ class skinmodel: UIViewController {
         
         return (gridX, gridY)
     }
+    func mapPointToHeightMap(hitResult: SCNHitTestResult, gridSize: Int) -> (Int, Int) {
+        let localPoint = hitResult.localCoordinates
+        let (minBounds, maxBounds) = hitResult.node.boundingBox
 
+        // Normalize the x and z coordinates
+        let normalizedX = (localPoint.x - minBounds.x) / (maxBounds.x - minBounds.x)
+        let normalizedZ = (localPoint.z - minBounds.z) / (maxBounds.z - minBounds.z)
+
+        // Map to grid
+        let gridX = Int(normalizedX * Float(gridSize - 1))
+        let gridY = Int(normalizedZ * Float(gridSize - 1))
+
+        // Clamp the values to ensure they are within the grid bounds
+        let clampedGridX = max(0, min(gridX, gridSize - 1))
+        let clampedGridY = max(0, min(gridY, gridSize - 1))
+
+        return (clampedGridX, clampedGridY)
+    }
+
+    
     
 }
 

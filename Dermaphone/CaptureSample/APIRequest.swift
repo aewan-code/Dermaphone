@@ -86,7 +86,7 @@ struct APIRequest {
                     print(error)
                     return
                 }
-                print("success")
+                print(resp)
             }.resume()
         }catch{
             

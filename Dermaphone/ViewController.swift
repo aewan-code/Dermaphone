@@ -70,20 +70,7 @@ class ViewController: UIViewController {
     }
     
     private func addAlanTuring() async {
-      // [START add_alan_turing]
-      // Add a second document with a generated ID.
-   /*   do {
-        let ref = try await db.collection("users").addDocument(data: [
-          "first": "Alan",
-          "middle": "Mathison",
-          "last": "Turing",
-          "born": 1912
-        ])
-        print("Document added with ID: \(ref.documentID)")
-      } catch {
-        print("Error adding document: \(error)")
-      }
-      // [END add_alan_turing]*/
+
     }
     
     @IBAction func readUsersTouched(_ sender: Any) {

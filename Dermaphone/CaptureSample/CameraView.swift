@@ -124,11 +124,147 @@ struct ScanToolbarView: View {
                 Button(action: {
                     print("Pressed Done!")
                     withAnimation {
-                        let inputFolder = model.captureFolderState?.captureDir?.absoluteString
-                        let outputFile = CaptureFolderState.createModelDirectory()?.absoluteString
-                        let photogrammetry = HelloPhotogrammetry.init(inputFolder: inputFolder!, outputFilename: outputFile!)
-                        photogrammetry.run()
 
+                     /*  if let url = URL(string: "http://146.169.244.136:8002") {
+                            let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+                                if let error = error {
+                                    print("Error: \(error)")
+                                } else if let response = response as? HTTPURLResponse {
+                                    print("Status code: \(response.statusCode)")
+                                }
+                            }
+                            task.resume()
+                        }*/
+                        
+                        // Define the URL of the server endpoint
+                 /*       let urlString = "http://146.169.244.136:8002"
+
+                        // Create a URL object from the string
+                        guard let url = URL(string: urlString) else {
+                            print("Invalid URL")
+                            return
+                        }
+
+                        // Create a URLRequest with the URL
+                    //    var request = URLRequest(url: url)
+                      //  request.httpMethod = "POST" // Set the HTTP method to POST
+                      
+                    //    let folderPath = model.captureDir?.path
+                       // print(inputFolder?.completePath(caseSensitive: true))
+                        // Define the path to the folder you want to upload
+                        guard let folderPath = model.captureDir?.path else{
+                            return
+                        }
+                        print("image folder")
+                        print(model.captureDir?.path)
+                        print(folderPath)
+                        // Create a FileManager instance
+                        let fileManager = FileManager.default
+
+                        // Get the list of files in the folder
+                       /* if let fileURLs = try? fileManager.contentsOfDirectory(at: URL(fileURLWithPath: folderPath), includingPropertiesForKeys: nil, options: []) {
+                            // Iterate through each file URL
+                            for fileURL in fileURLs {
+                                // Create a data object from the contents of the file
+                                guard let fileData = try? Data(contentsOf: fileURL) else {
+                                    print("Failed to read file data for: \(fileURL.lastPathComponent)")
+                                    continue
+                                }
+                                print(request.httpMethod)
+                                
+                                
+                                
+                                // Create a URLSession
+                                let session = URLSession.shared
+                                
+                                // Create a data task with the URLRequest
+                                let task = session.dataTask(with: request) { data, response, error in
+                                    // Handle the response
+                                    if let error = error {
+                                        print("Error: \(error)")
+                                    } else if let response = response as? HTTPURLResponse {
+                                        print("Status code for \(fileURL.lastPathComponent): \(response.statusCode)")
+                                        if let data = data {
+                                            print("Response data: \(String(data: data, encoding: .utf8) ?? "")")
+                                        }
+                                    }
+                                }
+                                print(task.originalRequest?.httpMethod)
+                                print("sent message")
+                                // Start the data task
+                                task.resume()
+                            }
+                   //         let url = URL(string: address)!
+                            var request = URLRequest(url: url)
+                            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                            request.httpMethod = "POST"
+                            let encoder = JSONEncoder()
+                            
+                            let message = Message(id: 1, content: "Hello, world!")
+                            let data = try encoder.encode(message)
+                            request.httpBody = data
+                          /*  Task { @MainActor in
+                               /* do {
+                                    let (responseData, response) = try await URLSession.shared.upload(for: request, from: data)
+                                    // Handle successful response
+                                    print("Response: \(response)")
+                                    print("Response Data: \(responseData)")
+                                } catch {
+                                    // Handle error
+                                    print("Error during upload: \(error)")
+                                }*/
+                            }*/
+                            
+                        } else {
+                            print("Failed to get contents of folder")
+                        }*/
+                      var request = URLRequest(url: url)
+                       // request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                       request.httpMethod = "POST"
+                        //let encoder = JSONEncoder()
+                        
+                        let message = Message(id: 1, content: "Hello, world!")
+                        do {
+                            let encoder = JSONEncoder()
+                            let data = try encoder.encode(message)
+                  //          request.httpBody = data
+                            Task { @MainActor in
+                                do {
+                                    let (responseData, response) = try await URLSession.shared.upload(for: request, from: data)
+                                    print("hello")
+                                    // Handle successful response
+                                    print("Response: \(response)")
+                                    print("Response Data: \(responseData)")
+                                } catch {
+                                    // Handle error
+                                    print("Error during upload: \(error)")
+                                }
+                            }
+                            // Proceed with using the encoded data
+                        } catch {
+                            // Handle the error
+                            print("Error encoding message: \(error)")
+                        }
+                   //     let data = try encoder.encode(message)
+                        
+
+                     //   let inputFolder = model.captureFolderState?.captureDir?.absoluteString
+                      //  let outputFile = CaptureFolderState.createModelDirectory()?.absoluteString
+                    //    let photogrammetry = HelloPhotogrammetry.init(inputFolder: inputFolder!, outputFilename: outputFile!)
+                   //     photogrammetry.run()
+*/
+                        let message = Message(message: "My name is Aleera")
+                        let postRequest = APIRequest(endpoint: "upload")
+                       /* postRequest.send(message, completion: {result in
+                            switch result {
+                            case .success(let message):
+                                print("the message was sent")
+                            case .failure(let error):
+                                print("An error occured: ", error)
+                            }
+                            
+                        })*/
+                        postRequest.sendImage()
                     }
                 }) {
                     Text("Done")
@@ -343,5 +479,54 @@ struct ThumbnailImageView: View {
             .overlay(RoundedRectangle(cornerRadius: thumbnailFrameCornerRadius)
                         .stroke(Color.primary, lineWidth: thumbnailStrokeWidth))
             .shadow(radius: 10)
+    }
+}
+extension Dictionary {
+    func percentEncoded() -> Data? {
+        map { key, value in
+            let escapedKey = "\(key)".addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) ?? ""
+            let escapedValue = "\(value)".addingPercentEncoding(withAllowedCharacters: .urlQueryValueAllowed) ?? ""
+            return escapedKey + "=" + escapedValue
+        }
+        .joined(separator: "&")
+        .data(using: .utf8)
+    }
+}
+
+extension CharacterSet {
+    static let urlQueryValueAllowed: CharacterSet = {
+        let generalDelimitersToEncode = ":#[]@" // does not include "?" or "/" due to RFC 3986 - Section 3.4
+        let subDelimitersToEncode = "!$&'()*+,;="
+        
+        var allowed: CharacterSet = .urlQueryAllowed
+        allowed.remove(charactersIn: "\(generalDelimitersToEncode)\(subDelimitersToEncode)")
+        return allowed
+    }()
+}
+
+func getImagesFromFolder(folderPath: String){
+    let fileManager = FileManager.default
+    var imageList: [UIImage] = [] // Your list to hold UIImages
+    
+    // Get the list of files in the folder
+    if let fileURLs = try? fileManager.contentsOfDirectory(at: URL(fileURLWithPath: folderPath), includingPropertiesForKeys: nil, options: []) {
+        // Iterate through each file URL
+        for fileURL in fileURLs {
+            // Call the loadImage method to asynchronously load the image
+            ImageLoader.loadImage(url: fileURL)
+                .receive(on: DispatchQueue.main)
+                .sink(receiveCompletion: { completion in
+                    // Handle any completion (success or failure) if necessary
+                    switch completion {
+                    case .finished:
+                        print("Image loading completed.")
+                    case .failure(let error):
+                        print("Error loading image: \(error)")
+                    }
+                }, receiveValue: { image in
+                    // When the image is successfully loaded, append it to the imageList
+                    imageList.append(image)
+                })
+        }
     }
 }

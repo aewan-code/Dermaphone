@@ -13,7 +13,7 @@ class Haptics{
     //haptics end
     //haptics parameters
     let engine :  CHHapticEngine
-    var continuousPlayer: CHHapticAdvancedPatternPlayer!
+    var continuousPlayer: CHHapticAdvancedPatternPlayer?
     
     init(engine: CHHapticEngine) {
         self.engine = engine
@@ -69,16 +69,12 @@ class Haptics{
             }
     }
     func playHeightHaptic(height: Float){
-        //HEIGHT needs to be scaled proportional to range of heights, to be between 0 and 1
-     //   let scaledHeight = height - 12
-       // print(scaledHeight)
         let hapticDict = [
             CHHapticPattern.Key.pattern: [
                 [
                     CHHapticPattern.Key.event: [
                         CHHapticPattern.Key.eventType: CHHapticEvent.EventType.hapticTransient,
                         CHHapticPattern.Key.time: CHHapticTimeImmediate,
-                     //   CHHapticPattern.Key.eventDuration: 0.00001,
                         CHHapticPattern.Key.eventParameters: [
                             [
                                 CHHapticPattern.Key.parameterID: CHHapticEvent.ParameterID.hapticIntensity,
@@ -115,6 +111,12 @@ class Haptics{
     //from hapticpalette code
     /// - Tag: CreateContinuousPattern
     func createContinuousHapticPlayer(initialIntensity : Float, initialSharpness : Float) {
+        do {
+                try engine.start()
+            } catch let error {
+                print("Failed to start haptic engine: \(error)")
+                return
+            }
         // Create an intensity parameter:
         let intensity = CHHapticEventParameter(parameterID: .hapticIntensity,
                                                value: initialIntensity)
@@ -140,7 +142,7 @@ class Haptics{
             print("Pattern Player Creation Error: \(error)")
         }
         
-        continuousPlayer.completionHandler = { _ in
+        continuousPlayer?.completionHandler = { _ in
             DispatchQueue.main.async {
                 // Restore original color.
                 //  self.continuousPalette.backgroundColor = self.padColor

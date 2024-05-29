@@ -1,8 +1,22 @@
 import uuid
+import firebase_admin.storage
 from flask import Flask, request, jsonify
 import os
 from werkzeug.utils import secure_filename
 import subprocess
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+from firebase_admin import storage
+from google.cloud import storage
+from google.oauth2 import service_account
+
+# Fetch the service account key JSON file contents
+cred = credentials.Certificate('/Users/ace20/dermaphonePython/dermaphone-d131b-firebase-adminsdk-fki8j-fcab73ef6d.json')
+firebase_admin.initialize_app(cred, {
+    'storageBucket': 'dermaphone-d131b.appspot.com'
+})
+bucket = firebase_admin.storage.bucket()
 
 
 app = Flask(__name__)
@@ -10,6 +24,22 @@ UPLOAD_FOLDER = 'images'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 OUTPUT_FOLDER = 'output'
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
+# Generate a unique UUID
+download_token = str(uuid.uuid4())
+
+def upload_file_with_token(file_path, destination_blob_name):
+    blob = bucket.blob(destination_blob_name)
+    
+    # Define metadata with download token
+    blob.metadata = {
+        'firebaseStorageDownloadTokens': download_token
+    }
+    
+    # Upload the file
+    blob.upload_from_filename(filename=file_path)
+    print(f"File {file_path} uploaded to {destination_blob_name} with download token.")
+
+
 def create_upload_folder():
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
@@ -147,6 +177,9 @@ def upload():
             if success:
                 print("success")
                 usdzfile = output_folder_path + '/baked_mesh.usdz'
+
+                storageName = "processingModels/" + senderName + '.usdz'
+                upload_file_with_token(usdzfile, storageName)
                 return jsonify({'success': 'converted file', 'details': success}), 200
         except Exception as e:
             print(f"An error occurred when trying to run the script: {e}")
@@ -156,3 +189,5 @@ def upload():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8000)
+
+

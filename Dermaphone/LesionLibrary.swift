@@ -35,14 +35,16 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
     }
 
     func createModels(){
-        let testModel = SkinCondition(name: "Test Model", description: "", texture: "", symptoms: "", treatment: "", modelName: "triangle", images: [], modelFile: "tri.scn", similarConditions: [], notes: "", urgency: "Test")
+      //  let testModel = SkinCondition(name: "Test Model", description: "", texture: "", symptoms: "", treatment: "", modelName: "triangle", images: [], modelFile: "tri.scn", similarConditions: [], notes: "", urgency: "Test")
         let skin3Model = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma. Crusty rough spots", urgency: "Precancerous")
         let skin2Model = SkinCondition(name: "Basal Cell Carcinoma", description: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun", texture: "", symptoms: "recurring sore that bleeds and heals", treatment: "", modelName: "Mesh", images: [], modelFile: "test2scene.scn", similarConditions: [(skin3Model, "link to cancer")], notes: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun.", urgency: "Cancerous")
         if let image1 = UIImage(named: "IMG_3929") {
             skin3Model.image?.append(image1)
-            print("yes")
         }
-        data.append(testModel)
+        if let image2 = UIImage(named: "BasalImage") {
+            skin2Model.image?.append(image2)
+        }
+     //   data.append(testModel)
         data.append(skin3Model)
         data.append(skin2Model)
     }

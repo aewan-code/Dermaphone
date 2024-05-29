@@ -54,7 +54,7 @@ class skinmodel: UIViewController {
     @IBOutlet weak var RotateToggle: UIButton!
     @IBOutlet weak var SelectPivot: UIButton!
     @IBOutlet weak var recordHaptic: UIButton!
-    @IBOutlet weak var smoothButton: UIButton!
+//    @IBOutlet weak var smoothButton: UIButton!
     @IBOutlet weak var hapticMethod: UISegmentedControl!
 
 
@@ -229,7 +229,6 @@ class skinmodel: UIViewController {
         view.bringSubviewToFront(xScale)
         view.bringSubviewToFront(yScale)
         view.bringSubviewToFront(zScale)
-        view.bringSubviewToFront(smoothButton)
         view.bringSubviewToFront(hapticsButton)
         view.bringSubviewToFront(settingsButton)
         view.bringSubviewToFront(hapticsSettings)
@@ -537,16 +536,16 @@ class skinmodel: UIViewController {
         return vectorList
     }
     
-    @IBAction func applyGaussian(_ sender: Any) {
+/*    @IBAction func applyGaussian(_ sender: Any) {
         if !gradientToggle{
             gradientToggle = true
-            smoothButton.tintColor = .green
+       //     smoothButton.tintColor = .green
         }
         else{
             gradientToggle = false
-            smoothButton.tintColor = .blue
+          //  smoothButton.tintColor = .blue
         }
-    }
+    }*/
   /*  func applyGaussian(){
 
     }*/
@@ -1161,7 +1160,7 @@ class skinmodel: UIViewController {
         similarButton.isHidden = true
         recordHaptic.isHidden = true
         settingsButton.isHidden = true
-        smoothButton.isHidden = true
+   //     smoothButton.isHidden = true
         palpationOption.isHidden = true
         hapticMethod.isHidden = true
         sceneView.debugOptions = SCNDebugOptions(rawValue: 2048)//shows the grid
@@ -1196,7 +1195,7 @@ class skinmodel: UIViewController {
         similarButton.isHidden = false
         recordHaptic.isHidden = false
         settingsButton.isHidden = false
-        smoothButton.isHidden = false
+  //      smoothButton.isHidden = false
         palpationOption.isHidden = false
         hapticMethod.isHidden = false
         hideAxes()

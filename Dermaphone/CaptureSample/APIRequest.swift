@@ -71,13 +71,13 @@ struct APIRequest {
         }
     }
     
-    func sendImage(){
+    func sendImage(imageList: [UIImage], lesionName: String){
         do{
             var urlRequest = URLRequest(url: resourceURL)
             urlRequest.httpMethod = "POST"
             urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
             urlRequest.setValue("multipart/form-data; boundary=" + self.boundary, forHTTPHeaderField: "Content-Type")
-            let requestBody = self.multipartFormDataBody(self.boundary, "Aleera", imageArray)
+            let requestBody = self.multipartFormDataBody(self.boundary, lesionName, imageList)
             urlRequest.httpBody = requestBody
             
             URLSession.shared.dataTask(with: urlRequest){

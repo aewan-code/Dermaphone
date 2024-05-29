@@ -11,16 +11,17 @@ class SkinCondition{
     let name : String
     let description : String?//are they required when creating the skin condition package?
     var image : [UIImage]?
-    let texture : String?//features e.g. colour
-    let symptoms : String?
-    let treatment: String?
+    var texture : String?//features e.g. colour
+    var symptoms : String?
+    var treatment: String?
     let modelName : String
     let modelFile : String
-    let similarConditions : [(SkinCondition, String)]?
-    let notes : String?
+    var similarConditions : [(SkinCondition, String)]?
+    var notes : String?
+    var heightMap : [[Float]]
     let urgency : String?
  //   let model : [skinmodel]//Should this be a view controller? List of all models that are this skin condition
-    init(name : String, description : String, texture : String, symptoms : String, treatment : String, modelName : String, images : [UIImage], modelFile : String, similarConditions : [(SkinCondition, String)], notes : String, urgency : String ){
+    init(name : String, description : String, texture : String, symptoms : String, treatment : String, modelName : String, images : [UIImage], modelFile : String, similarConditions : [(SkinCondition, String)], notes : String, urgency : String, heightMap : [[Float]] ){
         self.name = name
         self.description = description
         self.texture = texture
@@ -32,6 +33,7 @@ class SkinCondition{
         self.similarConditions = similarConditions
         self.notes = notes
         self.urgency = urgency
+        self.heightMap = heightMap
     }
     
     //set image - either from gallery or from camera or from model (screenshot) (ideally needs to be top down view). Can it get dermnet image maybe?
@@ -53,4 +55,5 @@ class SkinCondition{
     func removeConditionLink(){
         
     }
+    
 }

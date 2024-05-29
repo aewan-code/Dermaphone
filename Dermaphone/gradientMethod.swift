@@ -921,6 +921,37 @@ class gradientMethod{
 
         return heightMap
     }
+    
+    func fillNaNWithClosest(heightMap: inout [[Float]]) {
+        let rows = heightMap.count
+        let cols = heightMap[0].count
+        let directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  // Directions: right, down, left, up
+        var queue = Queue<(Int, Int, Float)>()
+
+        // Enqueue all non-NaN positions
+        for i in 0..<rows {
+            for j in 0..<cols {
+                if !heightMap[i][j].isNaN {
+                    queue.enqueue((i, j, heightMap[i][j]))
+                }
+            }
+        }
+
+        // Process the queue
+        while !queue.isEmpty {
+            if let (x, y, value) = queue.dequeue() {
+                for (dx, dy) in directions {
+                    let nx = x + dx
+                    let ny = y + dy
+                    // Ensure the new position is within bounds and is NaN
+                    if nx >= 0 && nx < rows && ny >= 0 && ny < cols && heightMap[nx][ny].isNaN {
+                        heightMap[nx][ny] = value  // Assign the closest non-NaN value
+                        queue.enqueue((nx, ny, value))  // Add the new position to the queue
+                    }
+                }
+            }
+        }
+    }
 
 
 
@@ -936,5 +967,22 @@ extension SCNVector3 {
         let glkMatrix = SCNMatrix4ToGLKMatrix4(transform)
         let glkVector = GLKMatrix4MultiplyVector3WithTranslation(glkMatrix, GLKVector3Make(x, y, z))
         return SCNVector3(glkVector.x, glkVector.y, glkVector.z)
+    }
+}
+
+struct Queue<Element> {
+    private var elements: [Element] = []
+
+    mutating func enqueue(_ element: Element) {
+        elements.append(element)
+    }
+
+    mutating func dequeue() -> Element? {
+        guard !elements.isEmpty else { return nil }
+        return elements.removeFirst()
+    }
+
+    var isEmpty: Bool {
+        elements.isEmpty
     }
 }

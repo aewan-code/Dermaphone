@@ -14,6 +14,8 @@ struct CameraView: View {
     
     @ObservedObject var model: CameraViewModel
     @State private var showInfo: Bool = false
+
+
     
     let aspectRatio: CGFloat = 4.0 / 3.0
     let previewCornerRadius: CGFloat = 15.0
@@ -103,6 +105,9 @@ struct ScanToolbarView: View {
     @ObservedObject var model: CameraViewModel
     @Binding var showInfo: Bool
     
+    @State private var showingAlert = false
+    @State private var userInput = ""
+    
     var body: some View {
         ZStack {
             HStack {
@@ -122,24 +127,32 @@ struct ScanToolbarView: View {
                 }
                 Spacer()
                 Button(action: {
-                    print("Pressed Done!")
                     withAnimation {
-
-                        guard let inputFolder = model.captureFolderState?.captureDir?.path(percentEncoded: false) else{
-                            return
-                        }
-                        
-                        print("images")
-                        let imageList = getImagesFromFolder(folderPath: inputFolder)
-                        print("imagecount", imageList.isEmpty )
-                        let message = Message(message: "My name is Aleera")
-                        let postRequest = APIRequest(endpoint: "upload")
-                        postRequest.sendImage()
+                        showingAlert = true
                     }
-                }) {
+                }
+                )
+                {
                     Text("Done")
                         .foregroundColor(Color.blue)
-                }
+                }.alert("What is the name of the skin lesion?", isPresented: $showingAlert) {
+                    TextField("Skin lesion: ", text: $userInput).foregroundStyle(.black)
+                    Button("Submit") {
+                        print("Pressed Done!")
+                        withAnimation {
+                            guard let inputFolder = model.captureFolderState?.captureDir?.path(percentEncoded: false) else{
+                                return
+                            }
+                            let lesionName = userInput
+                            let imageList = getImagesFromFolder(folderPath: inputFolder)
+                            let postRequest = APIRequest(endpoint: "upload")
+                            postRequest.sendImage(imageList: imageList, lesionName: lesionName)
+                        }
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } /*message: {
+                    Text("Please enter some text.")
+                }*/
             }
             
             if showInfo {
@@ -378,8 +391,8 @@ func getImagesFromFolder(folderPath: String) -> [UIImage]{
     let fileManager = FileManager.default
     var imageList: [UIImage] = [] // Your list to hold UIImages
     let allPaths = Bundle.main.paths(forResourcesOfType: nil, inDirectory: nil)
-    let imageExtensions = ["jpg", "png", "heic", "jpeg"]
-    //let imageExtensions = ["jpg", "png", "heic", "jpeg", "tif"] -> to include depth data
+    //let imageExtensions = ["jpg", "png", "heic", "jpeg"]
+    let imageExtensions = ["jpg", "png", "heic", "jpeg", "tif"]// -> to include depth data
     // Get the list of files in the folder
     if let fileURLs = try? fileManager.contentsOfDirectory(atPath: folderPath) {
         // Iterate through each file URL

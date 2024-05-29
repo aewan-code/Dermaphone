@@ -19,7 +19,7 @@ class ViewController: UIViewController {
     var db: Firestore!
     @IBOutlet weak var addUsers: UIButton!
     @IBOutlet weak var addModel: UIButton!
-    var currentModel : SkinCondition = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "", urgency: "")
+   // var currentModel : SkinCondition = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "", urgency: "")
     //Change currentModel so that if no models have been created either portrays a test one or presents a popup
     var skinConditions : [SkinCondition] = []
     @IBOutlet weak var ViewModel: UIButton!
@@ -27,7 +27,7 @@ class ViewController: UIViewController {
         guard let vc = storyboard?.instantiateViewController(withIdentifier: "skinmodel") as? skinmodel else {
             return
         }
-        vc.set(model: currentModel)
+    //    vc.set(model: currentModel)
         print("check")
         navigationController?.pushViewController(vc, animated: true)
     }
@@ -103,7 +103,7 @@ class ViewController: UIViewController {
                 for condition in self.skinConditions{
                     if action.title == condition.name{
                         foundCondition = true
-                        self.currentModel = condition
+                  //      self.currentModel = condition
                     }
                     
                 }
@@ -127,15 +127,15 @@ class ViewController: UIViewController {
     //this will later be 'loadModels' - to be loaded from the database
     func createModels(){
         
-        let skin3Model = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma. Crusty rough spots", urgency: "Precancerous")
-        let skin2Model = SkinCondition(name: "Basal Cell Carcinoma", description: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun", texture: "", symptoms: "recurring sore that bleeds and heals", treatment: "", modelName: "Mesh", images: [], modelFile: "test2scene.scn", similarConditions: [(skin3Model, "link to cancer")], notes: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun.", urgency: "Cancerous")
-        if let image1 = UIImage(named: "IMG_3929") {
+            //let skin3Model = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma. Crusty rough spots", urgency: "Precancerous")
+   //     let skin2Model = SkinCondition(name: "Basal Cell Carcinoma", description: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun", texture: "", symptoms: "recurring sore that bleeds and heals", treatment: "", modelName: "Mesh", images: [], modelFile: "test2scene.scn", similarConditions: [(skin3Model, "link to cancer")], notes: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun.", urgency: "Cancerous")
+    /*    if let image1 = UIImage(named: "IMG_3929") {
             skin3Model.image?.append(image1)
             print("yes")
         }
         
         skinConditions.append(skin3Model)
-        skinConditions.append(skin2Model)
+        skinConditions.append(skin2Model)*/
     }
     
     @IBAction func addedModel(_ sender: Any) {

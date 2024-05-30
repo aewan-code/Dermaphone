@@ -44,20 +44,15 @@ class testSceneViewController: UIViewController {
                                                                 ambientLightNode.light = ambientLight
                                                                 mainScene.rootNode.addChildNode(ambientLightNode)
                                                                 self.sceneView.allowsCameraControl = true
-                                                                self.sceneView.backgroundColor = UIColor.black
+                                                              //  self.sceneView.backgroundColor = UIColor.black
                                                               
                                                                 
                                                             }
-                                                            // Optionally, update your UI or handle the file (e.g., display the image)
-                                                        
-                        // Optionally, update your UI or handle the file (e.g., display the image)
                     } else {
                         print("Failed to download the file.")
                     }
                 }
             }
-
-
         }
        
 

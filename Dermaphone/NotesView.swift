@@ -13,6 +13,7 @@ class NotesView : UIViewController {
     @IBOutlet weak var NotesTitle: UILabel!
     var editMode = false
     var labelTitle : String?
+    var notesType : String?
     var textContent : String?
     @IBOutlet weak var text: UITextView!
     @IBOutlet weak var editButton: UIButton!
@@ -31,6 +32,7 @@ class NotesView : UIViewController {
     //edge case - sort out clicking similar conditions
     func set(condition : SkinCondition, type : String){
         self.condition = condition
+        self.notesType = type
         switch type {
         case "Notes":
             labelTitle = "Clinical Notes"
@@ -55,6 +57,17 @@ class NotesView : UIViewController {
          //   editButton.isHighlighted = false
             editButton.backgroundColor = .blue
             editButton.tintColor = .blue
+            switch notesType {
+            case "Notes":
+                break
+            case "Treatment":
+                break
+            case "Symptoms":
+                break
+            default://should never enter this
+                break//how to change model's value
+            }
+            
         }
         else{
             editMode = true

@@ -6,6 +6,10 @@
 //
 import RealityKit
 import UIKit
+import FirebaseCore
+import FirebaseFirestore
+import FirebaseAuth
+import FirebaseStorage
 
 class LesionLibrary: UIViewController, UITableViewDataSource{
 
@@ -15,6 +19,10 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
     }
 
     var sourceType: SourceType?
+    
+
+    
+    
     
     @IBOutlet weak var table: UITableView!
     var data : [SkinCondition] = []
@@ -33,17 +41,25 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        createModels()
-        table.register(LesionLibraryTableViewCell.nib(), forCellReuseIdentifier: LesionLibraryTableViewCell.identifier)
-        table.dataSource = self
+      //  createModels()
+
         // Do any additional setup after loading the view.
         configureBasedOnSource()
+        Task {
+            await loadModels()
+            if sourceType == .consultant{
+                await loadNewModels()
+            }
+        }
+
+
+        
     }
 
     func createModels(){
       //  let testModel = SkinCondition(name: "Test Model", description: "", texture: "", symptoms: "", treatment: "", modelName: "triangle", images: [], modelFile: "tri.scn", similarConditions: [], notes: "", urgency: "Test")
-        let skin3Model = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma. Crusty rough spots", urgency: "Precancerous", heightMap: [[]])
-        let skin2Model = SkinCondition(name: "Basal Cell Carcinoma", description: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun", texture: "", symptoms: "recurring sore that bleeds and heals", treatment: "", modelName: "Mesh", images: [], modelFile: "test2scene.scn", similarConditions: [(skin3Model, "link to cancer")], notes: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun.", urgency: "Cancerous", heightMap: [[]])
+        let skin3Model = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma. Crusty rough spots", urgency: "Precancerous", heightMap: [[]], isCreated: true)
+        let skin2Model = SkinCondition(name: "Basal Cell Carcinoma", description: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun", texture: "", symptoms: "recurring sore that bleeds and heals", treatment: "", modelName: "Mesh", images: [], modelFile: "test2scene.scn", similarConditions: [(skin3Model, "link to cancer")], notes: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun.", urgency: "Cancerous", heightMap: [[]], isCreated: true)
         if let image1 = UIImage(named: "IMG_3929") {
             skin3Model.image?.append(image1)
         }
@@ -67,9 +83,6 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
     }
     */
     
-    func getModels(){
-        
-    }
     
     private func configureBasedOnSource() {
         print(sourceType)
@@ -86,6 +99,89 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
                 break
             }
         }
+    
+    func loadModels() async{
+        
+        let db = Firestore.firestore()
+        var skinConditions : [SkinCondition] = []
+        do {
+            let querySnapshot = try await db.collection("models").getDocuments()
+          for document in querySnapshot.documents {
+            print("\(document.documentID) => \(document.data())")
+              print(type(of: document.data()["name"]))
+              if let name = document.data()["name"] as? String,
+                       let severity = document.data()["urgency"] as? String,
+                       let symptoms = document.data()["symptoms"] as? String,
+                       let treatment = document.data()["treatment"] as? String,
+                       let notes = document.data()["clinical notes"] as? String,
+                       let modelName = document.data()["modelName"] as? String,
+                       let modelFile = document.data()["modelFile"] as? String
+                {
+                  print("check conditions created")
+                  let condition = SkinCondition(name: name, description: "", texture: "", symptoms: symptoms, treatment: treatment, modelName: modelName, images: [], modelFile: modelFile, similarConditions: [], notes: notes, urgency: severity, heightMap: [[]], isCreated: true)
+                  skinConditions.append(condition)
+              }
+          }
+            DispatchQueue.main.async {
+                           // Ensure UI updates are on the main thread
+                           //self.updateModelList()
+                self.data = skinConditions
+                print(self.data)
+                self.table.register(LesionLibraryTableViewCell.nib(), forCellReuseIdentifier: LesionLibraryTableViewCell.identifier)
+                self.table.dataSource = self
+                       }
+        } catch {
+          print("Error getting documents: \(error)")
+            DispatchQueue.main.async {
+                           // Ensure UI updates are on the main thread
+                           self.errorUI()
+                       }
+        }
+
+    }
+    
+    func loadNewModels() async{
+        let storage = Storage.storage()
+        let storageReference = storage.reference().child("processingModels")
+        var skinConditions : [SkinCondition] = []
+        do {
+          let result = try await storageReference.listAll()
+          for prefix in result.prefixes {
+              
+            // The prefixes under storageReference.
+            // You may call listAll(completion:) recursively on them.
+          }
+          for item in result.items {
+              print(item.name)
+              var name = item.name
+              if let dotRange = name.range(of: ".") {
+                name.removeSubrange(dotRange.lowerBound..<name.endIndex)
+              }
+              let condition = SkinCondition(name: name, description: "", texture: "", symptoms: "", treatment: "", modelName: "", images: [], modelFile: "", similarConditions: [], notes: "", urgency: "", heightMap: [[]], isCreated: false)
+              skinConditions.append(condition)
+            // The items under storageReference.
+          }
+            DispatchQueue.main.async {
+                           // Ensure UI updates are on the main thread
+                           //self.updateModelList()
+                self.data.append(contentsOf: skinConditions)
+                print(self.data)
+                self.table.register(LesionLibraryTableViewCell.nib(), forCellReuseIdentifier: LesionLibraryTableViewCell.identifier)
+                self.table.dataSource = self
+                       }
+        } catch {
+          // ...
+        }
+    }
+    
+    func updateModelList(){
+        
+        
+    }
+    
+    func errorUI(){
+        
+    }
 
 }
 

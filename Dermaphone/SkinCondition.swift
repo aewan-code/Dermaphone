@@ -20,8 +20,9 @@ class SkinCondition{
     var notes : String?
     var heightMap : [[Float]]
     let urgency : String?
+    var isCreated : Bool
  //   let model : [skinmodel]//Should this be a view controller? List of all models that are this skin condition
-    init(name : String, description : String, texture : String, symptoms : String, treatment : String, modelName : String, images : [UIImage], modelFile : String, similarConditions : [(SkinCondition, String)], notes : String, urgency : String, heightMap : [[Float]] ){
+    init(name : String, description : String, texture : String, symptoms : String, treatment : String, modelName : String, images : [UIImage], modelFile : String, similarConditions : [(SkinCondition, String)], notes : String, urgency : String, heightMap : [[Float]], isCreated : Bool ){
         self.name = name
         self.description = description
         self.texture = texture
@@ -34,6 +35,7 @@ class SkinCondition{
         self.notes = notes
         self.urgency = urgency
         self.heightMap = heightMap
+        self.isCreated = isCreated
     }
     
     //set image - either from gallery or from camera or from model (screenshot) (ideally needs to be top down view). Can it get dermnet image maybe?

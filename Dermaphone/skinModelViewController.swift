@@ -12,6 +12,8 @@ import CoreHaptics
 import SwiftUI
 import simd
 import SceneKit.ModelIO
+import FirebaseFirestore
+import FirebaseStorage
 
 
 enum FilterType: String {
@@ -25,6 +27,7 @@ enum FilterType: String {
 class skinmodel: UIViewController {
     var activityIndicator: UIActivityIndicatorView!
         var modelLoaded = false
+    @IBOutlet weak var saveButton: UIButton!
     var filter : FilterType = .none//save type
     var kVal : Int = 5
     var sigmaVal : Float = 1
@@ -208,40 +211,7 @@ class skinmodel: UIViewController {
 
             //   scene = SCNScene(named: modelFile ?? "test2scene.scn")
         let database = DatabaseManagement()
-        let sceneURL = database.localFileURL(for: "scene.usdz", directory: .documentDirectory)
-        
-   //     scene = loadScene(from: sceneURL)
-  //      print("check scene exists")
-    //    print(scene?.rootNode.childNode(withName: "Mesh", recursively: true))
-    /*    guard let baseNode = scene?.rootNode.childNode(withName: "Mesh", recursively: true) else {
-                 fatalError("Unable to find baseNode")
-                }*/
-        // Create and configure a haptic engine.
-        // Create a Cone Geometry
-         let coneGeometry = SCNCone(topRadius: 10, bottomRadius: 40, height: 10.0)
-        let gradient1 = gradientMethod()
-        
-        
-         // Optionally, set materials for the cone
-         let material = SCNMaterial()
-        material.diffuse.contents = UIColor.blue
-         coneGeometry.materials = [material]
 
-         // Create a Node with the Cone Geometry
-         let coneNode = SCNNode(geometry: coneGeometry)
-        if (modelName == "triangle"){
-            sceneView.scene?.rootNode.addChildNode(coneNode)
-            coneNode.position = SCNVector3(0, 0, 0)
-            print("ALEERA")
-          //  print(gradient1.extractHeightMap(from: coneNode.geometry!, gridSizeX: 30, gridSizeZ: 30))
-            print("hi")
-            
-        }
-        else{
-        //    sceneView.scene?.rootNode.addChildNode(baseNode)
-            print("model name", modelName)
-        }
-      //
         do {
             engine = try CHHapticEngine()
         } catch let error {
@@ -276,14 +246,8 @@ class skinmodel: UIViewController {
         hideAxes()
         navBar.title = "Skin Lesion: \(self.condition?.name ?? "")"
         navBar.titleView?.isHidden = false
-        let point1 = SCNVector3(x: 0.0, y: 6.0, z: 0.0)
-        let indices: [Int32] = [
-            0, 1, 2 // Triangle with vertices 0, 1, 2
-        ]
-        let points = [point1, SCNVector3(x: 0.1, y: 5.7, z: 0.0), SCNVector3(x: -0.1, y: 5.7, z: 0.0), SCNVector3(x: 0.2, y: 6.2, z: 0.0)]
-        let testSource = SCNGeometrySource(vertices: points)
-        let testElement = SCNGeometryElement(indices: indices, primitiveType: .triangles)
         gradientEffect = false
+
      /*  DispatchQueue.global(qos: .background).async{
             
             
@@ -1811,14 +1775,173 @@ class skinmodel: UIViewController {
                     print("check node is there")
                     print(self.sceneView.scene?.rootNode)
                     self.setupSceneView()
+                    if ((self.condition?.heightMap.isEmpty) != nil){
+                        self.hapticsButton.isEnabled = false
+                        DispatchQueue.global(qos: .background).async{
+                            
+                                let gradient = gradientMethod()
+                                guard let node = self.scene?.rootNode.childNode(withName: "Mesh", recursively: true) else {
+                                    self.showError("Failed to get model geometry")
+                                    return
+                                    //print error message
+                                }
+                                let transformedVertices = gradient.getTransformedVertices(node: node)
+                                var heightMap = gradient.createHeightMap4(from: transformedVertices, resolutionX: 80, resolutionZ: 80)//dynamically change ratio
+                            let minVal = findMinElement(in: heightMap)
+                            let maxVal = findMaxElement(in: heightMap)
+                            DispatchQueue.main.async{
+                                print("start")
+                                print(heightMap)
+                                self.originalHeightMap = heightMap
+                                self.enhancedMap = heightMap
+                                self.maxHeight = maxVal
+                                print("max", self.maxHeight)
+                                self.minHeight = minVal
+                                print("min", self.minHeight)
+                                self.hapticsButton.isEnabled = true
+                            }
+                            
+                        }
+                    }
+                    else{
+                        self.originalHeightMap = self.condition?.heightMap
+                    }
                 } else {
                     print("Failed to download the file.")
                     self.showError("Failed to download the model.")
                 }
             }
         }
+        
+        
+    }
+    func convertFlatArrayTo2D(flatArray: [Float], rows: Int, columns: Int) -> [[Float]] {
+        var heightMap = [[Float]]()
+        for row in 0..<rows {
+            let start = row * columns
+            let end = start + columns
+            let rowData = Array(flatArray[start..<end])
+            heightMap.append(rowData)
+        }
+        return heightMap
     }
     
+    func flattenHeightMap1(heightMap: [[Float]]) -> [Float] {
+        return heightMap.flatMap { $0 }
+    }
+    func flattenHeightMap(heightMap: [[Float]]) -> [Float] {
+        return heightMap.flatMap { row in row.map { $0.isNaN ? 0 : $0 } }
+    }
+
+    func storeHeightMap(heightMap: [[Float]]) -> ([Float], Int, Int) {
+        let flatArray = flattenHeightMap(heightMap: heightMap)
+        let rows = heightMap.count
+        let columns = heightMap.first?.count ?? 0
+
+        let data: [String: Any] = [
+            "flatHeightMap": flatArray,
+            "rows": rows,
+            "columns": columns
+        ]
+        return (flatArray, rows, columns)
+
+    }
+
+    
+    @IBAction func savePressed(_ sender: Any) {
+        //update model file values on database
+        let db = Firestore.firestore()
+        guard let conditionName = self.condition?.name else{
+            showError("Error saving file")
+            return
+        }
+        guard let map = self.enhancedMap else{
+            showError("Error saving haptic data")
+            return
+        }
+        let convertedMap = storeHeightMap(heightMap: map)
+        if self.condition?.isCreated == false{
+            //create model
+            //move file from processingmodels to models
+            let lesion = databaseCondition(name: conditionName, urgency: self.condition?.urgency, symptoms: self.condition?.symptoms, clinicalNotes: self.condition?.notes, treatment: self.condition?.treatment, heightmap: convertedMap.0, rows: convertedMap.1, columns: convertedMap.2)
+            //also adding similar conditions logic
+            do {
+                try db.collection("models").document(conditionName).setData(from: lesion)
+            } catch let error {
+                print("Error writing city to Firestore: \(error)")
+                showError("Error saving file")
+                
+            }
+            DispatchQueue.global(qos: .background).async{
+                self.moveModelStorage()
+            }
+
+        }else{
+            //update existing values -> height map
+            let modelRef = db.collection("models").document(conditionName)
+            DispatchQueue.global(qos: .background).async {
+                // Set the "capital" field of the city 'DC'
+                modelRef.updateData([
+                    "heightmap": convertedMap.0,
+                    "rows": convertedMap.1,
+                    "columns": convertedMap.2
+                ]) { error in
+                    if let error = error {
+                        print("Error updating document: \(error.localizedDescription)")
+                        
+                    } else {
+                        print("Document successfully updated")
+                    }
+                }
+            }
+
+        }
+        
+    }
+    
+    func moveModelStorage(){
+        let storage = Storage.storage()
+        let storageRef = storage.reference()
+        // File located on disk
+   //     let localFile = URL(string: "path/to/image")!
+        let database = DatabaseManagement()
+        let localFile = database.localFileURL(for: "scene.usdz", directory: .documentDirectory)
+        let newUrl = "models/" + (self.condition?.name ?? "") + ".usdz"
+        // Create a reference to the file you want to upload
+        let modelRef = storageRef.child(newUrl)
+
+        // Upload the file to the path "images/rivers.jpg"
+        let uploadTask = modelRef.putFile(from: localFile, metadata: nil) { metadata, error in
+          guard let metadata = metadata else {
+            // Uh-oh, an error occurred!
+              self.showError("Error uploading model")
+            return
+          }
+          // Metadata contains file metadata such as size, content-type.
+          let size = metadata.size
+          // You can also access to download URL after upload.
+          modelRef.downloadURL { (url, error) in
+            guard let downloadURL = url else {
+              // Uh-oh, an error occurred!
+                self.showError("Error creating model")
+              return
+            }
+          }
+        }
+        
+        // Create a reference to the file to delete
+        let oldUrl = "processingModels/" + (self.condition?.name ?? "") + ".usdz"
+        let oldFileRef = storageRef.child(oldUrl)
+
+        oldFileRef.delete { error in
+            if let error = error {
+                self.showError("Error deleting old file: \(error.localizedDescription)")
+            } else {
+                print("Old file deleted successfully.")
+            }
+        }
+    }
+
     func showLoadingIndicator(_ show: Bool) {
         if show {
             activityIndicator.startAnimating()
@@ -1835,9 +1958,11 @@ class skinmodel: UIViewController {
     }
     
     func showError(_ message: String) {
-        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(alert, animated: true)
+        }
     }
     
     func completeDownload(completion: Bool){
@@ -1953,4 +2078,28 @@ func findMaxElement(in array: [[Float]]) -> Float? {
 func findMinElement(in array: [[Float]]) -> Float? {
     // Flatten the 2D array to a 1D array and find the max element
     return array.flatMap { $0 }.min()
+}
+
+public struct databaseCondition: Codable {
+
+  let name: String?
+  let urgency: String?
+  let symptoms: String?
+  let clinicalNotes: String?
+  let treatment: String?
+    let heightmap: [Float]?
+    let rows: Int?
+    let columns: Int?
+
+  enum CodingKeys: String, CodingKey {
+    case name
+    case urgency
+    case symptoms
+    case clinicalNotes
+    case treatment
+      case heightmap
+      case rows
+      case columns
+  }
+
 }

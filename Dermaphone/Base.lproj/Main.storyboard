@@ -500,6 +500,15 @@
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </view>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RtB-0y-VXY">
+                                <rect key="frame" x="313" y="184" width="61" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Save"/>
+                                <connections>
+                                    <action selector="savePressed:" destination="6oJ-M7-Edc" eventType="touchUpInside" id="OtN-Of-GPQ"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="EU6-GI-TbU"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -526,6 +535,7 @@
                         <outlet property="notesButton" destination="Djs-bE-UuZ" id="xhK-zc-FMn"/>
                         <outlet property="palpationOption" destination="mPf-Zx-PmS" id="Eo4-AJ-xr0"/>
                         <outlet property="recordHaptic" destination="7Ll-FG-3r2" id="52v-Hp-eEq"/>
+                        <outlet property="saveButton" destination="RtB-0y-VXY" id="V5U-oJ-2hk"/>
                         <outlet property="settingsButton" destination="YgM-ki-UE8" id="GtJ-Bb-JHc"/>
                         <outlet property="sigmaSetting" destination="29d-7E-eBX" id="gf0-SY-lbY"/>
                         <outlet property="similarButton" destination="QPi-yy-4Q6" id="4YP-eU-2lS"/>

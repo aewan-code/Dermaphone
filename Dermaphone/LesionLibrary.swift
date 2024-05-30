@@ -113,12 +113,10 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
                        let severity = document.data()["urgency"] as? String,
                        let symptoms = document.data()["symptoms"] as? String,
                        let treatment = document.data()["treatment"] as? String,
-                       let notes = document.data()["clinical notes"] as? String,
-                       let modelName = document.data()["modelName"] as? String,
-                       let modelFile = document.data()["modelFile"] as? String
+                       let notes = document.data()["clinicalNotes"] as? String
                 {
                   print("check conditions created")
-                  let condition = SkinCondition(name: name, description: "", texture: "", symptoms: symptoms, treatment: treatment, modelName: modelName, images: [], modelFile: modelFile, similarConditions: [], notes: notes, urgency: severity, heightMap: [[]], isCreated: true)
+                  let condition = SkinCondition(name: name, description: "", texture: "", symptoms: symptoms, treatment: treatment, modelName: "", images: [], modelFile: "", similarConditions: [], notes: notes, urgency: severity, heightMap: [[]], isCreated: true)
                   skinConditions.append(condition)
               }
           }

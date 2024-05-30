@@ -74,6 +74,7 @@
 		FFB13AA42BAE183800A94673 /* DermaphoneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13AA32BAE183800A94673 /* DermaphoneUITestsLaunchTests.swift */; };
 		FFB13B412BAF034600A94673 /* testTexture.ahap in Resources */ = {isa = PBXBuildFile; fileRef = FFB13B402BAF034600A94673 /* testTexture.ahap */; };
 		FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13B422BB1D41500A94673 /* Haptics.swift */; };
+		FFC117DE2C07B30B003AC758 /* loginStudent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC117DD2C07B30B003AC758 /* loginStudent.swift */; };
 		FFC1CEAA2BBB22AA00FD49B7 /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE942BBB22A900FD49B7 /* ImageLoader.swift */; };
 		FFC1CEAB2BBB22AA00FD49B7 /* Capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE952BBB22A900FD49B7 /* Capture.swift */; };
 		FFC1CEAC2BBB22AA00FD49B7 /* CaptureFoldersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE962BBB22A900FD49B7 /* CaptureFoldersView.swift */; };
@@ -174,6 +175,7 @@
 		FFB13AA32BAE183800A94673 /* DermaphoneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DermaphoneUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		FFB13B402BAF034600A94673 /* testTexture.ahap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = testTexture.ahap; path = ../../FYPTestingTemp/FYPTestingTemp/testTexture.ahap; sourceTree = "<group>"; };
 		FFB13B422BB1D41500A94673 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		FFC117DD2C07B30B003AC758 /* loginStudent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = loginStudent.swift; sourceTree = "<group>"; };
 		FFC1CE942BBB22A900FD49B7 /* ImageLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
 		FFC1CE952BBB22A900FD49B7 /* Capture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Capture.swift; sourceTree = "<group>"; };
 		FFC1CE962BBB22A900FD49B7 /* CaptureFoldersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureFoldersView.swift; sourceTree = "<group>"; };
@@ -346,6 +348,7 @@
 				FFDBBA5D2BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.swift */,
 				FFDBBA5E2BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.xib */,
 				FFDBBA572BFF3F8C00CBEF79 /* LogIn.swift */,
+				FFC117DD2C07B30B003AC758 /* loginStudent.swift */,
 				FF662E352BECD60F00FD9411 /* LinkConditionCell.swift */,
 				FF662E332BECD43300FD9411 /* LinkConditions.swift */,
 				FF5C1CAC2BE117CA00C097E9 /* NotesView.swift */,
@@ -726,6 +729,7 @@
 				FFF154E02BBC8C3100834F38 /* SkinCondition.swift in Sources */,
 				FF5C1CB12BE90CE300C097E9 /* gradientMethod.swift in Sources */,
 				FF662E342BECD43300FD9411 /* LinkConditions.swift in Sources */,
+				FFC117DE2C07B30B003AC758 /* loginStudent.swift in Sources */,
 				FFDBBA5A2BFF400400CBEF79 /* LesionLibrary.swift in Sources */,
 				FFDBBA582BFF3F8C00CBEF79 /* LogIn.swift in Sources */,
 				FFC1CEB12BBB22AA00FD49B7 /* TimerView.swift in Sources */,

@@ -673,10 +673,10 @@
             </objects>
             <point key="canvasLocation" x="4783.9694656488546" y="-106.33802816901409"/>
         </scene>
-        <!--Login-->
+        <!--Log In-->
         <scene sceneID="OEw-K4-OOf">
             <objects>
-                <viewController id="lB9-JI-vYo" customClass="login" customModule="Dermaphone" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="lB9-JI-vYo" customClass="LogIn" customModule="Dermaphone" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="LDL-BM-iFn">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -736,13 +736,13 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hXQ-nc-k7d">
-                                <rect key="frame" x="160" y="409" width="71" height="35"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gFd-cl-TCe">
+                                <rect key="frame" x="161" y="409" width="70" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Log In"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Log in"/>
                                 <connections>
-                                    <segue destination="gGC-6V-Sp1" kind="show" id="Pgt-j5-O0B"/>
+                                    <action selector="login:" destination="lB9-JI-vYo" eventType="touchUpInside" id="Mic-t8-Xvy"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -750,17 +750,20 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <navigationItem key="navigationItem" id="aAk-mO-asp"/>
+                    <connections>
+                        <outlet property="loginbutton" destination="gFd-cl-TCe" id="Nvc-Y2-kbG"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="YC2-TF-eqA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3408.3969465648852" y="578.87323943661977"/>
+            <point key="canvasLocation" x="3408" y="579"/>
         </scene>
         <!--Skin Lesion Library-->
         <scene sceneID="Rpy-dh-iJ6">
             <objects>
                 <viewController storyboardIdentifier="LesionLibrary" useStoryboardIdentifierAsRestorationIdentifier="YES" id="gGC-6V-Sp1" customClass="LesionLibrary" customModule="Dermaphone" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lBK-Gr-Hz7">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="200" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="h4b-WG-N1i">
@@ -802,87 +805,13 @@
                     </view>
                     <navigationItem key="navigationItem" title="Skin Lesion Library" id="a2R-tJ-Noj"/>
                     <connections>
+                        <outlet property="createModel" destination="YWz-WW-kFD" id="GWB-aq-LWR"/>
                         <outlet property="table" destination="h4b-WG-N1i" id="FuG-eJ-n1N"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AaJ-aF-jKQ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="4381" y="579"/>
-        </scene>
-        <!--Log In-->
-        <scene sceneID="0G3-hp-EXY">
-            <objects>
-                <viewController storyboardIdentifier="LogIn" useStoryboardIdentifierAsRestorationIdentifier="YES" id="vki-2j-qQe" customClass="LogIn" customModule="Dermaphone" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="Ure-g1-pHc">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LAb-bK-b4b">
-                                <rect key="frame" x="161" y="409" width="71" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="filled" title="Log In"/>
-                            </button>
-                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="bLd-nl-goK">
-                                <rect key="frame" x="212" y="367" width="97" height="34"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
-                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Username" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="kYf-1u-QFu">
-                                <rect key="frame" x="212" y="325" width="97" height="34"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Username" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ByZ-fI-ER5">
-                                <rect key="frame" x="97" y="332" width="79" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Password" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JPm-5U-CO6">
-                                <rect key="frame" x="97" y="367" width="74" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="r3A-15-YrQ">
-                                <rect key="frame" x="115" y="452" width="160" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Sign in as student"/>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yHR-Bb-pqH">
-                                <rect key="frame" x="113" y="480" width="164" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Create an account"/>
-                            </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Consultant Log In" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6mE-EM-pEd">
-                                <rect key="frame" x="125" y="260" width="141" height="22"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Dermaphone" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aoI-qH-vkz">
-                                <rect key="frame" x="129" y="225" width="133" height="27"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="22"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="ZvT-MF-CrV"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="IZL-ef-Gxq" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3408.3969465648852" y="578.87323943661977"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="pLg-qt-1QB">
@@ -902,10 +831,10 @@
             </objects>
             <point key="canvasLocation" x="2481.679389312977" y="578.87323943661977"/>
         </scene>
-        <!--Login-->
+        <!--Login Student-->
         <scene sceneID="MeX-9k-YG4">
             <objects>
-                <viewController id="CxD-WN-a4n" customClass="login" customModule="Dermaphone" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="CxD-WN-a4n" customClass="loginStudent" customModule="Dermaphone" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="gF1-pU-j4J">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="842"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -971,7 +900,7 @@
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Log In"/>
                                 <connections>
-                                    <segue destination="gGC-6V-Sp1" kind="show" id="gRU-AI-uoy"/>
+                                    <action selector="loginbutton:" destination="CxD-WN-a4n" eventType="touchUpInside" id="gSB-zr-bAW"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -979,14 +908,16 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <navigationItem key="navigationItem" id="5rz-74-lVf"/>
+                    <connections>
+                        <outlet property="login" destination="Osl-ZL-QSc" id="ntU-Qo-bkJ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZuE-0X-6cb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3408" y="1323"/>
+            <point key="canvasLocation" x="3334" y="1342"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="gRU-AI-uoy"/>
         <segue reference="efy-YI-PBK"/>
     </inferredMetricsTieBreakers>
     <resources>

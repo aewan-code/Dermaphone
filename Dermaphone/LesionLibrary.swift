@@ -9,7 +9,12 @@ import UIKit
 
 class LesionLibrary: UIViewController, UITableViewDataSource{
 
-    
+    @IBOutlet weak var createModel: UIButton!
+    enum SourceType {
+            case consultant, student
+    }
+
+    var sourceType: SourceType?
     
     @IBOutlet weak var table: UITableView!
     var data : [SkinCondition] = []
@@ -32,6 +37,7 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
         table.register(LesionLibraryTableViewCell.nib(), forCellReuseIdentifier: LesionLibraryTableViewCell.identifier)
         table.dataSource = self
         // Do any additional setup after loading the view.
+        configureBasedOnSource()
     }
 
     func createModels(){
@@ -60,6 +66,26 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
         // Pass the selected object to the new view controller.
     }
     */
+    
+    func getModels(){
+        
+    }
+    
+    private func configureBasedOnSource() {
+        print(sourceType)
+            switch sourceType {
+            case .consultant:
+                // Configuration for when coming from User Login
+                createModel.isHidden = false
+                print("Came from User Login")
+            case .student:
+                // Configuration for when coming from Student Login
+                createModel.isHidden = true
+                print("Came from Student Login")
+            case .none:
+                break
+            }
+        }
 
 }
 
@@ -70,6 +96,7 @@ extension LesionLibrary : LesionLibraryTableViewCellDelegate {
             return
         }
         vc.set(model: model)
+        vc.sourceType = self.sourceType
         print("check")
         navigationController?.pushViewController(vc, animated: true)
     }

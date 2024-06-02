@@ -50,6 +50,9 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
             if sourceType == .consultant{
                 await loadNewModels()
             }
+            
+            await loadImages()
+            
         }
 
 
@@ -58,7 +61,7 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
 
     func createModels(){
       //  let testModel = SkinCondition(name: "Test Model", description: "", texture: "", symptoms: "", treatment: "", modelName: "triangle", images: [], modelFile: "tri.scn", similarConditions: [], notes: "", urgency: "Test")
-        let skin3Model = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma. Crusty rough spots", urgency: "Precancerous", heightMap: [[]], isCreated: true)
+      /*  let skin3Model = SkinCondition(name: "Actinic Keratosis", description: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma", texture: "crusty rough spots", symptoms: "pink coloration", treatment: "", modelName: "Mesh", images: [], modelFile: "testTransform.scn", similarConditions: [], notes: "(Precancerous) Most common precancer. Can evolve into squamous cell carcinoma. Crusty rough spots", urgency: "Precancerous", heightMap: [[]], isCreated: true)
         let skin2Model = SkinCondition(name: "Basal Cell Carcinoma", description: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun", texture: "", symptoms: "recurring sore that bleeds and heals", treatment: "", modelName: "Mesh", images: [], modelFile: "test2scene.scn", similarConditions: [(skin3Model, "link to cancer")], notes: "(Cancerous) Most common form of skin cancer. Normally found on body pars exposed to the sun.", urgency: "Cancerous", heightMap: [[]], isCreated: true)
         if let image1 = UIImage(named: "IMG_3929") {
             skin3Model.image?.append(image1)
@@ -68,7 +71,7 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
         }
      //   data.append(testModel)
         data.append(skin3Model)
-        data.append(skin2Model)
+        data.append(skin2Model)*/
     }
     
     
@@ -85,7 +88,6 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
     
     
     private func configureBasedOnSource() {
-        print(sourceType)
             switch sourceType {
             case .consultant:
                 // Configuration for when coming from User Login
@@ -107,26 +109,35 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
         do {
             let querySnapshot = try await db.collection("models").getDocuments()
           for document in querySnapshot.documents {
-            print("\(document.documentID) => \(document.data())")
-              print(type(of: document.data()["name"]))
+          //  print("\(document.documentID) => \(document.data())")
+              print(document.data()["name"])
               if let name = document.data()["name"] as? String,
                        let severity = document.data()["urgency"] as? String,
                        let symptoms = document.data()["symptoms"] as? String,
                        let treatment = document.data()["treatment"] as? String,
-                       let notes = document.data()["clinicalNotes"] as? String
+                       let notes = document.data()["clinicalNotes"] as? String,
+                 let heightMapList = document.data()["heightmap"] as? [Float],
+                 let rows = document.data()["rows"] as? Int,
+                 let columns = document.data()["columns"] as? Int,
+                 let rotationScale = document.data()["rotationScale"] as? Int
                 {
                   print("check conditions created")
-                  let condition = SkinCondition(name: name, description: "", texture: "", symptoms: symptoms, treatment: treatment, modelName: "", images: [], modelFile: "", similarConditions: [], notes: notes, urgency: severity, heightMap: [[]], isCreated: true)
+                  let condition = SkinCondition(name: name, description: "", texture: "", symptoms: symptoms, treatment: treatment, modelName: "", images: [], modelFile: "", similarConditions: [], notes: notes, urgency: severity, heightMap: [[]], isCreated: true, rotationScale: rotationScale)
+
                   skinConditions.append(condition)
               }
+              
           }
+            self.data = skinConditions
             DispatchQueue.main.async {
                            // Ensure UI updates are on the main thread
                            //self.updateModelList()
-                self.data = skinConditions
-                print(self.data)
+            //    self.data.append(contentsOf: skinConditions)
+
                 self.table.register(LesionLibraryTableViewCell.nib(), forCellReuseIdentifier: LesionLibraryTableViewCell.identifier)
                 self.table.dataSource = self
+                self.table.reloadData()
+                
                        }
         } catch {
           print("Error getting documents: \(error)")
@@ -136,6 +147,34 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
                        }
         }
 
+    }
+    
+    func loadImages() async{
+        for conditions in data{
+            let fileUrl = "images/" +  conditions.name + ".HEIC" //need to check .jpg format
+            let storage = Storage.storage()
+            let storageRef = storage.reference()
+            let imageRef = storageRef.child(fileUrl)
+       //     DispatchQueue.global(qos: .background).async{
+
+                // Download in memory with a maximum allowed size of 1MB (1 * 1024 * 1024 bytes)
+                await imageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
+                  if let error = error {
+                      print("ERROR ADDING IMAGE")
+                  } else {
+                      if let image = UIImage(data: data!){
+                          conditions.image?.append(image)
+                          DispatchQueue.main.async {
+                              
+                              print("IMAGE ADDED")
+                              self.table.reloadData()
+                              
+                          }
+                      }
+                  }
+                }
+          //  }
+        }
     }
     
     func loadNewModels() async{
@@ -155,17 +194,19 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
               if let dotRange = name.range(of: ".") {
                 name.removeSubrange(dotRange.lowerBound..<name.endIndex)
               }
-              let condition = SkinCondition(name: name, description: "", texture: "", symptoms: "", treatment: "", modelName: "", images: [], modelFile: "", similarConditions: [], notes: "", urgency: "", heightMap: [[]], isCreated: false)
+              let condition = SkinCondition(name: name, description: "", texture: "", symptoms: "", treatment: "", modelName: "", images: [], modelFile: "", similarConditions: [], notes: "", urgency: "", heightMap: [[]], isCreated: false, rotationScale: 4)
               skinConditions.append(condition)
+
             // The items under storageReference.
           }
+            self.data.append(contentsOf: skinConditions)
             DispatchQueue.main.async {
                            // Ensure UI updates are on the main thread
                            //self.updateModelList()
-                self.data.append(contentsOf: skinConditions)
-                print(self.data)
+
                 self.table.register(LesionLibraryTableViewCell.nib(), forCellReuseIdentifier: LesionLibraryTableViewCell.identifier)
                 self.table.dataSource = self
+                self.table.reloadData()
                        }
         } catch {
           // ...
@@ -180,18 +221,21 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
     func errorUI(){
         
     }
+    
+    func convertHeightMap(heightMapArray : [Float], rows : Int, columns : Int)->[[Float]]{
+        var heightMap : [[Float]] = [[]]
+        return heightMap
+    }
 
 }
 
 extension LesionLibrary : LesionLibraryTableViewCellDelegate {
     func buttonPressed(forModel model: SkinCondition) {
-        print("view button pressed")
         guard let vc = storyboard?.instantiateViewController(withIdentifier: "skinmodel") as? skinmodel else {
             return
         }
         vc.set(model: model)
         vc.sourceType = self.sourceType
-        print("check")
         navigationController?.pushViewController(vc, animated: true)
     }
     

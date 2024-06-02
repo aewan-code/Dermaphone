@@ -31,6 +31,7 @@ class skinmodel: UIViewController {
     var filter : FilterType = .none//save type
     var kVal : Int = 5
     var sigmaVal : Float = 1
+    var rotationScaleVal : Int = 4
     var condition : SkinCondition?
     var modelName: String?// = "Mesh"
     var modelFile : String?// = "testTransform.scn"
@@ -75,6 +76,7 @@ class skinmodel: UIViewController {
     @IBOutlet weak var kSetting: UISlider!
     @IBOutlet weak var gradientHeightMap: UISegmentedControl!
     @IBOutlet weak var doneSettings: UIButton!
+    @IBOutlet weak var rotationScale: UISlider!
     
     ///UI - Coordinate Mode
     @IBOutlet weak var zScale: UISlider!
@@ -208,6 +210,7 @@ class skinmodel: UIViewController {
         hapticMethod.selectedSegmentIndex = 0
         currentView = view
         hapticTransient = true
+        
 
             //   scene = SCNScene(named: modelFile ?? "test2scene.scn")
         let database = DatabaseManagement()
@@ -562,7 +565,7 @@ class skinmodel: UIViewController {
                             print(test)
                             guard let currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
 
-                            let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test)
+                            let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test, scale: self.rotationScaleVal)
                             let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
 
                             //print("New camera orientation:", cameraNode.rotation)
@@ -814,7 +817,7 @@ class skinmodel: UIViewController {
                         print(test)
                         guard var currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
                         
-                        let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector,test)
+                        let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector,test, scale: self.rotationScaleVal)
                         let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
                         sceneView.defaultCameraController.pointOfView?.transform = newTransform
                     }
@@ -1148,7 +1151,7 @@ class skinmodel: UIViewController {
         print(test)
         guard let currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
 
-        let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test)
+        let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test, scale: self.rotationScaleVal)
         let identityMatrix = SCNMatrix4Identity
         let blendFactor: Float = 0.1  // Adjust this to make the rotation more or less pronounced
         let interpolatedMatrix = interpolateMatrices(identityMatrix, rotationQuaternion, blendFactor: blendFactor)
@@ -1163,7 +1166,7 @@ class skinmodel: UIViewController {
         
         guard let currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
         
-        let rotationQuaternion = SCNQuaternion.fromTwoVectors(cameraFront, surfaceNormalVector)
+        let rotationQuaternion = SCNQuaternion.fromTwoVectors(cameraFront, surfaceNormalVector, scale: self.rotationScaleVal)
         let identityMatrix = SCNMatrix4Identity
         let blendFactor: Float = 0.1  // Adjust this to make the rotation more or less pronounced
         let interpolatedMatrix = interpolateTransforms(from: identityMatrix, to: rotationQuaternion, fraction: CGFloat(blendFactor))
@@ -1371,6 +1374,7 @@ class skinmodel: UIViewController {
         self.condition = model
         self.modelFile = model.modelFile
         self.modelName = model.modelName
+        self.rotationScaleVal = model.rotationScale
      //   scene = SCNScene(named: model.modelFile)//do i need to deallocate the current scene?
 
     
@@ -1553,6 +1557,7 @@ class skinmodel: UIViewController {
     }
     @IBAction func changedSettings(_ sender: Any) {
         hapticsSettings.isHidden = true
+        rotationScaleVal = Int(rotationScale.value)
         if gradientHeightMap.selectedSegmentIndex == 0{
             self.gradientEffect = true
         }else{
@@ -1775,8 +1780,9 @@ class skinmodel: UIViewController {
                     print("check node is there")
                     print(self.sceneView.scene?.rootNode)
                     self.setupSceneView()
-                    if ((self.condition?.heightMap.isEmpty) != nil){
+                    if ((self.condition?.heightMap.isEmpty) != nil){//if there is not a height map ( = [[]])
                         self.hapticsButton.isEnabled = false
+                        
                         DispatchQueue.global(qos: .background).async{
                             
                                 let gradient = gradientMethod()
@@ -1863,12 +1869,12 @@ class skinmodel: UIViewController {
         if self.condition?.isCreated == false{
             //create model
             //move file from processingmodels to models
-            let lesion = databaseCondition(name: conditionName, urgency: self.condition?.urgency, symptoms: self.condition?.symptoms, clinicalNotes: self.condition?.notes, treatment: self.condition?.treatment, heightmap: convertedMap.0, rows: convertedMap.1, columns: convertedMap.2)
+            let lesion = databaseCondition(name: conditionName, urgency: self.condition?.urgency, symptoms: self.condition?.symptoms, clinicalNotes: self.condition?.notes, treatment: self.condition?.treatment, heightmap: convertedMap.0, rows: convertedMap.1, columns: convertedMap.2, rotationScale: rotationScaleVal)
             //also adding similar conditions logic
             do {
                 try db.collection("models").document(conditionName).setData(from: lesion)
             } catch let error {
-                print("Error writing city to Firestore: \(error)")
+                print("Error writing skin lesion to Firestore: \(error)")
                 showError("Error saving file")
                 
             }
@@ -1877,14 +1883,15 @@ class skinmodel: UIViewController {
             }
 
         }else{
-            //update existing values -> height map
+            //update existing values -> height map, rotationscale
             let modelRef = db.collection("models").document(conditionName)
             DispatchQueue.global(qos: .background).async {
                 // Set the "capital" field of the city 'DC'
                 modelRef.updateData([
                     "heightmap": convertedMap.0,
                     "rows": convertedMap.1,
-                    "columns": convertedMap.2
+                    "columns": convertedMap.2,
+                    "rotationScale": self.rotationScaleVal
                 ]) { error in
                     if let error = error {
                         print("Error updating document: \(error.localizedDescription)")
@@ -1979,13 +1986,15 @@ class skinmodel: UIViewController {
             return nil
         }
     }
+    
+    
 
     
     
 }
 
 extension SCNQuaternion {
-    static func fromTwoVectors(_ vectorA: SCNVector3, _ vectorB: SCNVector3) -> SCNMatrix4  {
+    static func fromTwoVectors(_ vectorA: SCNVector3, _ vectorB: SCNVector3, scale : Int) -> SCNMatrix4  {
         // Calculate the cross product
         let axis = SCNVector3(
             x: vectorA.y * vectorB.z - vectorA.z * vectorB.y,
@@ -2005,7 +2014,7 @@ extension SCNQuaternion {
         var angle = acos(dotProduct / (magnitudeA * magnitudeB))
         print("angle", angle)
         print(dotProduct / (magnitudeA * magnitudeB))
-        angle = angle/4
+        angle = angle/Float(11-scale)
         if angle > 15.0 * Float.pi / 180.0{
             angle = 15.0 * Float.pi / 180.0
         }
@@ -2090,6 +2099,7 @@ public struct databaseCondition: Codable {
     let heightmap: [Float]?
     let rows: Int?
     let columns: Int?
+    let rotationScale: Int?
 
   enum CodingKeys: String, CodingKey {
     case name
@@ -2100,6 +2110,7 @@ public struct databaseCondition: Codable {
       case heightmap
       case rows
       case columns
+      case rotationScale
   }
 
 }

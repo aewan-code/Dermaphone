@@ -129,6 +129,28 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
               
           }
             self.data = skinConditions
+            var temp1 : SkinCondition?
+            var temp2 : SkinCondition?
+            for condition in skinConditions {
+                if condition.name == "Actinic Keratosis"{
+                    temp1 = condition
+                }else if condition.name == "Squamous Cell Carcinoma"{
+                    temp2 = condition
+                }
+            }
+            for condition in self.data{
+                if condition.name == "Actinic Keratosis"{
+                    if let con = temp2{
+                        condition.similarConditions?.append((con, "Actinic Keratosis indicate an increased risk of developing cutaneous SCC."))
+                    }
+                    
+                }else if condition.name == "Squamous Cell Carcinoma"{
+                    if let con = temp1{
+                        condition.similarConditions?.append((con, "Actinic Keratosis indicate an increased risk of developing cutaneous SCC."))
+                    }
+                    
+                }
+            }
             DispatchQueue.main.async {
                            // Ensure UI updates are on the main thread
                            //self.updateModelList()

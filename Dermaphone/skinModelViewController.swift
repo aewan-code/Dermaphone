@@ -77,6 +77,8 @@ class skinmodel: UIViewController {
     @IBOutlet weak var gradientHeightMap: UISegmentedControl!
     @IBOutlet weak var doneSettings: UIButton!
     @IBOutlet weak var rotationScale: UISlider!
+    @IBOutlet weak var sharpnessToggle: UISegmentedControl!
+    @IBOutlet weak var intensitySkirt: UISlider!
     
     ///UI - Coordinate Mode
     @IBOutlet weak var zScale: UISlider!
@@ -147,6 +149,8 @@ class skinmodel: UIViewController {
     
     var enhancedMap : [[Float]]?
     var gradientEffect : Bool = false
+    var intensityScale : Float = 1
+    var sharpnessParam = false
     
     var sourceType: LesionLibrary.SourceType?
     override func viewWillAppear(_ animated: Bool) {
@@ -188,7 +192,8 @@ class skinmodel: UIViewController {
         sceneView.debugOptions = [.showCreases]
         //self.view = sceneView
         view.addSubview(sceneView)
-        sceneView.frame = CGRect(x: 0, y: notesButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (notesButton.frame.maxY + 10)) // Adjust the values as needed
+      //  sceneView.frame = CGRect(x: 0, y: notesButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (notesButton.frame.maxY + 10)) // Adjust the values as needed
+        sceneView.frame = CGRect(x: 0, y: hapticsButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (hapticsButton.frame.maxY + 10)) // Adjust the values as needed
         
         view.bringSubviewToFront(RotateToggle)
         view.bringSubviewToFront(palpationOption)
@@ -203,6 +208,10 @@ class skinmodel: UIViewController {
         view.bringSubviewToFront(hapticsButton)
         view.bringSubviewToFront(settingsButton)
         view.bringSubviewToFront(hapticsSettings)
+        view.bringSubviewToFront(notesButton)
+        view.bringSubviewToFront(symptonsButton)
+        view.bringSubviewToFront(treatmentButton)
+        view.bringSubviewToFront(similarButton)
     }
 
     override func viewDidLoad() {
@@ -307,9 +316,9 @@ class skinmodel: UIViewController {
             //bug - without pressing anything - should go to the currently selected item
             UIAction(title : "None", handler : optionClosure),
             UIAction(title : "Gaussian", handler : optionClosure),
-            UIAction(title : "Weighted Average", handler : optionClosure),
-            UIAction(title : "Ricker Wavelet", handler : optionClosure),
-            UIAction(title : "Height Map", handler : optionClosure),
+            UIAction(title : "Second Derivative", handler : optionClosure),
+            UIAction(title : "Sobel Operator", handler : optionClosure),
+            UIAction(title : "Peak Detector", handler : optionClosure),
             
         ])
         
@@ -517,7 +526,12 @@ class skinmodel: UIViewController {
         }
         // Perform hit test
                 let hitTestResults = sceneView.hitTest(location, options: nil)
-    
+        if recordHaptics{
+            let firstPoint = HapticDataPoint(intensity: 0, time: 0.0)
+            chartData?.append(firstPoint)
+            firstTimestamp = touch.timestamp
+            prevTimestamp = firstTimestamp
+        }
                 // Check if the desired node is touched
                 for result in hitTestResults {
                     
@@ -526,12 +540,7 @@ class skinmodel: UIViewController {
                         // Node is touched, perform desired action
                         let position = result.localCoordinates
                         //later remove so that first point is only added if continued onto touches moved
-                        if recordHaptics{
-                            let firstPoint = HapticDataPoint(intensity: 0, time: 0.0)
-                            chartData?.append(firstPoint)
-                            firstTimestamp = touch.timestamp
-                            prevTimestamp = firstTimestamp
-                        }
+
                         prevPoint = position.y
                         previousPosition = modelLocation(xPos: position.x, yPos: position.y, zPos: position.z)
                        // if !(hapticTransient ?? true) && hapticsToggle && !palpationToggle{
@@ -745,10 +754,12 @@ class skinmodel: UIViewController {
                         let gridSize = enhancedMap?.endIndex
                         print("grid size", gridSize)
                         let gridPoint = mapPointToHeightMap(hitResult: result, gridSize: 80)//
+                        var sharpparameter : Float =  1
+                        var value : Float = 0
                         if let map = self.enhancedMap {
                             let (gridX, gridY) = gridPoint
                             if gridY >= 0 && gridY < map.count && gridX >= 0 && gridX < map[gridY].count {
-                                let value = map[gridY][gridX]
+                                value = map[gridY][gridX]
                                 print(value)
                                 if value.isNaN{
                                     height = 0
@@ -763,12 +774,19 @@ class skinmodel: UIViewController {
                                 if height.isNaN{
                                     height = 0
                                 }
+                                height = height * self.intensityScale
+                                print(height)
+                                print("intensity", self.intensityScale)
                                 print(maxHeight)
                                 print(minHeight)
                                 } else {
                                     // Handle the case where the point is outside the bounds of the height map
                                     print("invalid access")// Returning NaN or another sentinel value to indicate an invalid access
                                 }
+                            if sharpnessParam{
+                                sharpparameter = value
+                                
+                            }
                             
                         }
                         
@@ -801,7 +819,7 @@ class skinmodel: UIViewController {
                             //try tempHaptics?.playHeightHaptic(height:intensity*10)
                         
                         
-                            try tempHaptics?.playHeightHaptic(height:height)
+                            try tempHaptics?.playHeightHaptic(height:height, sharpness: sharpparameter)
                         
                         
                             //edge detection effect
@@ -1437,7 +1455,7 @@ class skinmodel: UIViewController {
             return
         }
         if let skinCondition = condition {
-            popUp.set(condition: skinCondition, type: "Notes")
+            popUp.set(condition: skinCondition, type: "Notes", user: sourceType ?? .consultant)
             
             //navigationController?.pushViewController(popUp, animated: true)
             navigationController?.present(popUp, animated: true, completion: nil)
@@ -1450,7 +1468,7 @@ class skinmodel: UIViewController {
             return
         }
         if let skinCondition = condition {
-            popUp.set(condition: skinCondition, type: "Symptoms")
+            popUp.set(condition: skinCondition, type: "Symptoms", user: sourceType ?? .consultant)
             
             //navigationController?.pushViewController(popUp, animated: true)
             navigationController?.present(popUp, animated: true, completion: nil)
@@ -1462,7 +1480,7 @@ class skinmodel: UIViewController {
             return
         }
         if let skinCondition = condition {
-            popUp.set(condition: skinCondition, type: "Treatment")
+            popUp.set(condition: skinCondition, type: "Treatment", user: sourceType ?? .consultant)
             
             //navigationController?.pushViewController(popUp, animated: true)
             navigationController?.present(popUp, animated: true, completion: nil)
@@ -1563,6 +1581,12 @@ class skinmodel: UIViewController {
         }else{
             self.gradientEffect = false
         }
+        self.intensityScale = intensitySkirt.value
+        if sharpnessToggle.selectedSegmentIndex == 0{
+            self.sharpnessParam = true
+        }else{
+            self.sharpnessParam = false
+        }
         switch filterSetting.currentTitle{
         case "None":
             self.filter = .none
@@ -1616,7 +1640,7 @@ class skinmodel: UIViewController {
             enhancedMap = secondTemp.0
             
             
-        case "Ricker Wavelet":
+        case "Sobel Operator":
             self.filter = .edge
             self.kVal = Int(kSetting.value)
             self.sigmaVal = sigmaSetting.value
@@ -1633,8 +1657,13 @@ class skinmodel: UIViewController {
             }else{
                 enhancedMap = tempHeightMap
             }
-        case "Default":
+        case "Peak Detector":
             self.filter = .heightMap
+            let tempGradient = gradientMethod()
+            let map = tempGradient.detectPeaks(heightMap: originalHeightMap ?? [[]])
+            enhancedMap = map
+        case "Default":
+           // self.filter = .heightMap
             enhancedMap = self.originalHeightMap
             
         default:
@@ -1643,7 +1672,9 @@ class skinmodel: UIViewController {
         self.maxHeight = findMaxElement(in: enhancedMap ?? [[]])
         self.minHeight = findMinElement(in: enhancedMap ?? [[]])
         print("map changed")
-        print(enhancedMap)
+  //      print(enhancedMap)
+        print(self.minHeight)
+        print(self.maxHeight)
     }
     func mapPointToHeightMap1(hitResult: SCNHitTestResult, gridSize: Int) -> (Int, Int) {
         let localPoint = hitResult.localCoordinates
@@ -1686,12 +1717,19 @@ class skinmodel: UIViewController {
                 settingsButton.isHidden = false
                 SelectPivot.isHidden = false
                 recordHaptic.isHidden = false
+                saveButton.isHidden = false
+                hapticMethod.isHidden = true
+                recordHaptic.isHidden = true
                 print("Came from Consultant Login")
             case .student:
                 // Configuration for when coming from Student Login
-                settingsButton.isHidden = true
+               // settingsButton.isHidden = true
                 SelectPivot.isHidden = true
                 recordHaptic.isHidden = true
+                saveButton.isHidden = true
+                hapticMethod.isHidden = true
+                recordHaptic.isHidden = true
+                SelectPivot.isHidden = true
                 print("Came from Student Login")
             case .none:
                 break
@@ -2079,14 +2117,27 @@ extension SCNQuaternion {
 
 
 
-func findMaxElement(in array: [[Float]]) -> Float? {
+func findMaxElement1(in array: [[Float]]) -> Float? {
     // Flatten the 2D array to a 1D array and find the max element
     return array.flatMap { $0 }.max()
 }
+func findMaxElement(in matrix: [[Float]]) -> Float? {
+    // Flatten the matrix and remove any NaN values
+    let flattenedArray = matrix.flatMap { $0 }.filter { !$0.isNaN }
+    // Return the maximum element, if any exist
+    return flattenedArray.max()
+}
 
-func findMinElement(in array: [[Float]]) -> Float? {
+func findMinElement1(in array: [[Float]]) -> Float? {
     // Flatten the 2D array to a 1D array and find the max element
     return array.flatMap { $0 }.min()
+}
+
+func findMinElement(in matrix: [[Float]]) -> Float? {
+    // Flatten the matrix and remove any NaN values
+    let flattenedArray = matrix.flatMap { $0 }.filter { !$0.isNaN }
+    // Return the maximum element, if any exist
+    return flattenedArray.min()
 }
 
 public struct databaseCondition: Codable {

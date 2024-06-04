@@ -606,6 +606,18 @@ class gradientMethod{
         return appliedKernel//highPassHeightMap
         
     }
+    func getGaussianSmoothed(heightMap: [[Float]], k: Int, sigma: Float) -> [[Float]]{
+        let kernel = self.gaussianKernel(size: k, sigma: sigma)
+        let appliedKernel = self.applyKernel(kernel: kernel, to: heightMap)
+        var highPassHeightMap = Array(repeating: Array(repeating: Float(0), count: heightMap.count), count: heightMap.count)
+        for i in 0..<(heightMap.count){
+            for j in 0..<(heightMap.count){
+                highPassHeightMap[i][j] = heightMap[i][j] - appliedKernel[i][j]
+            }
+        }
+        return highPassHeightMap
+        
+    }
     //returns gradient height map and min and max values to scale it by
     func convertHeightMapToGradient(heightMap : [[Float]])->([[Float]], Float, Float){
         var gradientHeightMap = Array(repeating: Array(repeating: Float(0), count: heightMap.count), count: heightMap.count)
@@ -953,9 +965,69 @@ class gradientMethod{
         }
     }
 
+    func convertHeightMapToGradient1(heightMap : [[Float]])->([[Float]], Float, Float){
+        var gradientHeightMap = Array(repeating: Array(repeating: Float(0), count: heightMap.count), count: heightMap.count)
+        var maxPoint : Float = 1
+        var minPoint : Float = 0
+        for i in 0..<(heightMap.count){
+            for j in 0..<(heightMap.count){
+                if i != 0 && j != 0 && i != (heightMap.count - 1) && j != (heightMap.count - 1){
+                    let gradient_x = (heightMap[i+1][j] - heightMap[i-1][j]) / 2
+                    let gradient_z = (heightMap[i][j+1] - heightMap[i][j-1]) / 2
+                    let gradientMag = (gradient_x * gradient_x) + (gradient_z * gradient_z)
+                    gradientHeightMap[i][j] = gradientMag
+                    if gradientMag < minPoint{
+                        minPoint = gradientMag
+                    }
+                    if gradientMag > maxPoint{
+                        maxPoint = gradientMag
+                    }
+                }
+            }
+        }
+        return (gradientHeightMap, minPoint, maxPoint)
+    }
 
+    func detectPeaks(heightMap: [[Float]])->[[Float]]{
+        let gaussmap = getGaussianSmoothed(heightMap: heightMap, k: 5, sigma: 1)//CHECK
+        var newHeightMap = Array(repeating: Array(repeating: Float(0), count: gaussmap.count), count: gaussmap.count)
+        //get gaussian
+        
+        for i in 0..<(gaussmap.count){
+            for j in 0..<(gaussmap.count){
+                var surrounding : [Float] = []
+                if i != 0 && j != 0 && i != (gaussmap.count - 1) && j != (gaussmap.count - 1){
+                    let gauss1 = gaussmap[i-1][j-1]
+                    let gauss2 = gaussmap[i-1][j]
+                    let gauss3 = gaussmap[i-1][j+1]
+                    let gauss4 = gaussmap[i][j-1]
+                    let gauss5 = gaussmap[i][j+1]
+                    let gauss6 = gaussmap[i+1][j-1]
+                    let gauss7 = gaussmap[i+1][j]
+                    let gauss8 = gaussmap[i+1][j+1]
+                    let current = gaussmap[i][j]
+                    if (gauss1 < current) && (gauss2 < current) && (gauss3 < current) && (gauss5 < current) && (gauss6 < current) && (gauss7 < current) && (gauss8 < current){
+                        print("peak")
+                        newHeightMap[i][j] = ((current - gauss1) + (current - gauss2) + (current - gauss3) + (current - gauss4) + (current - gauss5) + (current - gauss6) + (current - gauss7) + (current - gauss8))/Float(8)
+                    }
+                    else{
+                        print(i)
+                        print(j)
+                        newHeightMap[i][j] = 0
+                    }
+             //      let gradient_x = (heightMap[i+1][j] - heightMap[i-1][j]) / 2
+              //      let gradient_z = (heightMap[i][j+1] - heightMap[i][j-1]) / 2
+               //     let gradientMag = (gradient_x * gradient_x) + (gradient_z * gradient_z)
+                        //    newHeightMap[i][j] = gradientMag
+                }
+            }
+        }
 
-
+        //for each value, check if it is greater than k surrounding neighbours. if so, = average height difference, otherwise = 0
+        
+        return newHeightMap
+    }
+    
     
 
 

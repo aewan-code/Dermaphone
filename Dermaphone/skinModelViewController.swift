@@ -46,6 +46,8 @@ class skinmodel: UIViewController {
     var firstTimestamp : TimeInterval?
     var modelVertices : [SCNVector3]?
     
+    @IBOutlet weak var uiLine1: UIView!
+    @IBOutlet weak var uiLine2: UIView!
     var maxPoint : SCNVector3?
     var minPoint : SCNVector3?
     var filterMin : SCNVector3?
@@ -192,13 +194,15 @@ class skinmodel: UIViewController {
         sceneView.debugOptions = [.showCreases]
         //self.view = sceneView
         view.addSubview(sceneView)
+        
       //  sceneView.frame = CGRect(x: 0, y: notesButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (notesButton.frame.maxY + 10)) // Adjust the values as needed
-        sceneView.frame = CGRect(x: 0, y: hapticsButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (hapticsButton.frame.maxY + 10)) // Adjust the values as needed
+        sceneView.frame = CGRect(x: 0, y: (urgencylabel.frame.maxY + 10), width: view.frame.width, height: view.frame.height - (urgencylabel.frame.maxY + 30))
         
         view.bringSubviewToFront(RotateToggle)
         view.bringSubviewToFront(palpationOption)
         view.bringSubviewToFront(SelectPivot)
         view.bringSubviewToFront(recordHaptic)
+        view.bringSubviewToFront(saveButton)
         view.bringSubviewToFront(xLabel)
         view.bringSubviewToFront(yLabel)
         view.bringSubviewToFront(zLabel)
@@ -206,6 +210,8 @@ class skinmodel: UIViewController {
         view.bringSubviewToFront(yScale)
         view.bringSubviewToFront(zScale)
         view.bringSubviewToFront(hapticsButton)
+        view.bringSubviewToFront(uiLine1)
+        view.bringSubviewToFront(uiLine2)
         view.bringSubviewToFront(settingsButton)
         view.bringSubviewToFront(hapticsSettings)
         view.bringSubviewToFront(notesButton)
@@ -1029,9 +1035,13 @@ class skinmodel: UIViewController {
         similarButton.isHidden = true
         recordHaptic.isHidden = true
         settingsButton.isHidden = true
+        saveButton.isHidden = true
    //     smoothButton.isHidden = true
         palpationOption.isHidden = true
         hapticMethod.isHidden = true
+        uiLine1.isHidden = true
+        uiLine2.isHidden = true
+
         sceneView.debugOptions = SCNDebugOptions(rawValue: 2048)//shows the grid
         originalOrientation = sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation
         currentXVal = 0
@@ -1057,6 +1067,7 @@ class skinmodel: UIViewController {
         SelectPivot.isHidden = false
         hapticsButton.isHidden = false
         sceneView.debugOptions = [.showCreases]
+        
         notesButton.isHidden = false
         symptonsButton.isHidden = false
         treatmentButton.isHidden = false
@@ -1066,9 +1077,9 @@ class skinmodel: UIViewController {
         settingsButton.isHidden = false
   //      smoothButton.isHidden = false
         palpationOption.isHidden = false
-        hapticMethod.isHidden = false
+  //      hapticMethod.isHidden = false
         hideAxes()
-        
+        saveButton.isHidden = false
     }
     @IBAction func cancelPressed(_ sender: Any) {
         sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation = originalOrientation!
@@ -1410,7 +1421,7 @@ class skinmodel: UIViewController {
     @IBAction func hapticsPressed(_ sender: Any) {
         if !hapticsToggle{
             hapticsToggle = true
-            hapticsButton.tintColor = .green
+            hapticsButton.tintColor = .systemPink
             print(palpationToggle)
             if let originalPosition = originalCameraPosition {
                 sceneView.defaultCameraController.pointOfView?.position = originalPosition
@@ -1454,7 +1465,7 @@ class skinmodel: UIViewController {
         guard let popUp = storyboard?.instantiateViewController(withIdentifier: "NotesView") as? NotesView else {
             return
         }
-        if let skinCondition = condition {
+        if let skinCondition = self.condition {
             popUp.set(condition: skinCondition, type: "Notes", user: sourceType ?? .consultant)
             
             //navigationController?.pushViewController(popUp, animated: true)
@@ -1719,7 +1730,6 @@ class skinmodel: UIViewController {
                 recordHaptic.isHidden = false
                 saveButton.isHidden = false
                 hapticMethod.isHidden = true
-                recordHaptic.isHidden = true
                 print("Came from Consultant Login")
             case .student:
                 // Configuration for when coming from Student Login
@@ -1818,9 +1828,11 @@ class skinmodel: UIViewController {
                     print("check node is there")
                     print(self.sceneView.scene?.rootNode)
                     self.setupSceneView()
+                    print((self.condition?.heightMap.isEmpty) != nil)
+                    print(self.condition?.heightMap)
                     if ((self.condition?.heightMap.isEmpty) != nil){//if there is not a height map ( = [[]])
                         self.hapticsButton.isEnabled = false
-                        
+                        print("hi")
                         DispatchQueue.global(qos: .background).async{
                             
                                 let gradient = gradientMethod()
@@ -1830,7 +1842,19 @@ class skinmodel: UIViewController {
                                     //print error message
                                 }
                                 let transformedVertices = gradient.getTransformedVertices(node: node)
+                            
                                 var heightMap = gradient.createHeightMap4(from: transformedVertices, resolutionX: 80, resolutionZ: 80)//dynamically change ratio
+                            // Determine bounds for normalization
+                            let (minX, maxX, minZ, maxZ) =  transformedVertices.reduce((Float.infinity, -Float.infinity, Float.infinity, -Float.infinity)) { (bounds, vertex) in
+                                (min(bounds.0, vertex.x), max(bounds.1, vertex.x), min(bounds.2, vertex.z), max(bounds.3, vertex.z))
+                            }
+                           // print(heightMap)
+                            print("original vertices", transformedVertices)
+                            var convertedBack = gradient.convertHeightMapToVertices(heightMap: heightMap, resolutionX: 80, resolutionZ: 80, minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ)
+                            print("height map", convertedBack)
+                            let difference = gradient.compareVertices(originalVertices: transformedVertices, heightMapVertices: convertedBack)
+                            
+                            print("difference in accuracy: ", difference)
                             let minVal = findMinElement(in: heightMap)
                             let maxVal = findMaxElement(in: heightMap)
                             DispatchQueue.main.async{
@@ -1843,12 +1867,26 @@ class skinmodel: UIViewController {
                                 self.minHeight = minVal
                                 print("min", self.minHeight)
                                 self.hapticsButton.isEnabled = true
+                                
                             }
                             
                         }
                     }
                     else{
+                  //      let gradient = gradientMethod()
+                 //       guard let node = self.scene?.rootNode.childNode(withName: "Mesh", recursively: true) else {
+                      //      self.showError("Failed to get model geometry")
+                        //    return
+                            //print error message
+                   //     }
+                   //     let transformedVertices = gradient.getTransformedVertices(node: node)
                         self.originalHeightMap = self.condition?.heightMap
+                  //      let (minX, maxX, minZ, maxZ) =  transformedVertices.reduce((Float.infinity, -Float.infinity, Float.infinity, -Float.infinity)) { (bounds, vertex) in
+                  //          (min(bounds.0, vertex.x), max(bounds.1, vertex.x), min(bounds.2, vertex.z), max(bounds.3, vertex.z))
+                      //  }
+                 //       var convertedBack = gradient.convertHeightMapToVertices(heightMap: self.condition?.heightMap ?? [[]], resolutionX: 80, resolutionZ: 80, minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ)
+               //         let difference = gradient.compareVertices(originalVertices: transformedVertices, heightMapVertices: convertedBack)
+                //        print("difference in accuracy: ", difference)
                     }
                 } else {
                     print("Failed to download the file.")
@@ -2025,7 +2063,19 @@ class skinmodel: UIViewController {
         }
     }
     
+    func notesViewController(_ controller: NotesView, didUpdateNotes notes: String, type: String) {
+        if type == "Notes"{
+            
+            self.condition?.notes = notes
+        }else if type == "Treatment"{
+            self.condition?.treatment = notes
+        }else if type == "Symptoms"{
+            self.condition?.symptoms = notes
+            print(self.condition?.symptoms)
+        }
     
+
+    }
 
     
     

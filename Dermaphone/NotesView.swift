@@ -7,8 +7,12 @@
 
 import Foundation
 import UIKit
+protocol NotesViewControllerDelegate: AnyObject {
+    func notesViewController(_ controller: NotesView, didUpdateNotes notes: String, type: String)
+}
 
 class NotesView : UIViewController {
+    weak var delegate: NotesViewControllerDelegate?
     
     @IBOutlet weak var NotesTitle: UILabel!
     var editMode = false
@@ -97,6 +101,20 @@ class NotesView : UIViewController {
             editButton.backgroundColor = .green
             editButton.tintColor = .green
         }
+    }
+    
+    
+    @IBAction func saveButtonTapped(_ sender: Any) {
+        // Assume notesTextView contains the edited notes
+        let updatedNotes = text.text
+        print(updatedNotes)
+
+        // Notify the delegate about the update
+        delegate?.notesViewController(self, didUpdateNotes: updatedNotes ?? "", type: notesType ?? "")
+        print("hi")
+        
+        // Dismiss or pop the view controller
+        navigationController?.popViewController(animated: true)
     }
     
     func parseAndFormatText(_ rawText: String) -> NSAttributedString {

@@ -1028,7 +1028,62 @@ class gradientMethod{
         return newHeightMap
     }
     
-    
+    func convertHeightMapToVertices(heightMap: [[Float]], resolutionX: Int, resolutionZ: Int, minX: Float, maxX: Float, minZ: Float, maxZ: Float) -> [SCNVector3] {
+        var vertices: [SCNVector3] = []
+        
+        for ix in 0..<resolutionX {
+            for iz in 0..<resolutionZ {
+                let x = minX + Float(ix) / Float(resolutionX - 1) * (maxX - minX)
+                let z = minZ + Float(iz) / Float(resolutionZ - 1) * (maxZ - minZ)
+                print("x , z :", ix, iz)
+                var y = Float(0)
+             //   print(heightMap)
+                if heightMap[ix][iz] != Float.nan{
+                    y = heightMap[ix][iz]
+                }
+              //  let y = heightMap[ix][iz]
+                //if let y = heightMap[ix][iz]{
+                    vertices.append(SCNVector3(x, y, z))
+               // }
+               // else{
+                    
+              //  }
+                
+                
+            }
+        }
+        
+        return vertices
+    }
+
+    func compareVertices(originalVertices: [SCNVector3], heightMapVertices: [SCNVector3]) -> Float {
+        //guard originalVertices.count == heightMapVertices.count else {
+            print(originalVertices.count)
+            print(heightMapVertices.count)
+          //  fatalError("Vertex count mismatch")
+       // }
+        
+        var totalDifference: Float = 0.0
+        let numVertices = originalVertices.count
+        
+        for i in 0..<numVertices {
+            let originalVertex = originalVertices[i]
+            let heightMapVertex = closestDistance(points: heightMapVertices, inputPoint: originalVertex, k: 1)
+            
+          //  let heightMapVertex = heightMapVertices[i]
+            print(i)
+            
+            let difference = abs(originalVertex.y - heightMapVertex[0].y)
+            print(difference)
+            totalDifference += difference
+        }
+        
+        let averageDifference = totalDifference / Float(numVertices)
+        print("total difference: ", totalDifference)
+        print("average difference: ", averageDifference)
+        return averageDifference
+    }
+
 
 
 

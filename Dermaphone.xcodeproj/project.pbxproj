@@ -93,7 +93,6 @@
 		FFC1CEBB2BBB22AA00FD49B7 /* CaptureFolderState.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA62BBB22A900FD49B7 /* CaptureFolderState.swift */; };
 		FFC1CEBC2BBB22AA00FD49B7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA72BBB22A900FD49B7 /* ContentView.swift */; };
 		FFC1CEBE2BBB22AA00FD49B7 /* AsyncImageHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */; };
-		FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */; };
 		FFDB46862C022B5B005ECCF1 /* DatabaseManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDB46852C022B5B005ECCF1 /* DatabaseManagement.swift */; };
 		FFDB468A2C023D5E005ECCF1 /* testSceneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDB46892C023D5E005ECCF1 /* testSceneViewController.swift */; };
 		FFDBBA582BFF3F8C00CBEF79 /* LogIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDBBA572BFF3F8C00CBEF79 /* LogIn.swift */; };
@@ -131,6 +130,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		FF28F0712C1AE1CA00B0CA5A /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		FF5C1C792BD2F99400C097E9 /* skinModelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = skinModelViewController.swift; sourceTree = "<group>"; };
 		FF5C1C7B2BD2FA1000C097E9 /* HapticChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticChart.swift; sourceTree = "<group>"; };
 		FF5C1C7D2BD2FA8E00C097E9 /* HapticDataPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticDataPoint.swift; sourceTree = "<group>"; };
@@ -194,7 +194,6 @@
 		FFC1CEA62BBB22A900FD49B7 /* CaptureFolderState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureFolderState.swift; sourceTree = "<group>"; };
 		FFC1CEA72BBB22A900FD49B7 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncImageHelpers.swift; sourceTree = "<group>"; };
-		FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = photogrammetryAPI.swift; sourceTree = "<group>"; };
 		FFDB46852C022B5B005ECCF1 /* DatabaseManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManagement.swift; sourceTree = "<group>"; };
 		FFDB46892C023D5E005ECCF1 /* testSceneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testSceneViewController.swift; sourceTree = "<group>"; };
 		FFDBBA572BFF3F8C00CBEF79 /* LogIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogIn.swift; sourceTree = "<group>"; };
@@ -285,6 +284,7 @@
 		FF662E442BF234E000FD9411 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FF28F0712C1AE1CA00B0CA5A /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -295,8 +295,6 @@
 				FF5C1C872BD310E400C097E9 /* skin3_tex0.png */,
 				FF5C1C812BD2FCBD00C097E9 /* HapticRendering.swift */,
 				FF5C1C7D2BD2FA8E00C097E9 /* HapticDataPoint.swift */,
-				FFF154C12BBC375700834F38 /* 3dmodelSkin2 */,
-				FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */,
 				FFB13A7F2BAE183600A94673 /* Dermaphone */,
 				FFB13A962BAE183800A94673 /* DermaphoneTests */,
 				FFB13AA02BAE183800A94673 /* DermaphoneUITests */,
@@ -318,6 +316,7 @@
 		FFB13A7F2BAE183600A94673 /* Dermaphone */ = {
 			isa = PBXGroup;
 			children = (
+				FFF154C12BBC375700834F38 /* 3dmodelSkin2 */,
 				FF5C1C7B2BD2FA1000C097E9 /* HapticChart.swift */,
 				FFC1CE932BBB22A900FD49B7 /* CaptureSample */,
 				FFB13A802BAE183600A94673 /* AppDelegate.swift */,
@@ -417,7 +416,8 @@
 				FFF154C62BBC375700834F38 /* skin2.mtl */,
 				FFF154C72BBC375700834F38 /* skin2_tex0.png */,
 			);
-			path = 3dmodelSkin2;
+			name = 3dmodelSkin2;
+			path = ../3dmodelSkin2;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -741,7 +741,6 @@
 				FFC1CEB02BBB22AA00FD49B7 /* InfoPanelView.swift in Sources */,
 				FFC1CEAA2BBB22AA00FD49B7 /* ImageLoader.swift in Sources */,
 				FF662E862BF2ADD800FD9411 /* DataExtensions.swift in Sources */,
-				FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */,
 				FFC1CEB32BBB22AA00FD49B7 /* CaptureSampleApp.swift in Sources */,
 				FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */,
 				FFDB46862C022B5B005ECCF1 /* DatabaseManagement.swift in Sources */,

@@ -165,7 +165,7 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
           print("Error getting documents: \(error)")
             DispatchQueue.main.async {
                            // Ensure UI updates are on the main thread
-                           self.errorUI()
+                self.errorUI("Error loading models: \(error.localizedDescription)")
                        }
         }
 
@@ -240,8 +240,13 @@ class LesionLibrary: UIViewController, UITableViewDataSource{
         
     }
     
-    func errorUI(){
-        
+    
+    func errorUI(_ message: String) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(alert, animated: true)
+        }
     }
     
     func convertHeightMap(heightMapArray : [Float], rows : Int, columns : Int)->[[Float]]{

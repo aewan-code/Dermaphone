@@ -62,8 +62,7 @@ class gradientMethod{
                 }
             }
             
-            
-            // At this point you can read the data from the float array
+        
             let x = vectorData[0]
             let y = vectorData[1]
             let z = vectorData[2]
@@ -71,8 +70,6 @@ class gradientMethod{
             // Append the vertex to the array
             vertices.append(SCNVector3(x, y, z))
             
-            // ... or just log it
-            //  print("x: \(x), y: \(y), z: \(z)")
         }
         
         return vertices
@@ -137,8 +134,7 @@ class gradientMethod{
                 }
             }
             
-            
-            // At this point you can read the data from the float array
+      
             let x = vectorData[0]
             let y = vectorData[1]
             let z = vectorData[2]
@@ -150,15 +146,14 @@ class gradientMethod{
             let coordinateString = "\(point)\n"
             // Convert the string to Data
             //   if let data = coordinateString.data(using: .utf8) {
-            // Write the Data to the file
+ 
             if let data = coordinateString.data(using: .utf8) {
                 // Write the Data to the file
                 fileHandle.write(data)
             }
             print(i)
             
-            // ... or just log it
-            //  print("x: \(x), y: \(y), z: \(z)")
+
         }
         fileHandle.closeFile()
         return vertices
@@ -602,7 +597,6 @@ class gradientMethod{
                 highPassHeightMap[i][j] = heightMap[i][j] - appliedKernel[i][j]
             }
         }
-        //RETURN THE DIFFERENCE BETWEEN THE GAUSSIAN AND THAT VALUE
         return appliedKernel//highPassHeightMap
         
     }
@@ -647,7 +641,7 @@ class gradientMethod{
         return max(10, Int(ceil(range / desiredCellWidth)))  // Ensure at least a minimum grid size
     }
     func extractHeightMap(from geometry: SCNGeometry, gridSizeX: Int, gridSizeZ: Int) -> [[Float]]? {
-        // Ensure the vertex source is available and correctly formatted
+        
         guard let vertexSource = geometry.sources.first(where: { $0.semantic == .vertex }) else { return nil }
         
         let stride = vertexSource.dataStride // in bytes
@@ -686,7 +680,7 @@ class gradientMethod{
             }
         }
         
-        // Extract vertices and find min/max as previously described
+       
         let desiredCellWidth = 0.01
         // Calculate dynamic grid sizes based on min/max and desired cell width
         let gridSizeX = dynamicGridSize(min: minX, max1: maxX, desiredCellWidth: Float(desiredCellWidth))
@@ -695,7 +689,7 @@ class gradientMethod{
         // Initialize heightMap array
         var heightMap = Array(repeating: Array(repeating: Float.nan, count: gridSizeZ), count: gridSizeX)
         
-        // Process vertices to populate the height map
+       
         for vertex in vertices {
             let x = vertex.x
             let z = vertex.z
@@ -706,13 +700,13 @@ class gradientMethod{
             let iz = min(gridSizeZ - 1, max(0, Int((z - minZ) / (maxZ - minZ) * Float(gridSizeZ - 1))))
             
             // Set or average y value in the height map
-            heightMap[ix][iz] = y  // Adjust this line to handle averaging or max pooling if needed
+            heightMap[ix][iz] = y
         }
         
         return heightMap
     }
     
-    func createGeom() -> SCNGeometry{
+    func createGeom() -> SCNGeometry{//test geometry
         let height : [[Float]] = [[0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.25, 0.75, 1.25, 1.25, 0.75, 0.25, 0.0, 0.0], [0.0, 0.25, 1.25, 2.25, 3.25, 3.25, 2.25, 1.25, 0.25, 0.0], [0.0, 0.75, 2.25, 3.75, 4.75, 4.75, 3.75, 2.25, 0.75, 0.0], [0.0, 1.25, 3.25, 4.75, 5.0, 5.0, 4.75, 3.25, 1.25, 0.0], [0.25, 1.25, 3.25, 4.75, 5.0, 5.0, 4.75, 3.25, 1.25, 0.25], [0.0, 0.75, 2.25, 3.75, 4.75, 4.75, 3.75, 2.25, 0.75, 0.0], [0.0, 0.25, 1.25, 2.25, 3.25, 3.25, 2.25, 1.25, 0.25, 0.0], [0.0, 0.0, 0.25, 0.75, 1.25, 1.25, 0.75, 0.25, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0]]
         
         let rows = height.count
@@ -816,11 +810,11 @@ class gradientMethod{
                 let ix = Int(((x - minX) / (maxX - minX)) * Float(resolutionX - 1))
                 let iz = Int(((z - minZ) / (maxZ - minZ)) * Float(resolutionZ - 1))
                 
-                // Handle multiple y values: take the maximum or average them out
+
                 if heightMap[ix][iz].isNaN {
                     heightMap[ix][iz] = y
                 } else {
-                    // Replace the next line with your chosen method (average, min, max, etc.)
+        
                     heightMap[ix][iz] = max(heightMap[ix][iz], y)
                 }
             }
@@ -831,11 +825,9 @@ class gradientMethod{
     
     func createCustomCone(top: SCNVector3, radius: CGFloat, slices: Int) -> SCNGeometry {
         var vertices = [SCNVector3]()
-        vertices.append(top) // Top vertex of the cone
-
-        // Calculate the vertices around the base with varying angular increments
+        vertices.append(top)
         let centerBase = SCNVector3(top.x, top.y - Float(radius), top.z)
-        vertices.append(centerBase) // Center of the base for easy base creation
+        vertices.append(centerBase)
 
         for i in 0..<slices {
             let angularIncrement = CGFloat(i) * 2.0 * .pi / CGFloat(slices)
@@ -922,11 +914,11 @@ class gradientMethod{
                 return // Skip this vertex if out of bounds
             }
 
-            // Assign height value using y-coordinate, choose method to handle multiple values (e.g., max, average)
+       
             if heightMap[ix][iz].isNaN {
                 heightMap[ix][iz] = vertex.y
             } else {
-                // Use the maximum height for overlapping vertices or choose another method like average
+           
                 heightMap[ix][iz] = max(heightMap[ix][iz], vertex.y)
             }
         }
@@ -1015,10 +1007,7 @@ class gradientMethod{
                         print(j)
                         newHeightMap[i][j] = 0
                     }
-             //      let gradient_x = (heightMap[i+1][j] - heightMap[i-1][j]) / 2
-              //      let gradient_z = (heightMap[i][j+1] - heightMap[i][j-1]) / 2
-               //     let gradientMag = (gradient_x * gradient_x) + (gradient_z * gradient_z)
-                        //    newHeightMap[i][j] = gradientMag
+    
                 }
             }
         }

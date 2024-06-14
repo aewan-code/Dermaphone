@@ -17,7 +17,7 @@ struct HapticChart: View {
             }
         }
         .padding()
-        .chartXAxisLabel("Time (seconds)")//DOUBLE CHECK
+        .chartXAxisLabel("Time (seconds)")
         .chartYAxisLabel("Taptic Intensity")
         
     }

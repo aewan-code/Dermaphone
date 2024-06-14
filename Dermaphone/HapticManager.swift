@@ -1,7 +1,7 @@
 import CoreHaptics
 import UIKit
 class HapticManager{
-    
+    //old code -> see Haptics Class
     // Haptic Engine & Player State:
  /*   private var engine: CHHapticEngine!
     private var engineNeedsStart = true

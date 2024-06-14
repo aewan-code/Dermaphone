@@ -266,30 +266,7 @@ class skinmodel: UIViewController {
         navBar.titleView?.isHidden = false
         gradientEffect = false
 
-     /*  DispatchQueue.global(qos: .background).async{
-            
-            
-            DispatchQueue.main.async{
-                let gradient = gradientMethod()
-                print("CHECK HERE")
-                let geom = self.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.geometry
-                
-                let geom1 = gradient.createCustomCone(top: SCNVector3(0, 0.5, 0), radius: 0.5, slices: 20)
-                let coneNode = SCNNode(geometry: geom1)
-               // self.scene?.rootNode.addChildNode(node)
-                let node = self.scene?.rootNode.childNode(withName: "Mesh", recursively: true)
-                let transformedVertices = gradient.getTransformedVertices(node: node ?? coneNode)
-                var heightMap = gradient.createHeightMap4(from: transformedVertices, resolutionX: 80, resolutionZ: 80)
 
-                print("start")
-                print(heightMap)
-                self.originalHeightMap = heightMap
-                self.enhancedMap = self.originalHeightMap ?? [[]]
-                self.maxHeight = findMaxElement(in: self.originalHeightMap ?? [[]])
-                self.minHeight = findMinElement(in: self.originalHeightMap ?? [[]])
-                print("done")
-            }
-        }*/
         setFilters()
         configureBasedOnSource()
         
@@ -316,10 +293,8 @@ class skinmodel: UIViewController {
             
         }
         
-        //edge case - no conditions created - resolve this
        
         filterSetting.menu = UIMenu(children : [
-            //bug - without pressing anything - should go to the currently selected item
             UIAction(title : "None", handler : optionClosure),
             UIAction(title : "Gaussian", handler : optionClosure),
             UIAction(title : "Second Derivative", handler : optionClosure),
@@ -337,19 +312,16 @@ class skinmodel: UIViewController {
     func convertTextToSCNVector3(text: String) -> [SCNVector3] {
         var vectorList: [SCNVector3] = []
         
-        // Split text into lines
         let lines = text.components(separatedBy: .newlines)
         
         // Iterate over each line and convert it to SCNVector3
         for line in lines {
-            // Example line format: SCNVector3(x: 0.102449834, y: 8.901209e-05, z: 0.15636508)
-            
-            // Remove "SCNVector3" and parentheses
+  
             var cleanLine = line.replacingOccurrences(of: "SCNVector3", with: "")
             cleanLine = cleanLine.replacingOccurrences(of: "(", with: "")
             cleanLine = cleanLine.replacingOccurrences(of: ")", with: "")
             
-            // Split line by commas to get individual components
+
             let components = cleanLine.components(separatedBy: ",")
             
             // Extract x, y, and z values
@@ -360,7 +332,7 @@ class skinmodel: UIViewController {
                   let x = Float(xString),
                   let y = Float(yString),
                   let z = Float(zString) else {
-                // Skip this line if it doesn't match the expected format
+
                 continue
             }
             
@@ -370,24 +342,10 @@ class skinmodel: UIViewController {
         
         return vectorList
     }
-    
-/*    @IBAction func applyGaussian(_ sender: Any) {
-        if !gradientToggle{
-            gradientToggle = true
-       //     smoothButton.tintColor = .green
-        }
-        else{
-            gradientToggle = false
-          //  smoothButton.tintColor = .blue
-        }
-    }*/
-  /*  func applyGaussian(){
 
-    }*/
-    
 
     func extractVertices(from geometry: SCNGeometry) -> [SCNVector3]? {//returns all the vertices from
-        // Get vertex sources
+       
         guard let vertexSource = geometry.sources.first(where: { $0.semantic == .vertex }) else {return nil}
 
 
@@ -398,7 +356,7 @@ class skinmodel: UIViewController {
         let bytesPerVector = componentsPerVector * bytesPerComponent
         let vectorCount = vertexSource.vectorCount
 
-        var vertices = [SCNVector3]() // A new array for vertices
+        var vertices = [SCNVector3]()
 
         // For each vector, read the bytes
         for i in 0..<vectorCount {
@@ -406,37 +364,31 @@ class skinmodel: UIViewController {
             // If it was 8 then it would be a double (aka CGFloat)
             var vectorData = [Float](repeating: 0, count: componentsPerVector)
 
-            // The range of bytes for this vector
             let byteRange = i * stride + offset ..< i * stride + offset + bytesPerVector
             
-            vertexSource.data.withUnsafeBytes { (rawBufferPointer: UnsafeRawBufferPointer) in//explain code
-                // Bind the raw buffer pointer to the desired type (Float)
+            vertexSource.data.withUnsafeBytes { (rawBufferPointer: UnsafeRawBufferPointer) in
                 let typedBufferPointer = rawBufferPointer.bindMemory(to: Float.self)
 
                 // Access the base address of the typed buffer pointer
                 if let baseAddress = typedBufferPointer.baseAddress {
-                    // Calculate the destination pointer for the copy operation
-                    let destinationPointer = UnsafeMutablePointer<Float>.allocate(capacity: bytesPerVector / MemoryLayout<Float>.stride)
                     
-                    // Convert destinationPointer to UnsafeMutableRawPointer
+                    let destinationPointer = UnsafeMutablePointer<Float>.allocate(capacity: bytesPerVector / MemoryLayout<Float>.stride)
+              
                     let destinationRawPointer = UnsafeMutableRawPointer(destinationPointer)
                     
-                    // Convert destinationRawPointer to UnsafeMutableRawBufferPointer
+     
                     let destinationBufferPointer = UnsafeMutableRawBufferPointer(start: destinationRawPointer, count: bytesPerVector)
                     
-                    // Copy bytes from the byte range to the destination buffer pointer
+ 
                     rawBufferPointer.copyBytes(to: destinationBufferPointer, from: byteRange)
                     
-                    // Convert the copied bytes to an array of Float (vectorData)
                     vectorData = Array(UnsafeBufferPointer(start: destinationPointer, count: bytesPerVector / MemoryLayout<Float>.stride))
                     
-                    // Deallocate the memory allocated for the destination pointer
+    
                     destinationPointer.deallocate()
                 }
             }
 
-
-            // At this point you can read the data from the float array
             let x = vectorData[0]
             let y = vectorData[1]
             let z = vectorData[2]
@@ -444,8 +396,7 @@ class skinmodel: UIViewController {
             // Append the vertex to the array
             vertices.append(SCNVector3(x, y, z))
 
-            // ... or just log it
-            print("x: \(x), y: \(y), z: \(z)")
+       
         }
 
         return vertices
@@ -466,20 +417,17 @@ class skinmodel: UIViewController {
         material.diffuse.contents = UIColor.red // Color of the vertices
         sphereGeometry.materials = [material]
 
-        // Create nodes for each vertex and position them
+
         for vertex in Vertices {
             let vertexNode = SCNNode(geometry: sphereGeometry)
-           // vertexNode.position = vertex
-            // Adjust the position to be relative to the parent node
-          //  vertexNode.position = vertex + parentNode.position // Adjusted position
-            // Optionally, you can add some customization to the nodes
+
             vertexNode.position = SCNVector3Make(
                 vertex.x + (parentNode.childNode(withName: "Mesh", recursively: true)?.position.x ?? 0),
                 vertex.y + (parentNode.childNode(withName: "Mesh", recursively: true)?.position.y ?? 0),
                 vertex.z + (parentNode.childNode(withName: "Mesh", recursively: true)?.position.z ?? 0)
             )
 
-            // Add the vertex node to the scene
+ 
             parentNode.addChildNode(vertexNode)
         }
     }
@@ -500,7 +448,7 @@ class skinmodel: UIViewController {
         //let childTransform = childNode.worldTransform
         let transf = childNode.transform
 
-        // Create nodes for each vertex and position them relative to the child's transformed position
+      
         for vertex in vertices {
             let vertexPosition = SCNVector3ToGLKVector3(vertex)
             let childTransf = SCNMatrix4ToGLKMatrix4(transf)
@@ -511,9 +459,7 @@ class skinmodel: UIViewController {
 
             let vertexNode = SCNNode(geometry: sphereGeometry)
             vertexNode.position = transformedVertex
-            // Optionally, you can add some customization to the nodes
-
-            // Add the vertex node to the scene
+       
             childNode.addChildNode(vertexNode)
         }
     }
@@ -545,31 +491,12 @@ class skinmodel: UIViewController {
                         print("surface normal", result.localNormal)
                         // Node is touched, perform desired action
                         let position = result.localCoordinates
-                        //later remove so that first point is only added if continued onto touches moved
+                    
 
                         prevPoint = position.y
                         previousPosition = modelLocation(xPos: position.x, yPos: position.y, zPos: position.z)
                        // if !(hapticTransient ?? true) && hapticsToggle && !palpationToggle{
                         if hapticsToggle && !palpationToggle{
-                      /*      //continuous mode
-                            let tempGradient = gradientMethod()
-                            let approxPoint = tempGradient.closestDistance(points: smoothedCloud ?? [], inputPoint: position, k: 1)[0]
-                            //gets scaled height value between 1 and 0
-                            let scaledValue = HeightMap().scaleValue(value: approxPoint.y, maxValue: maxContinuous ?? 1, minValue: minContinuous ?? 0)
-                            tempHaptics?.createContinuousHapticPlayer(initialIntensity: scaledValue, initialSharpness: 0.73)
-                            currentIntensity = 0.1
-                            currentSharpness = scaledValue
-                         //   tempHaptics?.continuousPlayer.start(atTime: 0)
-                            // Warm engine.
-                            do {
-                                // Begin playing continuous pattern.
-                        //    try tempHaptics?.continuousPlayer?.start(atTime: CHHapticTimeImmediate)
-                                print("STARTED CONTINUOUS PLAYER")
-                            } catch let error {
-                                print("Error starting the continuous haptic player: \(error)")
-                            }*/
-
-                           // let rotation = SCNQuaternion(x: 0.0, y: (position.y * Float.pi)/180, z: 0.0, w: (position.y * Float.pi)/180)
 
                             
                         }
@@ -583,10 +510,8 @@ class skinmodel: UIViewController {
                             let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test, scale: self.rotationScaleVal)
                             let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
 
-                            //print("New camera orientation:", cameraNode.rotation)
                             sceneView.defaultCameraController.pointOfView?.transform = newTransform
-                        //    rotatePalpation(result: result)
-                        //    let angleInRadians: Float = 1 * (Float.pi / 180) // Convert 1 degree to radians
+          
 
                         }
                         return
@@ -618,15 +543,7 @@ class skinmodel: UIViewController {
                     let zChange = (position.z - (previousPosition?.zPos ?? 0.0))
                     let nextPoint = tempGradient.closestDistance(points: transientCloud ?? [], inputPoint: SCNVector3(position.x + xChange, position.y, position.z + zChange), k: 1)[0]
                     let changeInGradient = (Float(approxPoint.y - nextPoint.y) + Float(approxPoint.y - (previousPosition?.yPos ?? 0.0)))/2.0
-                    print("points")
-                    print(position.y)
-                    print(approxPoint.y)
-                    print(nextPoint.y)
-                    print(previousPosition?.yPos)
-                    print(changeInGradient)
-                    print("end")
                     
-                    //height = (approxPoint.y * 1000) + 1
                     height = abs(changeInGradient * 10000)
                 }
                 else if gradientToggle && !(hapticTransient ?? true){
@@ -675,88 +592,7 @@ class skinmodel: UIViewController {
                         var scaledValue = Float(0)  // HeightMap().scaleValue(value: approxPoint.y, maxValue: maxContinuous ?? 1, minValue: minContinuous ?? 0)
                         print("filter name", self.filter)
                         
-                       /* switch self.filter {
-                        case .none:
-                            scaledValue = HeightMap().scaleValue(value: position.y, maxValue: maxPoint?.y ?? 1, minValue: minPoint?.y ?? 0)
-                            height = scaledValue
-                            print("height", height)
-                        case .gaussian:
-                            if let allVertices = modelVertices {
-                                print("start gauss")
-
-                                print(position)
-                                let gaussianMax = self.filterMax?.y ?? 1
-                                let gaussianMin = self.filterMin?.y ?? 0
-                                let gaussian = tempGradient.applyGaussianFilter(to: position, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
-                                scaledValue = HeightMap().scaleValue(value: gaussian.y, maxValue: gaussianMax, minValue: gaussianMin)
-                                print(gaussian)
-                          //      print("gaussian bump")
-                           //     print(kVal)
-                           //     print(sigmaVal)
-                              //  print(allVertices)
-                                //bumpy
-                                let bumpyHeight = position.y - gaussian.y
-                                print("bumpyheight", bumpyHeight)
-                                print(gaussianMax)
-                                print(gaussianMin)
-                                print((minPoint?.y ?? 0) - gaussianMin)
-                                height = HeightMap().scaleValue(value: bumpyHeight, maxValue: (maxPoint?.y ?? 1) - (gaussianMax), minValue: (minPoint?.y ?? 0) - (gaussianMin))
-                            //    print(gaussianMax)
-                            //    print(gaussianMin)
-                                print("height", height)
-                            
-                                
-                            }
-                        
-                            else{
-                                //
-                            }
-                        case .heightMap:
-                            let gridPoint = mapPointToHeightMap(hitResult: result, gridSize: 50)//113)
-                            if let rickerMap = self.enhancedMap {
-                                let (gridX, gridY) = gridPoint
-                                if gridY >= 0 && gridY < rickerMap.count && gridX >= 0 && gridX < rickerMap[gridY].count {
-                                    let value = rickerMap[gridY][gridX]
-                                    height = value
-                                    print("Height Map Height")
-                                    print(height)
-                                    } else {
-                                        // Handle the case where the point is outside the bounds of the height map
-                                        print("invalid access")// Returning NaN or another sentinel value to indicate an invalid access
-                                    }
-                                
-                            }
-                        case .average:
-                            if let allVertices = modelVertices {
-                                let average = tempGradient.addNewAverage(inputPoint: position, originalPointCloud: allVertices, k: kVal)
-                                
-                            //    print("average bump")
-                                let bumpyHeight = position.y - average.y
-                                let averageMax = self.filterMax?.y ?? 1
-                                let averageMin = self.filterMin?.y ?? 0
-                                scaledValue = HeightMap().scaleValue(value: average.y, maxValue: averageMax, minValue: averageMin)
-                                height = HeightMap().scaleValue(value: bumpyHeight, maxValue: (maxPoint?.y ?? 1) - (averageMax), minValue: (minPoint?.y ?? 0) - (averageMin))
-                                print("height", height)
-                           //     print(averageMax)
-                           //     print(averageMin)
-                           //     print(self.filterMax?.y)
-                            }
-                            else{
-                                //
-                            }
-                        case .edge:
-                            if let allVertices = modelVertices {
-                                let accentuated = tempGradient.applyMexicanHatFilter(to: position, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
-                                
-                                let accentuatedMax = self.filterMax?.y ?? 1
-                                let accentuatedMin = self.filterMin?.y ?? 0
-                                scaledValue = HeightMap().scaleValue(value: (position.y - accentuated.y), maxValue: (maxPoint?.y ?? 1) - (accentuatedMax), minValue: (minPoint?.y ?? 0) - (accentuatedMin))
-                                height = HeightMap().scaleValue(value: accentuated.y, maxValue: accentuatedMax , minValue: accentuatedMin)
-                                print("height", height)
-                                
-                            }
-                        
-                    }*/
+                      
                         let gridSize = enhancedMap?.endIndex
                         print("grid size", gridSize)
                         let gridPoint = mapPointToHeightMap(hitResult: result, gridSize: 80)//
@@ -1536,14 +1372,11 @@ class skinmodel: UIViewController {
         // Current camera orientation
         guard let currentOrientation = sceneView.defaultCameraController.pointOfView?.orientation else { return  }
 
-        // Create a target orientation: this assumes the normal is in world coordinates
-        // You may need to convert it from local to world coordinates depending on your setup
         let targetOrientation = SCNQuaternion(x: -normal.x, y: -normal.y, z: -normal.z, w: 1)
 
         // Interpolate between the current orientation and the target orientation
         let slerpQuat = slerp(from: currentOrientation, to: targetOrientation, fraction: 0.1) // Adjust fraction for smoother or faster rotation
 
-        // Set the new orientation to the camera
         sceneView.defaultCameraController.pointOfView?.orientation = slerpQuat
         
         let lookAtDirection = SCNVector3(-normal.x, -normal.y, -normal.z)
@@ -1572,7 +1405,7 @@ class skinmodel: UIViewController {
     }
 
     func slerp1(from: SCNQuaternion, to: SCNQuaternion, fraction: CGFloat) -> SCNQuaternion {
-        // Simple lerp formula for demonstration; consider using simd.slerp for better results
+
         let lerp = SCNQuaternion(x: from.x + (to.x - from.x) * Float(fraction),
                                  y: from.y + (to.y - from.y) * Float(fraction),
                                  z: from.z + (to.z - from.z) * Float(fraction),
@@ -1635,16 +1468,7 @@ class skinmodel: UIViewController {
             }
             
         case "Second Derivative":
-            //self.filter = .average
-            //self.kVal = Int(kSetting.value)
-
-          /*  guard let maxPoint = self.maxPoint, let allVertices = self.modelVertices, let minPoint = self.minPoint else {
-                return
-            }
-            let tempGradient = gradientMethod()
-            self.filterMax = tempGradient.addNewAverage(inputPoint: maxPoint, originalPointCloud: allVertices, k: kVal)
-
-            self.filterMin = tempGradient.addNewAverage(inputPoint: minPoint, originalPointCloud: allVertices, k: kVal)*/
+ 
             let tempGradient = gradientMethod()
             let tempHeightMap = tempGradient.convertHeightMapToGradient(heightMap: originalHeightMap ?? [[]])
             let secondTemp = tempGradient.convertHeightMapToGradient(heightMap: tempHeightMap.0)
@@ -1713,7 +1537,7 @@ class skinmodel: UIViewController {
         let gridX = Int(normalizedX * Float(gridSize - 1))
         let gridY = Int(normalizedZ * Float(gridSize - 1))
 
-        // Clamp the values to ensure they are within the grid bounds
+        // ensure they are within the grid bounds
         let clampedGridX = max(0, min(gridX, gridSize - 1))
         let clampedGridY = max(0, min(gridY, gridSize - 1))
 
@@ -1854,7 +1678,7 @@ class skinmodel: UIViewController {
                             print("height map", convertedBack)
                             let difference = gradient.compareVertices(originalVertices: transformedVertices, heightMapVertices: convertedBack)
                             
-                            print("difference in accuracy: ", difference)
+                      //      print("difference in accuracy: ", difference)
                             let minVal = findMinElement(in: heightMap)
                             let maxVal = findMaxElement(in: heightMap)
                             DispatchQueue.main.async{
@@ -1873,20 +1697,9 @@ class skinmodel: UIViewController {
                         }
                     }
                     else{
-                  //      let gradient = gradientMethod()
-                 //       guard let node = self.scene?.rootNode.childNode(withName: "Mesh", recursively: true) else {
-                      //      self.showError("Failed to get model geometry")
-                        //    return
-                            //print error message
-                   //     }
-                   //     let transformedVertices = gradient.getTransformedVertices(node: node)
+
                         self.originalHeightMap = self.condition?.heightMap
-                  //      let (minX, maxX, minZ, maxZ) =  transformedVertices.reduce((Float.infinity, -Float.infinity, Float.infinity, -Float.infinity)) { (bounds, vertex) in
-                  //          (min(bounds.0, vertex.x), max(bounds.1, vertex.x), min(bounds.2, vertex.z), max(bounds.3, vertex.z))
-                      //  }
-                 //       var convertedBack = gradient.convertHeightMapToVertices(heightMap: self.condition?.heightMap ?? [[]], resolutionX: 80, resolutionZ: 80, minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ)
-               //         let difference = gradient.compareVertices(originalVertices: transformedVertices, heightMapVertices: convertedBack)
-                //        print("difference in accuracy: ", difference)
+
                     }
                 } else {
                     print("Failed to download the file.")
@@ -1962,7 +1775,7 @@ class skinmodel: UIViewController {
             //update existing values -> height map, rotationscale
             let modelRef = db.collection("models").document(conditionName)
             DispatchQueue.global(qos: .background).async {
-                // Set the "capital" field of the city 'DC'
+ 
                 modelRef.updateData([
                     "heightmap": convertedMap.0,
                     "rows": convertedMap.1,
@@ -1990,10 +1803,9 @@ class skinmodel: UIViewController {
         let database = DatabaseManagement()
         let localFile = database.localFileURL(for: "scene.usdz", directory: .documentDirectory)
         let newUrl = "models/" + (self.condition?.name ?? "") + ".usdz"
-        // Create a reference to the file you want to upload
+
         let modelRef = storageRef.child(newUrl)
 
-        // Upload the file to the path "images/rivers.jpg"
         let uploadTask = modelRef.putFile(from: localFile, metadata: nil) { metadata, error in
           guard let metadata = metadata else {
             // Uh-oh, an error occurred!
@@ -2002,10 +1814,10 @@ class skinmodel: UIViewController {
           }
           // Metadata contains file metadata such as size, content-type.
           let size = metadata.size
-          // You can also access to download URL after upload.
+     
           modelRef.downloadURL { (url, error) in
             guard let downloadURL = url else {
-              // Uh-oh, an error occurred!
+
                 self.showError("Error creating model")
               return
             }

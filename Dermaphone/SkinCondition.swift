@@ -9,7 +9,7 @@ import UIKit
 
 class SkinCondition{
     let name : String
-    let description : String?//are they required when creating the skin condition package?
+    let description : String?
     var image : [UIImage]?
     var texture : String?//features e.g. colour
     var symptoms : String?
@@ -22,7 +22,6 @@ class SkinCondition{
     let urgency : String?
     var isCreated : Bool
     var rotationScale : Int
- //   let model : [skinmodel]//Should this be a view controller? List of all models that are this skin condition
     init(name : String, description : String, texture : String, symptoms : String, treatment : String, modelName : String, images : [UIImage], modelFile : String, similarConditions : [(SkinCondition, String)], notes : String, urgency : String, heightMap : [[Float]], isCreated : Bool, rotationScale : Int ){
         self.name = name
         self.description = description
@@ -39,25 +38,6 @@ class SkinCondition{
         self.isCreated = isCreated
         self.rotationScale = rotationScale
     }
-    
-    //set image - either from gallery or from camera or from model (screenshot) (ideally needs to be top down view). Can it get dermnet image maybe?
-    func setImage(){
-        
-    }
-    
-    func changeTreatment(){
-        
-    }
-    
-    
-    //link to (all or most compatible?)other skin conditions, related by texture, colour, diagnosis method, treatment etc
-    //do i need information about how they are connected?
-    func addLink(){
-        
-    }
-    
-    func removeConditionLink(){
-        
-    }
+
     
 }

@@ -215,6 +215,33 @@ class CameraViewModel: ObservableObject {
 
         // If authorization fails, set setupResult to .unauthorized.
         requestAuthorizationIfNeeded()
+        if let device = AVCaptureDevice.default(for: .video){
+            do {
+                try device.lockForConfiguration()
+                
+                // Enable continuous auto-focus
+                if device.isFocusModeSupported(.continuousAutoFocus) {
+                    device.focusMode = .continuousAutoFocus
+                    print("autofocus")
+                }
+                
+                // Set auto-focus range restriction if needed
+                if device.isAutoFocusRangeRestrictionSupported {
+           //         device.autoFocusRangeRestriction = .near
+             //       print("range restriction")
+                }
+                
+                // Enable auto-exposure
+                if device.isExposureModeSupported(.continuousAutoExposure) {
+                    device.exposureMode = .continuousAutoExposure
+                    print("auto exposure")
+                }
+                
+                device.unlockForConfiguration()
+            } catch {
+                print("Error configuring device: \(error.localizedDescription)")
+            }
+        }
         sessionQueue.async {
             self.configureSession()
         }

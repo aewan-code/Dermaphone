@@ -14,8 +14,8 @@
             filePath = "Dermaphone/skinModelViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "775"
-            endingLineNumber = "775"
+            startingLineNumber = "609"
+            endingLineNumber = "609"
             landmarkName = "touchesMoved(_:with:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -23,16 +23,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "1AB14C62-86C9-4D9C-8FFE-1BD8CD65B2E1"
-            shouldBeEnabled = "No"
+            uuid = "A0D2E89D-03E4-498F-B7A8-73D23CD856D6"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Dermaphone/skinModelViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "315"
-            endingLineNumber = "315"
-            landmarkName = "viewDidLoad()"
+            startingLineNumber = "1967"
+            endingLineNumber = "1967"
+            landmarkName = "savePressed(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

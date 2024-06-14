@@ -74,6 +74,7 @@
 		FFB13AA42BAE183800A94673 /* DermaphoneUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13AA32BAE183800A94673 /* DermaphoneUITestsLaunchTests.swift */; };
 		FFB13B412BAF034600A94673 /* testTexture.ahap in Resources */ = {isa = PBXBuildFile; fileRef = FFB13B402BAF034600A94673 /* testTexture.ahap */; };
 		FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB13B422BB1D41500A94673 /* Haptics.swift */; };
+		FFC117DE2C07B30B003AC758 /* loginStudent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC117DD2C07B30B003AC758 /* loginStudent.swift */; };
 		FFC1CEAA2BBB22AA00FD49B7 /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE942BBB22A900FD49B7 /* ImageLoader.swift */; };
 		FFC1CEAB2BBB22AA00FD49B7 /* Capture.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE952BBB22A900FD49B7 /* Capture.swift */; };
 		FFC1CEAC2BBB22AA00FD49B7 /* CaptureFoldersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CE962BBB22A900FD49B7 /* CaptureFoldersView.swift */; };
@@ -92,7 +93,6 @@
 		FFC1CEBB2BBB22AA00FD49B7 /* CaptureFolderState.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA62BBB22A900FD49B7 /* CaptureFolderState.swift */; };
 		FFC1CEBC2BBB22AA00FD49B7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA72BBB22A900FD49B7 /* ContentView.swift */; };
 		FFC1CEBE2BBB22AA00FD49B7 /* AsyncImageHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */; };
-		FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */; };
 		FFDB46862C022B5B005ECCF1 /* DatabaseManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDB46852C022B5B005ECCF1 /* DatabaseManagement.swift */; };
 		FFDB468A2C023D5E005ECCF1 /* testSceneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDB46892C023D5E005ECCF1 /* testSceneViewController.swift */; };
 		FFDBBA582BFF3F8C00CBEF79 /* LogIn.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFDBBA572BFF3F8C00CBEF79 /* LogIn.swift */; };
@@ -130,6 +130,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		FF28F0712C1AE1CA00B0CA5A /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		FF5C1C792BD2F99400C097E9 /* skinModelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = skinModelViewController.swift; sourceTree = "<group>"; };
 		FF5C1C7B2BD2FA1000C097E9 /* HapticChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticChart.swift; sourceTree = "<group>"; };
 		FF5C1C7D2BD2FA8E00C097E9 /* HapticDataPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticDataPoint.swift; sourceTree = "<group>"; };
@@ -174,6 +175,7 @@
 		FFB13AA32BAE183800A94673 /* DermaphoneUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DermaphoneUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		FFB13B402BAF034600A94673 /* testTexture.ahap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = testTexture.ahap; path = ../../FYPTestingTemp/FYPTestingTemp/testTexture.ahap; sourceTree = "<group>"; };
 		FFB13B422BB1D41500A94673 /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
+		FFC117DD2C07B30B003AC758 /* loginStudent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = loginStudent.swift; sourceTree = "<group>"; };
 		FFC1CE942BBB22A900FD49B7 /* ImageLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
 		FFC1CE952BBB22A900FD49B7 /* Capture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Capture.swift; sourceTree = "<group>"; };
 		FFC1CE962BBB22A900FD49B7 /* CaptureFoldersView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureFoldersView.swift; sourceTree = "<group>"; };
@@ -192,7 +194,6 @@
 		FFC1CEA62BBB22A900FD49B7 /* CaptureFolderState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CaptureFolderState.swift; sourceTree = "<group>"; };
 		FFC1CEA72BBB22A900FD49B7 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		FFC1CEA92BBB22A900FD49B7 /* AsyncImageHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncImageHelpers.swift; sourceTree = "<group>"; };
-		FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = photogrammetryAPI.swift; sourceTree = "<group>"; };
 		FFDB46852C022B5B005ECCF1 /* DatabaseManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManagement.swift; sourceTree = "<group>"; };
 		FFDB46892C023D5E005ECCF1 /* testSceneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testSceneViewController.swift; sourceTree = "<group>"; };
 		FFDBBA572BFF3F8C00CBEF79 /* LogIn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogIn.swift; sourceTree = "<group>"; };
@@ -283,6 +284,7 @@
 		FF662E442BF234E000FD9411 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FF28F0712C1AE1CA00B0CA5A /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -293,8 +295,6 @@
 				FF5C1C872BD310E400C097E9 /* skin3_tex0.png */,
 				FF5C1C812BD2FCBD00C097E9 /* HapticRendering.swift */,
 				FF5C1C7D2BD2FA8E00C097E9 /* HapticDataPoint.swift */,
-				FFF154C12BBC375700834F38 /* 3dmodelSkin2 */,
-				FFC1CEBF2BBB292800FD49B7 /* photogrammetryAPI.swift */,
 				FFB13A7F2BAE183600A94673 /* Dermaphone */,
 				FFB13A962BAE183800A94673 /* DermaphoneTests */,
 				FFB13AA02BAE183800A94673 /* DermaphoneUITests */,
@@ -316,6 +316,7 @@
 		FFB13A7F2BAE183600A94673 /* Dermaphone */ = {
 			isa = PBXGroup;
 			children = (
+				FFF154C12BBC375700834F38 /* 3dmodelSkin2 */,
 				FF5C1C7B2BD2FA1000C097E9 /* HapticChart.swift */,
 				FFC1CE932BBB22A900FD49B7 /* CaptureSample */,
 				FFB13A802BAE183600A94673 /* AppDelegate.swift */,
@@ -346,6 +347,7 @@
 				FFDBBA5D2BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.swift */,
 				FFDBBA5E2BFF4F7A00CBEF79 /* LesionLibraryTableViewCell.xib */,
 				FFDBBA572BFF3F8C00CBEF79 /* LogIn.swift */,
+				FFC117DD2C07B30B003AC758 /* loginStudent.swift */,
 				FF662E352BECD60F00FD9411 /* LinkConditionCell.swift */,
 				FF662E332BECD43300FD9411 /* LinkConditions.swift */,
 				FF5C1CAC2BE117CA00C097E9 /* NotesView.swift */,
@@ -414,7 +416,8 @@
 				FFF154C62BBC375700834F38 /* skin2.mtl */,
 				FFF154C72BBC375700834F38 /* skin2_tex0.png */,
 			);
-			path = 3dmodelSkin2;
+			name = 3dmodelSkin2;
+			path = ../3dmodelSkin2;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -726,6 +729,7 @@
 				FFF154E02BBC8C3100834F38 /* SkinCondition.swift in Sources */,
 				FF5C1CB12BE90CE300C097E9 /* gradientMethod.swift in Sources */,
 				FF662E342BECD43300FD9411 /* LinkConditions.swift in Sources */,
+				FFC117DE2C07B30B003AC758 /* loginStudent.swift in Sources */,
 				FFDBBA5A2BFF400400CBEF79 /* LesionLibrary.swift in Sources */,
 				FFDBBA582BFF3F8C00CBEF79 /* LogIn.swift in Sources */,
 				FFC1CEB12BBB22AA00FD49B7 /* TimerView.swift in Sources */,
@@ -737,7 +741,6 @@
 				FFC1CEB02BBB22AA00FD49B7 /* InfoPanelView.swift in Sources */,
 				FFC1CEAA2BBB22AA00FD49B7 /* ImageLoader.swift in Sources */,
 				FF662E862BF2ADD800FD9411 /* DataExtensions.swift in Sources */,
-				FFC1CEC02BBB292800FD49B7 /* photogrammetryAPI.swift in Sources */,
 				FFC1CEB32BBB22AA00FD49B7 /* CaptureSampleApp.swift in Sources */,
 				FFB13B432BB1D41500A94673 /* Haptics.swift in Sources */,
 				FFDB46862C022B5B005ECCF1 /* DatabaseManagement.swift in Sources */,

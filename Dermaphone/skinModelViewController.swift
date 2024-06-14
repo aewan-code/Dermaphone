@@ -11,6 +11,9 @@ import RealityKit
 import CoreHaptics
 import SwiftUI
 import simd
+import SceneKit.ModelIO
+import FirebaseFirestore
+import FirebaseStorage
 
 
 enum FilterType: String {
@@ -22,9 +25,13 @@ enum FilterType: String {
 }
 
 class skinmodel: UIViewController {
+    var activityIndicator: UIActivityIndicatorView!
+        var modelLoaded = false
+    @IBOutlet weak var saveButton: UIButton!
     var filter : FilterType = .none//save type
     var kVal : Int = 5
     var sigmaVal : Float = 1
+    var rotationScaleVal : Int = 4
     var condition : SkinCondition?
     var modelName: String?// = "Mesh"
     var modelFile : String?// = "testTransform.scn"
@@ -39,6 +46,8 @@ class skinmodel: UIViewController {
     var firstTimestamp : TimeInterval?
     var modelVertices : [SCNVector3]?
     
+    @IBOutlet weak var uiLine1: UIView!
+    @IBOutlet weak var uiLine2: UIView!
     var maxPoint : SCNVector3?
     var minPoint : SCNVector3?
     var filterMin : SCNVector3?
@@ -54,7 +63,7 @@ class skinmodel: UIViewController {
     @IBOutlet weak var RotateToggle: UIButton!
     @IBOutlet weak var SelectPivot: UIButton!
     @IBOutlet weak var recordHaptic: UIButton!
-    @IBOutlet weak var smoothButton: UIButton!
+//    @IBOutlet weak var smoothButton: UIButton!
     @IBOutlet weak var hapticMethod: UISegmentedControl!
 
 
@@ -69,6 +78,9 @@ class skinmodel: UIViewController {
     @IBOutlet weak var kSetting: UISlider!
     @IBOutlet weak var gradientHeightMap: UISegmentedControl!
     @IBOutlet weak var doneSettings: UIButton!
+    @IBOutlet weak var rotationScale: UISlider!
+    @IBOutlet weak var sharpnessToggle: UISegmentedControl!
+    @IBOutlet weak var intensitySkirt: UISlider!
     
     ///UI - Coordinate Mode
     @IBOutlet weak var zScale: UISlider!
@@ -134,56 +146,24 @@ class skinmodel: UIViewController {
     var minContinuous : Float?
     var maxTransient : Float?
     var minTransient : Float?
+    var maxHeight : Float?
+    var minHeight : Float?
     
     var enhancedMap : [[Float]]?
     var gradientEffect : Bool = false
+    var intensityScale : Float = 1
+    var sharpnessParam = false
     
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        hapticMethod.selectedSegmentIndex = 0
-        currentView = view
-        hapticTransient = true
-        scene = SCNScene(named: modelFile ?? "test2scene.scn")
-        
-        guard let baseNode = scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true) else {
-                    fatalError("Unable to find baseNode")
-                }
-        // Create and configure a haptic engine.
-        // Create a Cone Geometry
-         let coneGeometry = SCNCone(topRadius: 10, bottomRadius: 40, height: 10.0)
-        let gradient1 = gradientMethod()
-        
-        
-         // Optionally, set materials for the cone
-         let material = SCNMaterial()
-        material.diffuse.contents = UIColor.blue
-         coneGeometry.materials = [material]
-
-         // Create a Node with the Cone Geometry
-         let coneNode = SCNNode(geometry: coneGeometry)
-        if (modelName == "triangle"){
-            sceneView.scene?.rootNode.addChildNode(coneNode)
-            coneNode.position = SCNVector3(0, 0, 0)
-            print("ALEERA")
-          //  print(gradient1.extractHeightMap(from: coneNode.geometry!, gridSizeX: 30, gridSizeZ: 30))
-            print("hi")
+    var sourceType: LesionLibrary.SourceType?
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if !modelLoaded {
+            loadModel()
             
         }
-        else{
-            sceneView.scene?.rootNode.addChildNode(baseNode)
-            print("model name", modelName)
-        }
-      //
-        do {
-            engine = try CHHapticEngine()
-        } catch let error {
-            fatalError("Engine Creation Error: \(error)")
-        }
-        tempHaptics = Haptics(engine: engine)
-        
-        sceneView.scene = scene
-        
+    }
+    
+    private func setupSceneView() {
         sceneView.allowsCameraControl = false//add button to move the model
         sceneView.showsStatistics = false
         //sceneView.backgroundColor = UIColor.black
@@ -214,25 +194,59 @@ class skinmodel: UIViewController {
         sceneView.debugOptions = [.showCreases]
         //self.view = sceneView
         view.addSubview(sceneView)
-        sceneView.frame = CGRect(x: 0, y: notesButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (notesButton.frame.maxY + 10)) // Adjust the values as needed
-        originalOrientation = (sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)!.orientation)!
-        urgencylabel.text = self.condition?.urgency ?? ""
         
-        //Add to function
+      //  sceneView.frame = CGRect(x: 0, y: notesButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (notesButton.frame.maxY + 10)) // Adjust the values as needed
+        sceneView.frame = CGRect(x: 0, y: (urgencylabel.frame.maxY + 10), width: view.frame.width, height: view.frame.height - (urgencylabel.frame.maxY + 30))
+        
         view.bringSubviewToFront(RotateToggle)
         view.bringSubviewToFront(palpationOption)
         view.bringSubviewToFront(SelectPivot)
         view.bringSubviewToFront(recordHaptic)
+        view.bringSubviewToFront(saveButton)
         view.bringSubviewToFront(xLabel)
         view.bringSubviewToFront(yLabel)
         view.bringSubviewToFront(zLabel)
         view.bringSubviewToFront(xScale)
         view.bringSubviewToFront(yScale)
         view.bringSubviewToFront(zScale)
-        view.bringSubviewToFront(smoothButton)
         view.bringSubviewToFront(hapticsButton)
+        view.bringSubviewToFront(uiLine1)
+        view.bringSubviewToFront(uiLine2)
         view.bringSubviewToFront(settingsButton)
         view.bringSubviewToFront(hapticsSettings)
+        view.bringSubviewToFront(notesButton)
+        view.bringSubviewToFront(symptonsButton)
+        view.bringSubviewToFront(treatmentButton)
+        view.bringSubviewToFront(similarButton)
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        hapticMethod.selectedSegmentIndex = 0
+        currentView = view
+        hapticTransient = true
+        
+
+            //   scene = SCNScene(named: modelFile ?? "test2scene.scn")
+        let database = DatabaseManagement()
+
+        do {
+            engine = try CHHapticEngine()
+        } catch let error {
+            fatalError("Engine Creation Error: \(error)")
+        }
+        tempHaptics = Haptics(engine: engine)
+        
+       // sceneView.scene = scene
+      //  getModel()
+       // setupSceneView()
+        setupActivityIndicator()
+        
+       //originalOrientation = (sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)!.orientation)!
+        urgencylabel.text = self.condition?.urgency ?? ""
+        
+        //Add to function
+
         xLabel.isHidden = true
         yLabel.isHidden = true
         zLabel.isHidden = true
@@ -250,215 +264,35 @@ class skinmodel: UIViewController {
         hideAxes()
         navBar.title = "Skin Lesion: \(self.condition?.name ?? "")"
         navBar.titleView?.isHidden = false
-      /*  for image in magnifier{
-            view.bringSubviewToFront(image)
-        }
-        for descript in magnifierText{
-            view.bringSubviewToFront(descript)
-        }*/
-      //  allVertices = try extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
-     //   print("before")
-      //  print(allVertices)
-        //try print(extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
-        print("HELLO 1")
-        let point1 = SCNVector3(x: 0.0, y: 6.0, z: 0.0)
-        let indices: [Int32] = [
-            0, 1, 2 // Triangle with vertices 0, 1, 2
-        ]
-        let points = [point1, SCNVector3(x: 0.1, y: 5.7, z: 0.0), SCNVector3(x: -0.1, y: 5.7, z: 0.0), SCNVector3(x: 0.2, y: 6.2, z: 0.0)]
-       // let points2 = []
-        let gaussMethod = gradientMethod()
-        let testSource = SCNGeometrySource(vertices: points)
-        let testElement = SCNGeometryElement(indices: indices, primitiveType: .triangles)
-        let testShape = SCNGeometry(sources: [testSource], elements: [testElement])
-            // -0.1293827, y: 0.019729614, z: 0.14373043
-       // let url = URL.documentsDirectory.appendingPathComponent("coordinates.txt")
-      //  let url2 = URL.documentsDirectory.appendingPathComponent("tra.txt")
-        let url = URL.documentsDirectory.appendingPathComponent("smoothCloud.txt")
-       let url2 = URL.documentsDirectory.appendingPathComponent("transientCloud.txt")
-        let url3 = URL.documentsDirectory.appendingPathComponent("vertices.txt")
-        let url4 = URL.documentsDirectory.appendingPathComponent("vertices5.txt")
-        
-        do {
-            print("HELLO 2")
-            let fileHandle = try FileHandle(forReadingFrom: url)
-            let data = fileHandle.readDataToEndOfFile()
-            fileHandle.closeFile()
-            
-            // Assuming the file contains text data, you can convert it to a String
-            if let text = String(data: data, encoding: .utf8) {
-                print("Smoothed cloud")
-                smoothedCloud = convertTextToSCNVector3(text: text)
-                print(smoothedCloud?[0])
-                let yValues = smoothedCloud?.map { $0.y }
-                maxContinuous = yValues?.max()
-                minContinuous = yValues?.min()
-            } else {
-                print("Unable to convert data to text.")
-            }
-        } catch {
-            print("Error: \(error)")
-        }
-        
-        var readingUrl = url3
-        if self.modelName == "Basal Cell Carcinoma"{
-            readingUrl = url4
-        }
-        else if (self.modelName == "Test Model"){
-
-
-        }
-        do {
-            print("HELLO 3")
-            let fileHandle = try FileHandle(forReadingFrom: readingUrl)
-            let data = fileHandle.readDataToEndOfFile()
-            fileHandle.closeFile()
-            
-            // Assuming the file contains text data, you can convert it to a String
-            if let text = String(data: data, encoding: .utf8) {
-                print("Vertices")
-                modelVertices = convertTextToSCNVector3(text: text)
-              //  print(modelVertices)
-            let gradient = gradientMethod()
-                print("height map")
-                let height : [[Float]] = [[0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.25, 0.75, 1.25, 1.25, 0.75, 0.25, 0.0, 0.0], [0.0, 0.25, 1.25, 2.25, 3.25, 3.25, 2.25, 1.25, 0.25, 0.0], [0.0, 0.75, 2.25, 3.75, 4.75, 4.75, 3.75, 2.25, 0.75, 0.0], [0.0, 1.25, 3.25, 4.75, 5.0, 5.0, 4.75, 3.25, 1.25, 0.0], [0.25, 1.25, 3.25, 4.75, 5.0, 5.0, 4.75, 3.25, 1.25, 0.25], [0.0, 0.75, 2.25, 3.75, 4.75, 4.75, 3.75, 2.25, 0.75, 0.0], [0.0, 0.25, 1.25, 2.25, 3.25, 3.25, 2.25, 1.25, 0.25, 0.0], [0.0, 0.0, 0.25, 0.75, 1.25, 1.25, 0.75, 0.25, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0]]
-//gradient.createHeightMap(from: modelVertices ?? [], gridSize: 5)//113)
-                originalHeightMap = height
-                // Example usage
-                let sigma: Float = 1  // Adjust sigma as needed
-                let kernelSize = 7  // Ensure this is an odd number
-                let kernel = gradient.mexicanHatKernel(size: kernelSize, sigma: sigma)
-                enhancedMap = gradient.applyKernel(kernel: kernel, to: height)
-                //print(gradient.applySobelOperator(to: height))
-                print(enhancedMap)
-                
-                
-                maxPoint = modelVertices?.max(by: { $0.y < $1.y })
-                minPoint = modelVertices?.min(by: { $0.y < $1.y })
-             //   let yValues = smoothedCloud?.map { $0.y }
-             //   maxContinuous = yValues?.max()
-             //   minContinuous = yValues?.min()
-            } else {
-                print("Unable to convert data to text.")
-            }
-        } catch {
-            print("Error: \(error)")
-        }
-        
-        do {
-            print("HELLO 4")
-            let fileHandle = try FileHandle(forReadingFrom: url2)
-            let data = fileHandle.readDataToEndOfFile()
-            fileHandle.closeFile()
-            
-            // Assuming the file contains text data, you can convert it to a String
-            if let text = String(data: data, encoding: .utf8) {
-                print("transientCloud.txt:")
-                transientCloud = convertTextToSCNVector3(text: text)
-                let yValues = smoothedCloud?.map { $0.y }
-                print(transientCloud)
-                maxTransient = yValues?.max()
-                minTransient = yValues?.min()
-            } else {
-                print("Unable to convert data to text.")
-            }
-        } catch {
-            print("Error: \(error)")
-        }
-     /*   do {
-            try FileManager.default.removeItem(at: url)
-        }catch{
-            print("error deleting file")
-        }*/
         gradientEffect = false
-        DispatchQueue.global(qos: .background).async{
-           // let clouds = gaussMethod.smoothPointCloud(from: (self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry)!)
-          //  let allVertex = gaussMethod.storeExtractVertices(from: coneNode.geometry!)
+
+     /*  DispatchQueue.global(qos: .background).async{
             
             
             DispatchQueue.main.async{
-              //  print("smoothed:")
-            //    print(clouds.smoothed)
-            //    print("transient")
                 let gradient = gradientMethod()
-       /*         let gradient = gradientMethod()
-                let height : [[Float]] = [[0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.25, 0.75, 1.25, 1.25, 0.75, 0.25, 0.0, 0.0], [0.0, 0.25, 1.25, 2.25, 3.25, 3.25, 2.25, 1.25, 0.25, 0.0], [0.0, 0.75, 2.25, 3.75, 4.75, 4.75, 3.75, 2.25, 0.75, 0.0], [0.0, 1.25, 3.25, 4.75, 5.0, 5.0, 4.75, 3.25, 1.25, 0.0], [0.25, 1.25, 3.25, 4.75, 5.0, 5.0, 4.75, 3.25, 1.25, 0.25], [0.0, 0.75, 2.25, 3.75, 4.75, 4.75, 3.75, 2.25, 0.75, 0.0], [0.0, 0.25, 1.25, 2.25, 3.25, 3.25, 2.25, 1.25, 0.25, 0.0], [0.0, 0.0, 0.25, 0.75, 1.25, 1.25, 0.75, 0.25, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0]]
-//gradient.createHeightMap(from: allVertex ?? [], gridSize: 20)//113)
-                print("height map cone")
-                print(height)
-                let sigma: Float = 5  // Adjust sigma as needed
-                let kernelSize = 3  // Ensure this is an odd number
-                let kernel = gradient.mexicanHatKernel(size: kernelSize, sigma: sigma)
-                print("ricker wavelet")
-                print(gradient.applyKernel(kernel: kernel, to: height))
-                
-                print("gaussian")
-                print(gradient.applyGaussianToHeightMap(heightMap: height, k: 3, sigma: 5))
-                
-                print("gradient height map")
-                let temp = gradient.convertHeightMapToGradient(heightMap: height)
-                print(temp)
-                
-                print("second derivative")
-                print(gradient.convertHeightMapToGradient(heightMap: temp.0))
-                
-                print("sobel")
-                print(gradient.applySobelOperator(to: height))
-                
-                print("done")
-          //      print(clouds.transient)*/
                 print("CHECK HERE")
-               // let geom = gradient.createGeom()
-               // let node = SCNNode(geometry: geom)
-                let geom = self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)?.geometry
+                let geom = self.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.geometry
                 
                 let geom1 = gradient.createCustomCone(top: SCNVector3(0, 0.5, 0), radius: 0.5, slices: 20)
                 let coneNode = SCNNode(geometry: geom1)
                // self.scene?.rootNode.addChildNode(node)
-                let node = self.scene?.rootNode.childNode(withName: self.modelName ?? "Mesh", recursively: true)
+                let node = self.scene?.rootNode.childNode(withName: "Mesh", recursively: true)
                 let transformedVertices = gradient.getTransformedVertices(node: node ?? coneNode)
-                let heightMap = gradient.createHeightMap4(from: transformedVertices, resolutionX: 80, resolutionZ: 80)
+                var heightMap = gradient.createHeightMap4(from: transformedVertices, resolutionX: 80, resolutionZ: 80)
 
                 print("start")
                 print(heightMap)
-               // print(gradient.createHeightMap(from: geom ?? geom1, resolutionX: 128, resolutionZ: 128))
+                self.originalHeightMap = heightMap
+                self.enhancedMap = self.originalHeightMap ?? [[]]
+                self.maxHeight = findMaxElement(in: self.originalHeightMap ?? [[]])
+                self.minHeight = findMinElement(in: self.originalHeightMap ?? [[]])
                 print("done")
             }
-        }
-       //print(gaussMethod.smoothPointCloud(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
-      //  print(gaussMethod.smoothPointCloud(from: testShape))
-       // let clouds = gaussMethod.smoothPointCloud(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
-        //let smoothedCloud = clouds//.smoothed
-       // let transientCloud = clouds.transient
-      //  print(smoothedCloud)
-        print("gaussian")
-      //  print(transientCloud)
-        //might need to buffer the edges** like with image processing to ensure that those on the ends arent affected by not having nearby pointslet xAxis = SCNCylinder(radius: 0.001, height: 1)
-       // print(gaussMethod.averageValues(closestPoints: points, inputPoint: point1))
-       // print(gaussMethod.addNewAverage(inputPoint: point1, originalPointCloud: points, currentSmoothed: [], k: 3))
-        //edge case: k > length of pointcloud
-       // vertices = extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!)
-        
-        
-
-
-        //let normalisedKernel = smoothedModel.normaliseKernel(kernel)
-      //  let gaussianModel = smoothedModel.applyGaussianSmoothing(pointcloud: newCoordinates!, kernel: kernel)
-        
-      //  print(gaussianModel)
-       /* print("PRINTING NUMBER OF VERTICES")
-        print(scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry?.sources.first(where: { $0.semantic == .vertex }))
-        try print(extractVertices(from: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!))
-        try showVertices1(of: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, childNode: scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)! )
-        
-        print(scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.transform)
-        print(scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.worldTransform)*/
-       // try showVertices1(of: (scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.geometry)!, childNode: scene!.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)! )
-      //  print("check", vertices)
-    
-       // kernel = smoothedModel.generateKernel(kernelSize: 3, sigma: 0.5)
-        
+        }*/
         setFilters()
+        configureBasedOnSource()
+        
     }
     
     func setFilters(){
@@ -488,9 +322,9 @@ class skinmodel: UIViewController {
             //bug - without pressing anything - should go to the currently selected item
             UIAction(title : "None", handler : optionClosure),
             UIAction(title : "Gaussian", handler : optionClosure),
-            UIAction(title : "Weighted Average", handler : optionClosure),
-            UIAction(title : "Ricker Wavelet", handler : optionClosure),
-            UIAction(title : "Height Map", handler : optionClosure),
+            UIAction(title : "Second Derivative", handler : optionClosure),
+            UIAction(title : "Sobel Operator", handler : optionClosure),
+            UIAction(title : "Peak Detector", handler : optionClosure),
             
         ])
         
@@ -537,16 +371,16 @@ class skinmodel: UIViewController {
         return vectorList
     }
     
-    @IBAction func applyGaussian(_ sender: Any) {
+/*    @IBAction func applyGaussian(_ sender: Any) {
         if !gradientToggle{
             gradientToggle = true
-            smoothButton.tintColor = .green
+       //     smoothButton.tintColor = .green
         }
         else{
             gradientToggle = false
-            smoothButton.tintColor = .blue
+          //  smoothButton.tintColor = .blue
         }
-    }
+    }*/
   /*  func applyGaussian(){
 
     }*/
@@ -640,9 +474,9 @@ class skinmodel: UIViewController {
           //  vertexNode.position = vertex + parentNode.position // Adjusted position
             // Optionally, you can add some customization to the nodes
             vertexNode.position = SCNVector3Make(
-                vertex.x + (parentNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.position.x ?? 0),
-                vertex.y + (parentNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.position.y ?? 0),
-                vertex.z + (parentNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.position.z ?? 0)
+                vertex.x + (parentNode.childNode(withName: "Mesh", recursively: true)?.position.x ?? 0),
+                vertex.y + (parentNode.childNode(withName: "Mesh", recursively: true)?.position.y ?? 0),
+                vertex.z + (parentNode.childNode(withName: "Mesh", recursively: true)?.position.z ?? 0)
             )
 
             // Add the vertex node to the scene
@@ -698,21 +532,21 @@ class skinmodel: UIViewController {
         }
         // Perform hit test
                 let hitTestResults = sceneView.hitTest(location, options: nil)
-    
+        if recordHaptics{
+            let firstPoint = HapticDataPoint(intensity: 0, time: 0.0)
+            chartData?.append(firstPoint)
+            firstTimestamp = touch.timestamp
+            prevTimestamp = firstTimestamp
+        }
                 // Check if the desired node is touched
                 for result in hitTestResults {
                     
-                    if result.node.name == modelName{
+                    if result.node.name == "Mesh"{
                         print("surface normal", result.localNormal)
                         // Node is touched, perform desired action
                         let position = result.localCoordinates
                         //later remove so that first point is only added if continued onto touches moved
-                        if recordHaptics{
-                            let firstPoint = HapticDataPoint(intensity: 0, time: 0.0)
-                            chartData?.append(firstPoint)
-                            firstTimestamp = touch.timestamp
-                            prevTimestamp = firstTimestamp
-                        }
+
                         prevPoint = position.y
                         previousPosition = modelLocation(xPos: position.x, yPos: position.y, zPos: position.z)
                        // if !(hapticTransient ?? true) && hapticsToggle && !palpationToggle{
@@ -746,7 +580,7 @@ class skinmodel: UIViewController {
                             print(test)
                             guard let currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
 
-                            let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test)
+                            let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test, scale: self.rotationScaleVal)
                             let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
 
                             //print("New camera orientation:", cameraNode.rotation)
@@ -772,7 +606,7 @@ class skinmodel: UIViewController {
         
         // Check if the desired node is touched
         for result in hitTestResults {
-            if result.node.name == modelName {
+            if result.node.name == "Mesh" {
                 let position = result.localCoordinates
                 var height = result.localCoordinates.y
                 let tempGradient = gradientMethod()
@@ -841,7 +675,7 @@ class skinmodel: UIViewController {
                         var scaledValue = Float(0)  // HeightMap().scaleValue(value: approxPoint.y, maxValue: maxContinuous ?? 1, minValue: minContinuous ?? 0)
                         print("filter name", self.filter)
                         
-                        switch self.filter {
+                       /* switch self.filter {
                         case .none:
                             scaledValue = HeightMap().scaleValue(value: position.y, maxValue: maxPoint?.y ?? 1, minValue: minPoint?.y ?? 0)
                             height = scaledValue
@@ -922,7 +756,47 @@ class skinmodel: UIViewController {
                                 
                             }
                         
-                    }
+                    }*/
+                        let gridSize = enhancedMap?.endIndex
+                        print("grid size", gridSize)
+                        let gridPoint = mapPointToHeightMap(hitResult: result, gridSize: 80)//
+                        var sharpparameter : Float =  1
+                        var value : Float = 0
+                        if let map = self.enhancedMap {
+                            let (gridX, gridY) = gridPoint
+                            if gridY >= 0 && gridY < map.count && gridX >= 0 && gridX < map[gridY].count {
+                                value = map[gridY][gridX]
+                                print(value)
+                                if value.isNaN{
+                                    height = 0
+                                }
+                                else{
+                                    let scaledValue = HeightMap().scaleValue(value: value, maxValue: self.maxHeight ?? 1, minValue: self.minHeight ?? 0)
+                                    height = scaledValue
+                                }
+                                
+                                print("Height Map Height")
+                                print(height)
+                                if height.isNaN{
+                                    height = 0
+                                }
+                                height = height * self.intensityScale
+                                print(height)
+                                print("intensity", self.intensityScale)
+                                print(maxHeight)
+                                print(minHeight)
+                                } else {
+                                    // Handle the case where the point is outside the bounds of the height map
+                                    print("invalid access")// Returning NaN or another sentinel value to indicate an invalid access
+                                }
+                            if sharpnessParam{
+                                sharpparameter = value
+                                
+                            }
+                            
+                        }
+                        
+                        
 
                         
                         
@@ -951,7 +825,7 @@ class skinmodel: UIViewController {
                             //try tempHaptics?.playHeightHaptic(height:intensity*10)
                         
                         
-                            try tempHaptics?.playHeightHaptic(height:height)
+                            try tempHaptics?.playHeightHaptic(height:height, sharpness: sharpparameter)
                         
                         
                             //edge detection effect
@@ -967,7 +841,7 @@ class skinmodel: UIViewController {
                         print(test)
                         guard var currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
                         
-                        let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector,test)
+                        let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector,test, scale: self.rotationScaleVal)
                         let newTransform = SCNMatrix4Mult(currentTransform, rotationQuaternion)
                         sceneView.defaultCameraController.pointOfView?.transform = newTransform
                     }
@@ -1161,11 +1035,15 @@ class skinmodel: UIViewController {
         similarButton.isHidden = true
         recordHaptic.isHidden = true
         settingsButton.isHidden = true
-        smoothButton.isHidden = true
+        saveButton.isHidden = true
+   //     smoothButton.isHidden = true
         palpationOption.isHidden = true
         hapticMethod.isHidden = true
+        uiLine1.isHidden = true
+        uiLine2.isHidden = true
+
         sceneView.debugOptions = SCNDebugOptions(rawValue: 2048)//shows the grid
-        originalOrientation = sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.orientation
+        originalOrientation = sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation
         currentXVal = 0
         currentYVal = 0
         currentZVal = 0
@@ -1189,6 +1067,7 @@ class skinmodel: UIViewController {
         SelectPivot.isHidden = false
         hapticsButton.isHidden = false
         sceneView.debugOptions = [.showCreases]
+        
         notesButton.isHidden = false
         symptonsButton.isHidden = false
         treatmentButton.isHidden = false
@@ -1196,14 +1075,14 @@ class skinmodel: UIViewController {
         similarButton.isHidden = false
         recordHaptic.isHidden = false
         settingsButton.isHidden = false
-        smoothButton.isHidden = false
+  //      smoothButton.isHidden = false
         palpationOption.isHidden = false
-        hapticMethod.isHidden = false
+  //      hapticMethod.isHidden = false
         hideAxes()
-        
+        saveButton.isHidden = false
     }
     @IBAction func cancelPressed(_ sender: Any) {
-        sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.orientation = originalOrientation!
+        sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation = originalOrientation!
         showOriginalView()
     }
     
@@ -1234,7 +1113,7 @@ class skinmodel: UIViewController {
         let sinAngle = sin((Float.pi * newValue/180))
         let cosAngle = cos((Float.pi * newValue/180))
         let q = SCNQuaternion(sinAngle, 0, 0, cosAngle)
-        sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.localRotate(by: q)
+        sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
         
     }
     @IBAction func yChanged(_ sender: Any) {
@@ -1262,7 +1141,7 @@ class skinmodel: UIViewController {
         let cosAngle = cos((Float.pi * newValue/180))
         let q = SCNQuaternion(0, sinAngle, 0, cosAngle)
 
-        sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.localRotate(by: q)
+        sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
         
     }
     @IBAction func zChanged(_ sender: Any) {
@@ -1289,7 +1168,7 @@ class skinmodel: UIViewController {
         let sinAngle = sin((Float.pi * newValue/180))
         let cosAngle = cos((Float.pi * newValue/180))
         let q = SCNQuaternion(0, 0, sinAngle, cosAngle)
-        sceneView.scene?.rootNode.childNode(withName: modelName ?? "Mesh", recursively: true)?.localRotate(by: q)
+        sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.localRotate(by: q)
         
     }
     
@@ -1301,7 +1180,7 @@ class skinmodel: UIViewController {
         print(test)
         guard let currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
 
-        let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test)
+        let rotationQuaternion = SCNQuaternion.fromTwoVectors(surfaceNormalVector, test, scale: self.rotationScaleVal)
         let identityMatrix = SCNMatrix4Identity
         let blendFactor: Float = 0.1  // Adjust this to make the rotation more or less pronounced
         let interpolatedMatrix = interpolateMatrices(identityMatrix, rotationQuaternion, blendFactor: blendFactor)
@@ -1316,7 +1195,7 @@ class skinmodel: UIViewController {
         
         guard let currentTransform = sceneView.defaultCameraController.pointOfView?.transform else { return }
         
-        let rotationQuaternion = SCNQuaternion.fromTwoVectors(cameraFront, surfaceNormalVector)
+        let rotationQuaternion = SCNQuaternion.fromTwoVectors(cameraFront, surfaceNormalVector, scale: self.rotationScaleVal)
         let identityMatrix = SCNMatrix4Identity
         let blendFactor: Float = 0.1  // Adjust this to make the rotation more or less pronounced
         let interpolatedMatrix = interpolateTransforms(from: identityMatrix, to: rotationQuaternion, fraction: CGFloat(blendFactor))
@@ -1524,7 +1403,8 @@ class skinmodel: UIViewController {
         self.condition = model
         self.modelFile = model.modelFile
         self.modelName = model.modelName
-        scene = SCNScene(named: model.modelFile)//do i need to deallocate the current scene?
+        self.rotationScaleVal = model.rotationScale
+     //   scene = SCNScene(named: model.modelFile)//do i need to deallocate the current scene?
 
     
     }
@@ -1541,7 +1421,7 @@ class skinmodel: UIViewController {
     @IBAction func hapticsPressed(_ sender: Any) {
         if !hapticsToggle{
             hapticsToggle = true
-            hapticsButton.tintColor = .green
+            hapticsButton.tintColor = .systemPink
             print(palpationToggle)
             if let originalPosition = originalCameraPosition {
                 sceneView.defaultCameraController.pointOfView?.position = originalPosition
@@ -1585,8 +1465,8 @@ class skinmodel: UIViewController {
         guard let popUp = storyboard?.instantiateViewController(withIdentifier: "NotesView") as? NotesView else {
             return
         }
-        if let skinCondition = condition {
-            popUp.set(condition: skinCondition, type: "Notes")
+        if let skinCondition = self.condition {
+            popUp.set(condition: skinCondition, type: "Notes", user: sourceType ?? .consultant)
             
             //navigationController?.pushViewController(popUp, animated: true)
             navigationController?.present(popUp, animated: true, completion: nil)
@@ -1599,7 +1479,7 @@ class skinmodel: UIViewController {
             return
         }
         if let skinCondition = condition {
-            popUp.set(condition: skinCondition, type: "Symptoms")
+            popUp.set(condition: skinCondition, type: "Symptoms", user: sourceType ?? .consultant)
             
             //navigationController?.pushViewController(popUp, animated: true)
             navigationController?.present(popUp, animated: true, completion: nil)
@@ -1611,7 +1491,7 @@ class skinmodel: UIViewController {
             return
         }
         if let skinCondition = condition {
-            popUp.set(condition: skinCondition, type: "Treatment")
+            popUp.set(condition: skinCondition, type: "Treatment", user: sourceType ?? .consultant)
             
             //navigationController?.pushViewController(popUp, animated: true)
             navigationController?.present(popUp, animated: true, completion: nil)
@@ -1706,10 +1586,17 @@ class skinmodel: UIViewController {
     }
     @IBAction func changedSettings(_ sender: Any) {
         hapticsSettings.isHidden = true
+        rotationScaleVal = Int(rotationScale.value)
         if gradientHeightMap.selectedSegmentIndex == 0{
             self.gradientEffect = true
         }else{
             self.gradientEffect = false
+        }
+        self.intensityScale = intensitySkirt.value
+        if sharpnessToggle.selectedSegmentIndex == 0{
+            self.sharpnessParam = true
+        }else{
+            self.sharpnessParam = false
         }
         switch filterSetting.currentTitle{
         case "None":
@@ -1718,55 +1605,87 @@ class skinmodel: UIViewController {
             if self.gradientEffect{
                 let convertGradient = tempGradient.convertHeightMapToGradient(heightMap: originalHeightMap ?? [[]])
                 enhancedMap = convertGradient.0
-                
-                //HOW TO GET MAX VALUE?? -> DO I RETURN THE SCNVECTOR WITH X AND Z AS THE CONVERTED I AND J VALUES
+               
             }
             else{
                 enhancedMap = originalHeightMap ?? [[]]
             }
         case "Gaussian":
             self.filter = .gaussian
-            self.kVal = Int(kSetting.value)
-            self.sigmaVal = sigmaSetting.value
-            print(self.maxPoint)
-            print(self.minPoint)
-            print(self.modelVertices)
-            guard let maxPoint = self.maxPoint, let allVertices = self.modelVertices, let minPoint = self.minPoint else {
-                return
+            
+            if Int(kSetting.value) % 2 == 0{
+                self.kVal = Int(kSetting.value) + 1
+            }else{
+                self.kVal = Int(kSetting.value)
             }
+            self.sigmaVal = sigmaSetting.value
+          /*  guard let maxPoint = self.maxPoint, let allVertices = self.modelVertices, let minPoint = self.minPoint else {
+                return
+            }*/
             let tempGradient = gradientMethod()
-            self.filterMax = tempGradient.applyGaussianFilter(to: maxPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
+         /*   self.filterMax = tempGradient.applyGaussianFilter(to: maxPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
             
-            self.filterMin = tempGradient.applyGaussianFilter(to: minPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
+            self.filterMin = tempGradient.applyGaussianFilter(to: minPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)*/
+            let tempHeightMap = tempGradient.applyGaussianToHeightMap(heightMap: originalHeightMap ?? [[]], k: self.kVal, sigma: self.sigmaVal)
+            if self.gradientEffect{
+                let gradientGaussian = tempGradient.convertHeightMapToGradient(heightMap: tempHeightMap)
+                enhancedMap = gradientGaussian.0
+            }else{
+                enhancedMap = tempHeightMap
+            }
             
-            print(self.filterMax)
-            print(self.filterMin)
-        case "Weighted Average":
-            self.filter = .average
-            self.kVal = Int(kSetting.value)
+        case "Second Derivative":
+            //self.filter = .average
+            //self.kVal = Int(kSetting.value)
 
-            guard let maxPoint = self.maxPoint, let allVertices = self.modelVertices, let minPoint = self.minPoint else {
+          /*  guard let maxPoint = self.maxPoint, let allVertices = self.modelVertices, let minPoint = self.minPoint else {
                 return
             }
             let tempGradient = gradientMethod()
             self.filterMax = tempGradient.addNewAverage(inputPoint: maxPoint, originalPointCloud: allVertices, k: kVal)
 
-            self.filterMin = tempGradient.addNewAverage(inputPoint: minPoint, originalPointCloud: allVertices, k: kVal)
-        case "Ricker Wavelet":
+            self.filterMin = tempGradient.addNewAverage(inputPoint: minPoint, originalPointCloud: allVertices, k: kVal)*/
+            let tempGradient = gradientMethod()
+            let tempHeightMap = tempGradient.convertHeightMapToGradient(heightMap: originalHeightMap ?? [[]])
+            let secondTemp = tempGradient.convertHeightMapToGradient(heightMap: tempHeightMap.0)
+            enhancedMap = secondTemp.0
+            
+            
+        case "Sobel Operator":
             self.filter = .edge
             self.kVal = Int(kSetting.value)
             self.sigmaVal = sigmaSetting.value
-            guard let maxPoint = self.maxPoint, let allVertices = self.modelVertices, let minPoint = self.minPoint else {
+         /*   guard let maxPoint = self.maxPoint, let allVertices = self.modelVertices, let minPoint = self.minPoint else {
                 return
-            }
+            }*/
             let tempGradient = gradientMethod()
-            self.filterMax = tempGradient.applyMexicanHatFilter(to: maxPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
-            self.filterMin = tempGradient.applyMexicanHatFilter(to: minPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
-        case "Height Map":
+       /*     self.filterMax = tempGradient.applyMexicanHatFilter(to: maxPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)
+            self.filterMin = tempGradient.applyMexicanHatFilter(to: minPoint, sigma: sigmaVal, vertices: allVertices, kernelSize: kVal)*/
+            let tempHeightMap = tempGradient.applySobelOperator(to: originalHeightMap ?? [[]])
+            if self.gradientEffect{
+                let gradientGaussian = tempGradient.convertHeightMapToGradient(heightMap: tempHeightMap)
+                enhancedMap = gradientGaussian.0
+            }else{
+                enhancedMap = tempHeightMap
+            }
+        case "Peak Detector":
             self.filter = .heightMap
+            let tempGradient = gradientMethod()
+            let map = tempGradient.detectPeaks(heightMap: originalHeightMap ?? [[]])
+            enhancedMap = map
+        case "Default":
+           // self.filter = .heightMap
+            enhancedMap = self.originalHeightMap
+            
         default:
-            return
+            break
         }
+        self.maxHeight = findMaxElement(in: enhancedMap ?? [[]])
+        self.minHeight = findMinElement(in: enhancedMap ?? [[]])
+        print("map changed")
+  //      print(enhancedMap)
+        print(self.minHeight)
+        print(self.maxHeight)
     }
     func mapPointToHeightMap1(hitResult: SCNHitTestResult, gridSize: Int) -> (Int, Int) {
         let localPoint = hitResult.localCoordinates
@@ -1800,13 +1719,370 @@ class skinmodel: UIViewController {
 
         return (clampedGridX, clampedGridY)
     }
+    
+    private func configureBasedOnSource() {
+        print(sourceType)
+            switch sourceType {
+            case .consultant:
+                // Configuration for when coming from User Login
+                settingsButton.isHidden = false
+                SelectPivot.isHidden = false
+                recordHaptic.isHidden = false
+                saveButton.isHidden = false
+                hapticMethod.isHidden = true
+                print("Came from Consultant Login")
+            case .student:
+                // Configuration for when coming from Student Login
+               // settingsButton.isHidden = true
+                SelectPivot.isHidden = true
+                recordHaptic.isHidden = true
+                saveButton.isHidden = true
+                hapticMethod.isHidden = true
+                recordHaptic.isHidden = true
+                SelectPivot.isHidden = true
+                print("Came from Student Login")
+            case .none:
+                break
+            }
+        }
+    
+    func getModel(){
+        var fileUrl : String = ""
+        if self.condition?.isCreated == true{
+            guard let fileName = self.condition?.name else {
+                return //print error message
+            }
+            fileUrl = "models/" + fileName + ".usdz"
+        }else{
+            guard let fileName = self.condition?.name else {
+                return //print error message
+            }
+            fileUrl = "processingModels/" + fileName + ".usdz"
+        }
+        let database = DatabaseManagement()
+        let sceneURL = database.localFileURL(for: "scene.usdz", directory: .documentDirectory)
+        DispatchQueue.global(qos: .background).async{
+            database.downloadFile(from: fileUrl, to: sceneURL) { success in
+                DispatchQueue.main.async {
+                    if success {
+                        print("File was successfully downloaded to \(sceneURL)")
+                        if let loadedScene = self.loadScene(from: sceneURL) {
+                            // Directly use the loaded scene
+                            let root = loadedScene.rootNode
+                            print("Checking rootnode:", root)
+                            
+                            // Create and add ambient light to the scene
+                            let ambientLight = SCNLight()
+                            ambientLight.type = .ambient
+                            ambientLight.color = UIColor.white // Adjust the light color as needed
+                            let ambientLightNode = SCNNode()
+                            ambientLightNode.light = ambientLight
+                            root.addChildNode(ambientLightNode) // Adding light to the loaded scene's root
+                            
+                            // Set the loaded scene to the scene view
+                            self.sceneView.scene = loadedScene
+                            self.sceneView.allowsCameraControl = true
+                            print("ALEERA CHECK HERE")
+                            print(self.sceneView.scene)
+                            self.view.addSubview(self.sceneView)
+                        }
+                    } else {
+                        print("Failed to download the file.")
+                        print("ERROR: HANDLE THIS")
+                    }
+                }
+            }
+       }
+    }
+    
+    
+    
+    private func loadModel() {
+        showLoadingIndicator(true)
+        var fileUrl : String = ""
+        if self.condition?.isCreated == true{
+            guard let fileName = self.condition?.name else {
+                return //print error message
+            }
+            fileUrl = "models/" + fileName + ".usdz"
+        }else{
+            guard let fileName = self.condition?.name else {
+                return //print error message
+            }
+            fileUrl = "processingModels/" + fileName + ".usdz"
+        }
+        let database = DatabaseManagement()
+        let sceneURL = database.localFileURL(for: "scene.usdz", directory: .documentDirectory)
+        
+        database.downloadFile(from: fileUrl, to: sceneURL) { success in
+            DispatchQueue.main.async {
+                self.showLoadingIndicator(false)
+                if success {
+                    print("File was successfully downloaded to \(sceneURL)")
+                    self.scene = self.loadScene(from: sceneURL)
+                    guard let baseNode = self.scene?.rootNode.childNode(withName: "Mesh", recursively: true) else {
+                             fatalError("Unable to find baseNode")
+                            }
+                    self.sceneView.scene = self.scene
+                    self.sceneView.scene?.rootNode.addChildNode(baseNode)
+                    print("check node is there")
+                    print(self.sceneView.scene?.rootNode)
+                    self.setupSceneView()
+                    print((self.condition?.heightMap.isEmpty) != nil)
+                    print(self.condition?.heightMap)
+                    if ((self.condition?.heightMap.isEmpty) != nil){//if there is not a height map ( = [[]])
+                        self.hapticsButton.isEnabled = false
+                        print("hi")
+                        DispatchQueue.global(qos: .background).async{
+                            
+                                let gradient = gradientMethod()
+                                guard let node = self.scene?.rootNode.childNode(withName: "Mesh", recursively: true) else {
+                                    self.showError("Failed to get model geometry")
+                                    return
+                                    //print error message
+                                }
+                                let transformedVertices = gradient.getTransformedVertices(node: node)
+                            
+                                var heightMap = gradient.createHeightMap4(from: transformedVertices, resolutionX: 80, resolutionZ: 80)//dynamically change ratio
+                            // Determine bounds for normalization
+                            let (minX, maxX, minZ, maxZ) =  transformedVertices.reduce((Float.infinity, -Float.infinity, Float.infinity, -Float.infinity)) { (bounds, vertex) in
+                                (min(bounds.0, vertex.x), max(bounds.1, vertex.x), min(bounds.2, vertex.z), max(bounds.3, vertex.z))
+                            }
+                           // print(heightMap)
+                            print("original vertices", transformedVertices)
+                            var convertedBack = gradient.convertHeightMapToVertices(heightMap: heightMap, resolutionX: 80, resolutionZ: 80, minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ)
+                            print("height map", convertedBack)
+                            let difference = gradient.compareVertices(originalVertices: transformedVertices, heightMapVertices: convertedBack)
+                            
+                            print("difference in accuracy: ", difference)
+                            let minVal = findMinElement(in: heightMap)
+                            let maxVal = findMaxElement(in: heightMap)
+                            DispatchQueue.main.async{
+                                print("start")
+                                print(heightMap)
+                                self.originalHeightMap = heightMap
+                                self.enhancedMap = heightMap
+                                self.maxHeight = maxVal
+                                print("max", self.maxHeight)
+                                self.minHeight = minVal
+                                print("min", self.minHeight)
+                                self.hapticsButton.isEnabled = true
+                                
+                            }
+                            
+                        }
+                    }
+                    else{
+                  //      let gradient = gradientMethod()
+                 //       guard let node = self.scene?.rootNode.childNode(withName: "Mesh", recursively: true) else {
+                      //      self.showError("Failed to get model geometry")
+                        //    return
+                            //print error message
+                   //     }
+                   //     let transformedVertices = gradient.getTransformedVertices(node: node)
+                        self.originalHeightMap = self.condition?.heightMap
+                  //      let (minX, maxX, minZ, maxZ) =  transformedVertices.reduce((Float.infinity, -Float.infinity, Float.infinity, -Float.infinity)) { (bounds, vertex) in
+                  //          (min(bounds.0, vertex.x), max(bounds.1, vertex.x), min(bounds.2, vertex.z), max(bounds.3, vertex.z))
+                      //  }
+                 //       var convertedBack = gradient.convertHeightMapToVertices(heightMap: self.condition?.heightMap ?? [[]], resolutionX: 80, resolutionZ: 80, minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ)
+               //         let difference = gradient.compareVertices(originalVertices: transformedVertices, heightMapVertices: convertedBack)
+                //        print("difference in accuracy: ", difference)
+                    }
+                } else {
+                    print("Failed to download the file.")
+                    self.showError("Failed to download the model.")
+                }
+            }
+        }
+        
+        
+    }
+    func convertFlatArrayTo2D(flatArray: [Float], rows: Int, columns: Int) -> [[Float]] {
+        var heightMap = [[Float]]()
+        for row in 0..<rows {
+            let start = row * columns
+            let end = start + columns
+            let rowData = Array(flatArray[start..<end])
+            heightMap.append(rowData)
+        }
+        return heightMap
+    }
+    
+    func flattenHeightMap1(heightMap: [[Float]]) -> [Float] {
+        return heightMap.flatMap { $0 }
+    }
+    func flattenHeightMap(heightMap: [[Float]]) -> [Float] {
+        return heightMap.flatMap { row in row.map { $0.isNaN ? 0 : $0 } }
+    }
+
+    func storeHeightMap(heightMap: [[Float]]) -> ([Float], Int, Int) {
+        let flatArray = flattenHeightMap(heightMap: heightMap)
+        let rows = heightMap.count
+        let columns = heightMap.first?.count ?? 0
+
+        let data: [String: Any] = [
+            "flatHeightMap": flatArray,
+            "rows": rows,
+            "columns": columns
+        ]
+        return (flatArray, rows, columns)
+
+    }
+
+    
+    @IBAction func savePressed(_ sender: Any) {
+        //update model file values on database
+        let db = Firestore.firestore()
+        guard let conditionName = self.condition?.name else{
+            showError("Error saving file")
+            return
+        }
+        guard let map = self.enhancedMap else{
+            showError("Error saving haptic data")
+            return
+        }
+        let convertedMap = storeHeightMap(heightMap: map)
+        if self.condition?.isCreated == false{
+            //create model
+            //move file from processingmodels to models
+            let lesion = databaseCondition(name: conditionName, urgency: self.condition?.urgency, symptoms: self.condition?.symptoms, clinicalNotes: self.condition?.notes, treatment: self.condition?.treatment, heightmap: convertedMap.0, rows: convertedMap.1, columns: convertedMap.2, rotationScale: rotationScaleVal)
+            //also adding similar conditions logic
+            do {
+                try db.collection("models").document(conditionName).setData(from: lesion)
+            } catch let error {
+                print("Error writing skin lesion to Firestore: \(error)")
+                showError("Error saving file")
+                
+            }
+            DispatchQueue.global(qos: .background).async{
+                self.moveModelStorage()
+            }
+
+        }else{
+            //update existing values -> height map, rotationscale
+            let modelRef = db.collection("models").document(conditionName)
+            DispatchQueue.global(qos: .background).async {
+                // Set the "capital" field of the city 'DC'
+                modelRef.updateData([
+                    "heightmap": convertedMap.0,
+                    "rows": convertedMap.1,
+                    "columns": convertedMap.2,
+                    "rotationScale": self.rotationScaleVal
+                ]) { error in
+                    if let error = error {
+                        print("Error updating document: \(error.localizedDescription)")
+                        
+                    } else {
+                        print("Document successfully updated")
+                    }
+                }
+            }
+
+        }
+        
+    }
+    
+    func moveModelStorage(){
+        let storage = Storage.storage()
+        let storageRef = storage.reference()
+        // File located on disk
+   //     let localFile = URL(string: "path/to/image")!
+        let database = DatabaseManagement()
+        let localFile = database.localFileURL(for: "scene.usdz", directory: .documentDirectory)
+        let newUrl = "models/" + (self.condition?.name ?? "") + ".usdz"
+        // Create a reference to the file you want to upload
+        let modelRef = storageRef.child(newUrl)
+
+        // Upload the file to the path "images/rivers.jpg"
+        let uploadTask = modelRef.putFile(from: localFile, metadata: nil) { metadata, error in
+          guard let metadata = metadata else {
+            // Uh-oh, an error occurred!
+              self.showError("Error uploading model")
+            return
+          }
+          // Metadata contains file metadata such as size, content-type.
+          let size = metadata.size
+          // You can also access to download URL after upload.
+          modelRef.downloadURL { (url, error) in
+            guard let downloadURL = url else {
+              // Uh-oh, an error occurred!
+                self.showError("Error creating model")
+              return
+            }
+          }
+        }
+        
+        // Create a reference to the file to delete
+        let oldUrl = "processingModels/" + (self.condition?.name ?? "") + ".usdz"
+        let oldFileRef = storageRef.child(oldUrl)
+
+        oldFileRef.delete { error in
+            if let error = error {
+                self.showError("Error deleting old file: \(error.localizedDescription)")
+            } else {
+                print("Old file deleted successfully.")
+            }
+        }
+    }
+
+    func showLoadingIndicator(_ show: Bool) {
+        if show {
+            activityIndicator.startAnimating()
+        } else {
+            activityIndicator.stopAnimating()
+        }
+    }
+    
+    
+    private func setupActivityIndicator() {
+        activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator.center = self.view.center
+        view.addSubview(activityIndicator)
+    }
+    
+    func showError(_ message: String) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(alert, animated: true)
+        }
+    }
+    
+    func completeDownload(completion: Bool){
+        print("Download complete!")
+    }
+    
+
+    func loadScene(from localURL: URL) -> SCNScene? {
+        do {
+            let scene1 = try SCNScene(url: localURL, options: nil)
+            return scene1
+        } catch {
+            print("Failed to load SceneKit scene: \(error)")
+            return nil
+        }
+    }
+    
+    func notesViewController(_ controller: NotesView, didUpdateNotes notes: String, type: String) {
+        if type == "Notes"{
+            
+            self.condition?.notes = notes
+        }else if type == "Treatment"{
+            self.condition?.treatment = notes
+        }else if type == "Symptoms"{
+            self.condition?.symptoms = notes
+            print(self.condition?.symptoms)
+        }
+    
+
+    }
 
     
     
 }
 
 extension SCNQuaternion {
-    static func fromTwoVectors(_ vectorA: SCNVector3, _ vectorB: SCNVector3) -> SCNMatrix4  {
+    static func fromTwoVectors(_ vectorA: SCNVector3, _ vectorB: SCNVector3, scale : Int) -> SCNMatrix4  {
         // Calculate the cross product
         let axis = SCNVector3(
             x: vectorA.y * vectorB.z - vectorA.z * vectorB.y,
@@ -1826,7 +2102,7 @@ extension SCNQuaternion {
         var angle = acos(dotProduct / (magnitudeA * magnitudeB))
         print("angle", angle)
         print(dotProduct / (magnitudeA * magnitudeB))
-        angle = angle/4
+        angle = angle/Float(11-scale)
         if angle > 15.0 * Float.pi / 180.0{
             angle = 15.0 * Float.pi / 180.0
         }
@@ -1890,3 +2166,52 @@ extension SCNQuaternion {
 }
 
 
+
+func findMaxElement1(in array: [[Float]]) -> Float? {
+    // Flatten the 2D array to a 1D array and find the max element
+    return array.flatMap { $0 }.max()
+}
+func findMaxElement(in matrix: [[Float]]) -> Float? {
+    // Flatten the matrix and remove any NaN values
+    let flattenedArray = matrix.flatMap { $0 }.filter { !$0.isNaN }
+    // Return the maximum element, if any exist
+    return flattenedArray.max()
+}
+
+func findMinElement1(in array: [[Float]]) -> Float? {
+    // Flatten the 2D array to a 1D array and find the max element
+    return array.flatMap { $0 }.min()
+}
+
+func findMinElement(in matrix: [[Float]]) -> Float? {
+    // Flatten the matrix and remove any NaN values
+    let flattenedArray = matrix.flatMap { $0 }.filter { !$0.isNaN }
+    // Return the maximum element, if any exist
+    return flattenedArray.min()
+}
+
+public struct databaseCondition: Codable {
+
+  let name: String?
+  let urgency: String?
+  let symptoms: String?
+  let clinicalNotes: String?
+  let treatment: String?
+    let heightmap: [Float]?
+    let rows: Int?
+    let columns: Int?
+    let rotationScale: Int?
+
+  enum CodingKeys: String, CodingKey {
+    case name
+    case urgency
+    case symptoms
+    case clinicalNotes
+    case treatment
+      case heightmap
+      case rows
+      case columns
+      case rotationScale
+  }
+
+}

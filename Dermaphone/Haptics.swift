@@ -68,7 +68,7 @@ class Haptics{
                 fatalError("Player Creation Error: \(error)")
             }
     }
-    func playHeightHaptic(height: Float){
+    func playHeightHaptic(height: Float, sharpness : Float){
         let hapticDict = [
             CHHapticPattern.Key.pattern: [
                 [
@@ -82,7 +82,7 @@ class Haptics{
                             ],
                             [
                                 CHHapticPattern.Key.parameterID: CHHapticEvent.ParameterID.hapticSharpness,
-                                CHHapticPattern.Key.parameterValue: 1
+                                CHHapticPattern.Key.parameterValue: sharpness
                             ]
                         ]
                     ]

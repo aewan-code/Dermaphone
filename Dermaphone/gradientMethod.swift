@@ -606,6 +606,18 @@ class gradientMethod{
         return appliedKernel//highPassHeightMap
         
     }
+    func getGaussianSmoothed(heightMap: [[Float]], k: Int, sigma: Float) -> [[Float]]{
+        let kernel = self.gaussianKernel(size: k, sigma: sigma)
+        let appliedKernel = self.applyKernel(kernel: kernel, to: heightMap)
+        var highPassHeightMap = Array(repeating: Array(repeating: Float(0), count: heightMap.count), count: heightMap.count)
+        for i in 0..<(heightMap.count){
+            for j in 0..<(heightMap.count){
+                highPassHeightMap[i][j] = heightMap[i][j] - appliedKernel[i][j]
+            }
+        }
+        return highPassHeightMap
+        
+    }
     //returns gradient height map and min and max values to scale it by
     func convertHeightMapToGradient(heightMap : [[Float]])->([[Float]], Float, Float){
         var gradientHeightMap = Array(repeating: Array(repeating: Float(0), count: heightMap.count), count: heightMap.count)
@@ -921,11 +933,157 @@ class gradientMethod{
 
         return heightMap
     }
-
-
-
-
     
+    func fillNaNWithClosest(heightMap: inout [[Float]]) {
+        let rows = heightMap.count
+        let cols = heightMap[0].count
+        let directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  // Directions: right, down, left, up
+        var queue = Queue<(Int, Int, Float)>()
+
+        // Enqueue all non-NaN positions
+        for i in 0..<rows {
+            for j in 0..<cols {
+                if !heightMap[i][j].isNaN {
+                    queue.enqueue((i, j, heightMap[i][j]))
+                }
+            }
+        }
+
+        // Process the queue
+        while !queue.isEmpty {
+            if let (x, y, value) = queue.dequeue() {
+                for (dx, dy) in directions {
+                    let nx = x + dx
+                    let ny = y + dy
+                    // Ensure the new position is within bounds and is NaN
+                    if nx >= 0 && nx < rows && ny >= 0 && ny < cols && heightMap[nx][ny].isNaN {
+                        heightMap[nx][ny] = value  // Assign the closest non-NaN value
+                        queue.enqueue((nx, ny, value))  // Add the new position to the queue
+                    }
+                }
+            }
+        }
+    }
+
+    func convertHeightMapToGradient1(heightMap : [[Float]])->([[Float]], Float, Float){
+        var gradientHeightMap = Array(repeating: Array(repeating: Float(0), count: heightMap.count), count: heightMap.count)
+        var maxPoint : Float = 1
+        var minPoint : Float = 0
+        for i in 0..<(heightMap.count){
+            for j in 0..<(heightMap.count){
+                if i != 0 && j != 0 && i != (heightMap.count - 1) && j != (heightMap.count - 1){
+                    let gradient_x = (heightMap[i+1][j] - heightMap[i-1][j]) / 2
+                    let gradient_z = (heightMap[i][j+1] - heightMap[i][j-1]) / 2
+                    let gradientMag = (gradient_x * gradient_x) + (gradient_z * gradient_z)
+                    gradientHeightMap[i][j] = gradientMag
+                    if gradientMag < minPoint{
+                        minPoint = gradientMag
+                    }
+                    if gradientMag > maxPoint{
+                        maxPoint = gradientMag
+                    }
+                }
+            }
+        }
+        return (gradientHeightMap, minPoint, maxPoint)
+    }
+
+    func detectPeaks(heightMap: [[Float]])->[[Float]]{
+        let gaussmap = getGaussianSmoothed(heightMap: heightMap, k: 5, sigma: 1)//CHECK
+        var newHeightMap = Array(repeating: Array(repeating: Float(0), count: gaussmap.count), count: gaussmap.count)
+        //get gaussian
+        
+        for i in 0..<(gaussmap.count){
+            for j in 0..<(gaussmap.count){
+                var surrounding : [Float] = []
+                if i != 0 && j != 0 && i != (gaussmap.count - 1) && j != (gaussmap.count - 1){
+                    let gauss1 = gaussmap[i-1][j-1]
+                    let gauss2 = gaussmap[i-1][j]
+                    let gauss3 = gaussmap[i-1][j+1]
+                    let gauss4 = gaussmap[i][j-1]
+                    let gauss5 = gaussmap[i][j+1]
+                    let gauss6 = gaussmap[i+1][j-1]
+                    let gauss7 = gaussmap[i+1][j]
+                    let gauss8 = gaussmap[i+1][j+1]
+                    let current = gaussmap[i][j]
+                    if (gauss1 < current) && (gauss2 < current) && (gauss3 < current) && (gauss5 < current) && (gauss6 < current) && (gauss7 < current) && (gauss8 < current){
+                        print("peak")
+                        newHeightMap[i][j] = ((current - gauss1) + (current - gauss2) + (current - gauss3) + (current - gauss4) + (current - gauss5) + (current - gauss6) + (current - gauss7) + (current - gauss8))/Float(8)
+                    }
+                    else{
+                        print(i)
+                        print(j)
+                        newHeightMap[i][j] = 0
+                    }
+             //      let gradient_x = (heightMap[i+1][j] - heightMap[i-1][j]) / 2
+              //      let gradient_z = (heightMap[i][j+1] - heightMap[i][j-1]) / 2
+               //     let gradientMag = (gradient_x * gradient_x) + (gradient_z * gradient_z)
+                        //    newHeightMap[i][j] = gradientMag
+                }
+            }
+        }
+
+        //for each value, check if it is greater than k surrounding neighbours. if so, = average height difference, otherwise = 0
+        
+        return newHeightMap
+    }
+    
+    func convertHeightMapToVertices(heightMap: [[Float]], resolutionX: Int, resolutionZ: Int, minX: Float, maxX: Float, minZ: Float, maxZ: Float) -> [SCNVector3] {
+        var vertices: [SCNVector3] = []
+        
+        for ix in 0..<resolutionX {
+            for iz in 0..<resolutionZ {
+                let x = minX + Float(ix) / Float(resolutionX - 1) * (maxX - minX)
+                let z = minZ + Float(iz) / Float(resolutionZ - 1) * (maxZ - minZ)
+                print("x , z :", ix, iz)
+                var y = Float(0)
+             //   print(heightMap)
+                if heightMap[ix][iz] != Float.nan{
+                    y = heightMap[ix][iz]
+                }
+              //  let y = heightMap[ix][iz]
+                //if let y = heightMap[ix][iz]{
+                    vertices.append(SCNVector3(x, y, z))
+               // }
+               // else{
+                    
+              //  }
+                
+                
+            }
+        }
+        
+        return vertices
+    }
+
+    func compareVertices(originalVertices: [SCNVector3], heightMapVertices: [SCNVector3]) -> Float {
+        //guard originalVertices.count == heightMapVertices.count else {
+            print(originalVertices.count)
+            print(heightMapVertices.count)
+          //  fatalError("Vertex count mismatch")
+       // }
+        
+        var totalDifference: Float = 0.0
+        let numVertices = originalVertices.count
+        
+        for i in 0..<numVertices {
+            let originalVertex = originalVertices[i]
+            let heightMapVertex = closestDistance(points: heightMapVertices, inputPoint: originalVertex, k: 1)
+            
+          //  let heightMapVertex = heightMapVertices[i]
+            print(i)
+            
+            let difference = abs(originalVertex.y - heightMapVertex[0].y)
+            print(difference)
+            totalDifference += difference
+        }
+        
+        let averageDifference = totalDifference / Float(numVertices)
+        print("total difference: ", totalDifference)
+        print("average difference: ", averageDifference)
+        return averageDifference
+    }
+
 
 
 
@@ -936,5 +1094,22 @@ extension SCNVector3 {
         let glkMatrix = SCNMatrix4ToGLKMatrix4(transform)
         let glkVector = GLKMatrix4MultiplyVector3WithTranslation(glkMatrix, GLKVector3Make(x, y, z))
         return SCNVector3(glkVector.x, glkVector.y, glkVector.z)
+    }
+}
+
+struct Queue<Element> {
+    private var elements: [Element] = []
+
+    mutating func enqueue(_ element: Element) {
+        elements.append(element)
+    }
+
+    mutating func dequeue() -> Element? {
+        guard !elements.isEmpty else { return nil }
+        return elements.removeFirst()
+    }
+
+    var isEmpty: Bool {
+        elements.isEmpty
     }
 }

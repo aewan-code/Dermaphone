@@ -10,6 +10,7 @@ from firebase_admin import db
 from firebase_admin import storage
 from google.cloud import storage
 from google.oauth2 import service_account
+from firebase_admin import messaging
 
 # Fetch the service account key JSON file contents
 cred = credentials.Certificate('/Users/ace20/dermaphonePython/dermaphone-d131b-firebase-adminsdk-fki8j-fcab73ef6d.json')
@@ -26,6 +27,17 @@ OUTPUT_FOLDER = 'output'
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 # Generate a unique UUID
 download_token = str(uuid.uuid4())
+def send_topic_push(title, body):
+    topic = 'newModels'
+    message = messaging.Message(
+    notification=messaging.Notification(
+    title=title,
+    body=body
+  ),
+    topic=topic
+ )
+    messaging.send(message)
+
 
 def upload_file_with_token(file_path, destination_blob_name):
     blob = bucket.blob(destination_blob_name)
@@ -57,17 +69,17 @@ def create_unique_output_folder():
     return output_folder_path
 
 def run_process(command, cwd, output_folder, type):
-    # Start the subprocess
+    # Start subprocess
     process = subprocess.Popen(command, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-    # Monitor the output
+    # Monitor  output
     while True:
         output = process.stdout.readline()
         if output == '' and process.poll() is not None:
             break
         if output:
             print(output.strip())
-    process.wait()  # Ensure the process has finished
+    process.wait()  # Ensure process has finished
 
     # Check for errors
     if process.returncode != 0:
@@ -129,7 +141,6 @@ def upload():
         # Define the directory where usd.command is located
         directory = '/Applications/usdpython/'
 
-        # Path for the temporary shell script
         script_path = './temp_script.command'
 
 
@@ -139,7 +150,9 @@ def upload():
         echo "hi"
         """
         base_path = '/Applications/usdpython'
+        #usdz.command setup code at start
         script_content = f"""#!/bin/sh
+        
         BASEPATH="{base_path}"
         export PATH=$PATH:$BASEPATH/USD:$PATH:$BASEPATH/usdzconvert
         export PYTHONPATH=$PYTHONPATH:$BASEPATH/USD/lib/python
@@ -180,6 +193,7 @@ def upload():
 
                 storageName = "processingModels/" + senderName + '.usdz'
                 upload_file_with_token(usdzfile, storageName)
+                send_topic_push(senderName, "Model has been created")
                 return jsonify({'success': 'converted file', 'details': success}), 200
         except Exception as e:
             print(f"An error occurred when trying to run the script: {e}")

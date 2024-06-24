@@ -12,6 +12,7 @@ protocol NotesViewControllerDelegate: AnyObject {
 }
 
 class NotesView : UIViewController {
+    @IBOutlet weak var studentNotes: UIView!
     weak var delegate: NotesViewControllerDelegate?
     
     @IBOutlet weak var NotesTitle: UILabel!
@@ -35,8 +36,10 @@ class NotesView : UIViewController {
         switch usertype{
         case .consultant:
             editButton.isHidden = false
+            studentNotes.isHidden = true
         case .student:
             editButton.isHidden = true
+            studentNotes.isHidden = false
         
         case .none:
             editButton.isHidden = true

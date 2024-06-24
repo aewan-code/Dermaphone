@@ -1565,6 +1565,7 @@ class skinmodel: UIViewController {
                 recordHaptic.isHidden = true
                 SelectPivot.isHidden = true
                 print("Came from Student Login")
+                settingsButton.isHidden = true
             case .none:
                 break
             }
@@ -1669,14 +1670,14 @@ class skinmodel: UIViewController {
                             
                                 var heightMap = gradient.createHeightMap4(from: transformedVertices, resolutionX: 80, resolutionZ: 80)//dynamically change ratio
                             // Determine bounds for normalization
-                            let (minX, maxX, minZ, maxZ) =  transformedVertices.reduce((Float.infinity, -Float.infinity, Float.infinity, -Float.infinity)) { (bounds, vertex) in
-                                (min(bounds.0, vertex.x), max(bounds.1, vertex.x), min(bounds.2, vertex.z), max(bounds.3, vertex.z))
-                            }
+                    //        let (minX, maxX, minZ, maxZ) =  transformedVertices.reduce((Float.infinity, -Float.infinity, Float.infinity, -Float.infinity)) { (bounds, vertex) in
+                      //          (min(bounds.0, vertex.x), max(bounds.1, vertex.x), min(bounds.2, vertex.z), max(bounds.3, vertex.z))
+                      //      }
                            // print(heightMap)
-                            print("original vertices", transformedVertices)
-                            var convertedBack = gradient.convertHeightMapToVertices(heightMap: heightMap, resolutionX: 80, resolutionZ: 80, minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ)
-                            print("height map", convertedBack)
-                            let difference = gradient.compareVertices(originalVertices: transformedVertices, heightMapVertices: convertedBack)
+                   //         print("original vertices", transformedVertices)
+                    //        var convertedBack = gradient.convertHeightMapToVertices(heightMap: heightMap, resolutionX: 80, resolutionZ: 80, minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ)
+                       //     print("height map", convertedBack)
+                           // let difference = gradient.compareVertices(originalVertices: transformedVertices, heightMapVertices: convertedBack)
                             
                       //      print("difference in accuracy: ", difference)
                             let minVal = findMinElement(in: heightMap)

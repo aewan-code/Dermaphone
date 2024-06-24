@@ -748,6 +748,47 @@
                                 </subviews>
                                 <color key="backgroundColor" red="0.92407220602035522" green="0.78132683038711548" blue="0.94451195001602173" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tre-oI-UiA">
+                                <rect key="frame" x="39" y="469" width="315" height="300"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" text="-Rough, dry, or scaly" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="hEy-zu-Zwd">
+                                        <rect key="frame" x="0.0" y="58" width="315" height="242"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <color key="textColor" systemColor="labelColor"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                    </textView>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NgA-Vl-9XT">
+                                        <rect key="frame" x="184" y="15" width="54" height="35"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" title="Edit"/>
+                                        <connections>
+                                            <action selector="editTouched:" destination="Fxm-DI-V4H" eventType="touchUpInside" id="YVB-dF-7kd"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x82-U1-bmy">
+                                        <rect key="frame" x="243" y="15" width="61" height="35"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" title="Save"/>
+                                        <connections>
+                                            <action selector="editTouched:" destination="Fxm-DI-V4H" eventType="touchUpInside" id="2kp-M8-qic"/>
+                                            <action selector="saveButtonTapped:" destination="Fxm-DI-V4H" eventType="touchUpInside" id="sd7-Cm-aKk"/>
+                                        </connections>
+                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="My Notes" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CKl-ty-axY">
+                                        <rect key="frame" x="15" y="29" width="161" height="21"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" red="0.92407220599999995" green="0.78132683039999995" blue="0.94451194999999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="ey0-Si-dS4"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -756,6 +797,7 @@
                     <connections>
                         <outlet property="NotesTitle" destination="pXA-lN-Bhy" id="fpr-e1-SjG"/>
                         <outlet property="editButton" destination="G7b-g3-erC" id="P7N-mz-flE"/>
+                        <outlet property="studentNotes" destination="tre-oI-UiA" id="XOR-xj-VTZ"/>
                         <outlet property="text" destination="6Or-aE-fWR" id="PRT-wD-okr"/>
                     </connections>
                 </viewController>

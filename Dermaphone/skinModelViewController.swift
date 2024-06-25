@@ -64,6 +64,9 @@ class skinmodel: UIViewController {
     @IBOutlet weak var SelectPivot: UIButton!
     @IBOutlet weak var recordHaptic: UIButton!
 //    @IBOutlet weak var smoothButton: UIButton!
+    @IBOutlet var closeinfo: UIView!
+    @IBOutlet weak var hapticinfo: UIButton!
+    @IBOutlet weak var hapticinfoview: UIView!
     @IBOutlet weak var hapticMethod: UISegmentedControl!
 
 
@@ -188,14 +191,14 @@ class skinmodel: UIViewController {
                 return node.position
             }
         )]
-      //  originalCameraPosition = cameraNode.position
+        //  originalCameraPosition = cameraNode.position
         originalCameraPosition = sceneView.defaultCameraController.pointOfView?.position
         originalCameraOrientation = sceneView.defaultCameraController.pointOfView?.orientation
         sceneView.debugOptions = [.showCreases]
         //self.view = sceneView
         view.addSubview(sceneView)
         
-      //  sceneView.frame = CGRect(x: 0, y: notesButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (notesButton.frame.maxY + 10)) // Adjust the values as needed
+        //  sceneView.frame = CGRect(x: 0, y: notesButton.frame.maxY + 10, width: view.frame.width, height: view.frame.height - (notesButton.frame.maxY + 10)) // Adjust the values as needed
         sceneView.frame = CGRect(x: 0, y: (urgencylabel.frame.maxY + 10), width: view.frame.width, height: view.frame.height - (urgencylabel.frame.maxY + 30))
         
         view.bringSubviewToFront(RotateToggle)
@@ -212,12 +215,16 @@ class skinmodel: UIViewController {
         view.bringSubviewToFront(hapticsButton)
         view.bringSubviewToFront(uiLine1)
         view.bringSubviewToFront(uiLine2)
+        view.bringSubviewToFront(hapticinfo)
+        
         view.bringSubviewToFront(settingsButton)
         view.bringSubviewToFront(hapticsSettings)
         view.bringSubviewToFront(notesButton)
         view.bringSubviewToFront(symptonsButton)
         view.bringSubviewToFront(treatmentButton)
         view.bringSubviewToFront(similarButton)
+        view.bringSubviewToFront(hapticinfoview)
+        
     }
 
     override func viewDidLoad() {
@@ -254,6 +261,7 @@ class skinmodel: UIViewController {
         yScale.isHidden = true
         zScale.isHidden = true
         hapticsSettings.isHidden = true
+        hapticinfoview.isHidden = true
 
         cancelEdit.isHidden = true
         completeEdit.isHidden = true
@@ -1555,6 +1563,7 @@ class skinmodel: UIViewController {
                 saveButton.isHidden = false
                 hapticMethod.isHidden = true
                 print("Came from Consultant Login")
+                hapticinfo.isHidden = false
             case .student:
                 // Configuration for when coming from Student Login
                // settingsButton.isHidden = true
@@ -1565,6 +1574,7 @@ class skinmodel: UIViewController {
                 recordHaptic.isHidden = true
                 SelectPivot.isHidden = true
                 print("Came from Student Login")
+                hapticinfo.isHidden = true
                 settingsButton.isHidden = true
             case .none:
                 break
@@ -1684,7 +1694,7 @@ class skinmodel: UIViewController {
                             let maxVal = findMaxElement(in: heightMap)
                             DispatchQueue.main.async{
                                 print("start")
-                                print(heightMap)
+                           //     print(heightMap)
                                 self.originalHeightMap = heightMap
                                 self.enhancedMap = heightMap
                                 self.maxHeight = maxVal
@@ -1889,7 +1899,15 @@ class skinmodel: UIViewController {
     
 
     }
-
+    
+    @IBAction func viewinfo(_ sender: Any) {
+        hapticinfoview.isHidden = false
+    }
+    
+    @IBAction func closeinfopressed(_ sender: Any) {
+        hapticinfoview.isHidden = true
+    }
+    
     
     
 }

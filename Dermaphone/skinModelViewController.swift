@@ -885,6 +885,7 @@ class skinmodel: UIViewController {
         hapticMethod.isHidden = true
         uiLine1.isHidden = true
         uiLine2.isHidden = true
+        hapticinfo.isHidden = true
 
         sceneView.debugOptions = SCNDebugOptions(rawValue: 2048)//shows the grid
         originalOrientation = sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation
@@ -924,6 +925,7 @@ class skinmodel: UIViewController {
   //      hapticMethod.isHidden = false
         hideAxes()
         saveButton.isHidden = false
+        hapticinfo.isHidden = false
     }
     @IBAction func cancelPressed(_ sender: Any) {
         sceneView.scene?.rootNode.childNode(withName: "Mesh", recursively: true)?.orientation = originalOrientation!

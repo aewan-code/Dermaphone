@@ -30,8 +30,8 @@
             filePath = "Dermaphone/skinModelViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1791"
-            endingLineNumber = "1791"
+            startingLineNumber = "1793"
+            endingLineNumber = "1793"
             landmarkName = "savePressed(_:)"
             landmarkType = "7">
          </BreakpointContent>

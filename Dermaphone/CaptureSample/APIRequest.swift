@@ -35,7 +35,8 @@ struct APIRequest {
         UIImage(named: "IMG_3918")!
     ]
     init(endpoint: String){
-        let resourceString = "http://192.168.0.38:8000/\(endpoint)"
+        let resourceString = "https://ace20-f8b7a9b5-ae05-4c0a-b574-95fd6734eb81.socketxp.com/upload"
+    //http://192.168.0.38:8000/\(endpoint)"
         guard let resourceURL = URL(string: resourceString) else {fatalError()}
         
         self.resourceURL = resourceURL
